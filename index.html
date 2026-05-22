@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drafta — Markdown editor for developers</title>
+  <meta name="description" content="A native macOS Markdown editor built for developers. CodeMirror 6, syntax highlighting for 50+ languages, iCloud sync, custom themes. No Electron. No subscription.">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0e0f11;
+      --bg-2:      #13141a;
+      --bg-3:      #1a1b1f;
+      --bg-4:      #212228;
+      --border:    rgba(255,255,255,0.07);
+      --accent:    #6c9cff;
+      --accent-dim: rgba(108,156,255,0.15);
+      --text:      #e2e4ea;
+      --muted:     #6b7080;
+      --muted-2:   #3d4150;
+
+      --syn-keyword:  #cf8e6d;
+      --syn-string:   #6aab73;
+      --syn-number:   #2aacb8;
+      --syn-fn:       #6c9cff;
+      --syn-type:     #c77dbb;
+      --syn-comment:  #586069;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+      height: 60px;
+      background: rgba(14,15,17,0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'JetBrains Mono', 'Fira Code', Menlo, monospace;
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: default;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .btn-ghost:hover { border-color: var(--accent); background: var(--accent-dim); }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      background: var(--accent);
+      color: #0e0f11;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 10px;
+      text-decoration: none;
+      cursor: default;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    /* ─── HERO ─── */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 64px;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 96px 48px 80px;
+      min-height: calc(100vh - 60px);
+    }
+
+    .hero-text h1 {
+      font-size: clamp(32px, 4vw, 52px);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 20px;
+    }
+
+    .hero-text h1 em {
+      font-style: normal;
+      color: var(--accent);
+    }
+
+    .hero-text p {
+      font-size: 18px;
+      color: var(--muted);
+      line-height: 1.65;
+      max-width: 440px;
+      margin-bottom: 36px;
+    }
+
+    .hero-cta {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .beta-note {
+      font-size: 13px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .beta-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    /* ─── CSS APP MOCKUP ─── */
+    .app-window {
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.08),
+        0 40px 100px rgba(0,0,0,0.8),
+        0 20px 40px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      font-size: 12px;
+      background: var(--bg-2);
+      user-select: none;
+    }
+
+    .window-chrome {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      padding: 12px 16px;
+      background: #0d0e10;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      flex-shrink: 0;
+    }
+
+    .traffic-lights {
+      display: flex;
+      gap: 7px;
+      margin-right: 16px;
+    }
+    .tl { width: 12px; height: 12px; border-radius: 50%; }
+    .tl-r { background: #ff5f57; }
+    .tl-y { background: #ffbd2e; }
+    .tl-g { background: #28c840; }
+
+    .window-title {
+      flex: 1;
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    .window-body {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      height: 380px;
+    }
+
+    /* Sidebar */
+    .w-sidebar {
+      width: 175px;
+      flex-shrink: 0;
+      background: #0d0e10;
+      border-right: 1px solid rgba(255,255,255,0.05);
+      padding: 12px 0;
+      font-size: 12px;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .sb-app-name {
+      padding: 4px 14px 10px;
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--text);
+      letter-spacing: 0.01em;
+    }
+    .sb-section {
+      padding: 0 0 8px;
+    }
+    .sb-label {
+      padding: 4px 14px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--muted-2);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .sb-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 14px;
+      color: var(--muted);
+      cursor: default;
+    }
+    .sb-item.active { background: rgba(108,156,255,0.1); color: var(--accent); border-radius: 0; }
+    .sb-item.active { border-left: 2px solid var(--accent); padding-left: 12px; }
+    .sb-icon { font-size: 11px; opacity: 0.7; width: 14px; text-align: center; }
+    .sb-indent { padding-left: 30px; }
+
+    /* Note list */
+    .w-notelist {
+      width: 210px;
+      flex-shrink: 0;
+      background: var(--bg-2);
+      border-right: 1px solid rgba(255,255,255,0.05);
+      overflow-y: auto;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .nl-header {
+      padding: 10px 14px 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      position: sticky;
+      top: 0;
+      background: var(--bg-2);
+    }
+    .nl-note {
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      cursor: default;
+    }
+    .nl-note.selected { background: rgba(108,156,255,0.08); }
+    .nl-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .nl-preview {
+      font-size: 11px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 3px;
+    }
+    .nl-date { font-size: 10px; color: var(--muted-2); }
+
+    /* Editor pane */
+    .w-editor {
+      flex: 1;
+      background: var(--bg);
+      padding: 12px 0;
+      overflow: hidden;
+      font-family: 'JetBrains Mono', 'Fira Code', Menlo, 'Courier New', monospace;
+      font-size: 11.5px;
+      line-height: 1.7;
+    }
+    .ed-line {
+      display: flex;
+      padding: 0 14px;
+    }
+    .ed-ln {
+      width: 28px;
+      flex-shrink: 0;
+      text-align: right;
+      color: var(--muted-2);
+      margin-right: 14px;
+      font-size: 10.5px;
+      user-select: none;
+    }
+    .ed-content { color: var(--text); white-space: pre; }
+
+    .ed-line.active-line { background: rgba(255,255,255,0.025); }
+    .syn-h1 { color: var(--text); font-weight: 700; font-size: 13px; }
+    .syn-h2 { color: var(--text); font-weight: 600; }
+    .syn-kw { color: var(--syn-keyword); }
+    .syn-str { color: var(--syn-string); }
+    .syn-fn { color: var(--syn-fn); }
+    .syn-type { color: var(--syn-type); }
+    .syn-num { color: var(--syn-number); }
+    .syn-comment { color: var(--syn-comment); }
+    .syn-bold { color: var(--text); font-weight: 600; }
+    .syn-code { color: var(--syn-keyword); background: rgba(255,255,255,0.05); border-radius: 3px; padding: 0 3px; }
+    .syn-punct { color: var(--muted-2); }
+    .cursor { display: inline-block; width: 2px; height: 1em; background: var(--accent); vertical-align: text-bottom; animation: blink 1.1s step-end infinite; margin-left: 1px; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    /* ─── SECTION COMMON ─── */
+    section { padding: 96px 48px; }
+    .section-inner { max-width: 1100px; margin: 0 auto; }
+    .section-label {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(26px, 3vw, 38px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 16px;
+      line-height: 1.2;
+    }
+    .section-sub {
+      font-size: 17px;
+      color: var(--muted);
+      max-width: 560px;
+      line-height: 1.65;
+    }
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ─── FEATURES ─── */
+    .features-section { background: var(--bg); }
+    .features-header { margin-bottom: 56px; }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .feature-card {
+      padding: 32px 28px;
+      background: var(--bg-2);
+      transition: background 0.2s;
+    }
+    .feature-card:hover { background: var(--bg-3); }
+
+    .feature-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--accent-dim);
+      border: 1px solid rgba(108,156,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      font-size: 18px;
+    }
+    .feature-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .feature-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* SVG icons */
+    .icon-svg { width: 20px; height: 20px; stroke: var(--accent); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ─── MANIFESTO ─── */
+    .manifesto-section { background: var(--bg); }
+    .manifesto-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+    .manifesto-text {
+      font-size: 20px;
+      line-height: 1.75;
+      color: var(--muted);
+    }
+    .manifesto-text strong { color: var(--text); font-weight: 600; }
+    .manifesto-text .highlight { color: var(--accent); }
+
+    .manifesto-specs {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .spec-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+    .spec-row:last-child { border-bottom: none; }
+    .spec-key { color: var(--muted); }
+    .spec-val { color: var(--text); font-weight: 500; }
+    .spec-val.good { color: var(--syn-string); }
+
+    /* ─── PRICING ─── */
+    .pricing-section { background: var(--bg); }
+    .pricing-card {
+      max-width: 440px;
+      margin: 48px auto 0;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px;
+      background: var(--bg-2);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .pricing-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--syn-type));
+    }
+    .pricing-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      background: var(--accent-dim);
+      border: 1px solid rgba(108,156,255,0.25);
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .pricing-price {
+      font-size: 52px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.03em;
+      margin-bottom: 4px;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .pricing-price span { font-size: 24px; vertical-align: super; font-weight: 400; color: var(--muted); }
+    .pricing-billing {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .pricing-onetime {
+      font-size: 13px;
+      color: var(--muted-2);
+      margin-bottom: 32px;
+    }
+    .pricing-list {
+      list-style: none;
+      text-align: left;
+      margin-bottom: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .pricing-list li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--text);
+    }
+    .check { color: var(--syn-string); font-size: 16px; }
+    .pricing-note {
+      font-size: 12px;
+      color: var(--muted-2);
+      margin-top: 16px;
+    }
+
+    /* ─── ROADMAP ─── */
+    .roadmap-section { background: var(--bg); }
+    .roadmap-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-top: 48px;
+    }
+    .roadmap-item {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      background: var(--bg-2);
+    }
+    .roadmap-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .status-dot.done { background: var(--syn-string); }
+    .status-dot.progress { background: var(--syn-keyword); }
+    .status-dot.planned { background: var(--muted-2); }
+    .status-label { font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); }
+    .roadmap-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    .roadmap-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 48px;
+    }
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+    .footer-logo {
+      font-family: 'JetBrains Mono', 'Fira Code', Menlo, monospace;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .footer-meta {
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .footer-links {
+      display: flex;
+      gap: 20px;
+    }
+    .footer-links a {
+      font-size: 13px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--text); }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 900px) {
+      nav { padding: 0 24px; }
+      .hero { grid-template-columns: 1fr; gap: 48px; padding: 64px 24px; min-height: auto; }
+      .app-window { display: none; }
+      section { padding: 64px 24px; }
+      .features-grid { grid-template-columns: 1fr 1fr; }
+      .manifesto-inner { grid-template-columns: 1fr; gap: 40px; }
+      .roadmap-grid { grid-template-columns: 1fr 1fr; }
+      footer { padding: 40px 24px; }
+      .footer-inner { flex-direction: column; text-align: center; }
+    }
+
+    @media (max-width: 600px) {
+      nav { padding: 0 20px; }
+      .hero { padding: 48px 20px; }
+      .hero-text h1 { font-size: 28px; }
+      section { padding: 48px 20px; }
+      .features-grid { grid-template-columns: 1fr; }
+      .roadmap-grid { grid-template-columns: 1fr; }
+      .pricing-card { padding: 28px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── NAV ─── -->
+<nav>
+  <a class="nav-logo" href="#">Drafta</a>
+  <div class="nav-right">
+    <a class="btn-ghost" href="#">
+      <svg class="icon-svg" style="width:14px;height:14px" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download for macOS
+    </a>
+  </div>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section style="padding: 0; background: var(--bg);">
+  <div class="hero">
+    <div class="hero-text">
+      <p class="section-label">macOS · Native · Lightweight</p>
+      <h1>A Markdown editor built for developers.<br><em>By a developer.</em></h1>
+      <p>CodeMirror 6 inside a native macOS shell. Syntax highlighting for 50+ languages, split preview, custom themes, and your notes stored as plain Markdown files — forever readable, no lock-in.</p>
+      <div class="hero-cta">
+        <a class="btn-primary" href="#">
+          <svg class="icon-svg" style="width:16px;height:16px;stroke:#0e0f11" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download for macOS
+        </a>
+        <div class="beta-note">
+          <span class="beta-badge">Beta</span>
+          Free during beta · macOS 14+
+        </div>
+      </div>
+    </div>
+
+    <!-- CSS App Window Mockup -->
+    <div class="app-window">
+      <div class="window-chrome">
+        <div class="traffic-lights">
+          <div class="tl tl-r"></div>
+          <div class="tl tl-y"></div>
+          <div class="tl tl-g"></div>
+        </div>
+        <div class="window-title">Drafta</div>
+      </div>
+      <div class="window-body">
+
+        <!-- Sidebar -->
+        <div class="w-sidebar">
+          <div class="sb-app-name">Drafta</div>
+          <div class="sb-section">
+            <div class="sb-item active">
+              <span class="sb-icon">◈</span> All Notes
+            </div>
+            <div class="sb-item">
+              <span class="sb-icon">⌘</span> Pinned
+            </div>
+          </div>
+          <div class="sb-section">
+            <div class="sb-label">Notebooks</div>
+            <div class="sb-item">
+              <span class="sb-icon">▸</span> work
+            </div>
+            <div class="sb-item sb-indent">
+              <span class="sb-icon">↳</span> snippets
+            </div>
+            <div class="sb-item sb-indent">
+              <span class="sb-icon">↳</span> notes
+            </div>
+            <div class="sb-item">
+              <span class="sb-icon">▸</span> personal
+            </div>
+          </div>
+          <div class="sb-section">
+            <div class="sb-label">Tags</div>
+            <div class="sb-item"><span class="sb-icon">#</span> rust</div>
+            <div class="sb-item"><span class="sb-icon">#</span> python</div>
+            <div class="sb-item"><span class="sb-icon">#</span> ops</div>
+          </div>
+        </div>
+
+        <!-- Note list -->
+        <div class="w-notelist">
+          <div class="nl-header">All Notes</div>
+          <div class="nl-note selected">
+            <div class="nl-title">Getting started</div>
+            <div class="nl-preview">Install Drafta on your Mac...</div>
+            <div class="nl-date">2 min ago</div>
+          </div>
+          <div class="nl-note">
+            <div class="nl-title">Python snippets</div>
+            <div class="nl-preview">def hello(): print("Hello...</div>
+            <div class="nl-date">Yesterday</div>
+          </div>
+          <div class="nl-note">
+            <div class="nl-title">Deployment notes</div>
+            <div class="nl-preview">Cloudflare Pages, push main...</div>
+            <div class="nl-date">3 days ago</div>
+          </div>
+          <div class="nl-note">
+            <div class="nl-title">API design</div>
+            <div class="nl-preview">REST vs GraphQL tradeoffs...</div>
+            <div class="nl-date">Last week</div>
+          </div>
+        </div>
+
+        <!-- Editor -->
+        <div class="w-editor">
+          <div class="ed-line"><span class="ed-ln">1</span><span class="ed-content syn-h1"># Getting started</span></div>
+          <div class="ed-line"><span class="ed-ln">2</span><span class="ed-content">&nbsp;</span></div>
+          <div class="ed-line active-line"><span class="ed-ln">3</span><span class="ed-content">Install <span class="syn-bold">Drafta</span> on your Mac.<span class="cursor"></span></span></div>
+          <div class="ed-line"><span class="ed-ln">4</span><span class="ed-content">&nbsp;</span></div>
+          <div class="ed-line"><span class="ed-ln">5</span><span class="ed-content syn-punct">```python</span></div>
+          <div class="ed-line"><span class="ed-ln">6</span><span class="ed-content"><span class="syn-kw">def</span> <span class="syn-fn">hello</span>():</span></div>
+          <div class="ed-line"><span class="ed-ln">7</span><span class="ed-content">    <span class="syn-fn">print</span>(<span class="syn-str">"Hello, world!"</span>)</span></div>
+          <div class="ed-line"><span class="ed-ln">8</span><span class="ed-content syn-punct">```</span></div>
+          <div class="ed-line"><span class="ed-ln">9</span><span class="ed-content">&nbsp;</span></div>
+          <div class="ed-line"><span class="ed-ln">10</span><span class="ed-content syn-h2">## Features</span></div>
+          <div class="ed-line"><span class="ed-ln">11</span><span class="ed-content">&nbsp;</span></div>
+          <div class="ed-line"><span class="ed-ln">12</span><span class="ed-content">- Split preview with <span class="syn-code">⌘⌥P</span></span></div>
+          <div class="ed-line"><span class="ed-ln">13</span><span class="ed-content">- <span class="syn-type">50+</span> languages highlighted</span></div>
+          <div class="ed-line"><span class="ed-ln">14</span><span class="ed-content">- Custom themes + iCloud sync</span></div>
+          <div class="ed-line"><span class="ed-ln">15</span><span class="ed-content">&nbsp;</span></div>
+          <div class="ed-line"><span class="ed-ln">16</span><span class="ed-content syn-comment">&lt;!-- notes live as .md files --&gt;</span></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ─── FEATURES ─── -->
+<section class="features-section">
+  <div class="section-inner">
+    <div class="features-header">
+      <div class="section-label">What's inside</div>
+      <h2 class="section-title">Everything a developer needs.<br>Nothing they don't.</h2>
+      <p class="section-sub">Built around the tools and workflows developers already love — not another dumbed-down writing app.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </div>
+        <div class="feature-title">CodeMirror 6 editor</div>
+        <div class="feature-desc">The same battle-tested editor that powers Inkdrop and dozens of developer tools. Mature, fast, extensible.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg class="icon-svg" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <div class="feature-title">50+ languages</div>
+        <div class="feature-desc">Syntax highlighting for Python, Rust, TypeScript, Go, SQL, YAML, Bash, and 40+ more. Code blocks are first-class citizens.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg class="icon-svg" viewBox="0 0 24 24"><rect x="2" y="3" width="9" height="18" rx="1"/><rect x="13" y="3" width="9" height="18" rx="1"/></svg>
+        </div>
+        <div class="feature-title">Split live preview</div>
+        <div class="feature-desc">Editor and rendered Markdown side by side. Synchronized scroll. Resizable divider. Switch modes with a swipe.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="10" stroke-dasharray="3 2"/></svg>
+        </div>
+        <div class="feature-title">Custom themes</div>
+        <div class="feature-desc">Drafta Dark, Tokyo Night, Solarized, Dark Islands — or drop your own JSON theme file. The editor and preview update instantly.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg class="icon-svg" viewBox="0 0 24 24"><path d="M18 10h-4V3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7z"/><path d="M18 10l-4-7v7h4z"/></svg>
+        </div>
+        <div class="feature-title">Plain files, iCloud sync</div>
+        <div class="feature-desc">Notes are Markdown files with YAML front-matter. Readable by any editor, forever. iCloud Drive sync — no proprietary format.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg class="icon-svg" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 0 0 1 1h3m10-11l2 2m-2-2v10a1 1 0 0 1-1 1h-3m-6 0a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1"/></svg>
+        </div>
+        <div class="feature-title">Revision history</div>
+        <div class="feature-desc">Every save is versioned. Browse history, view unified diffs, restore any revision. Up to 30 revisions per note, stored locally.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ─── MANIFESTO ─── -->
+<section class="manifesto-section">
+  <div class="manifesto-inner">
+    <div>
+      <div class="section-label">The philosophy</div>
+      <h2 class="section-title">Built differently.</h2>
+      <p class="manifesto-text" style="margin-top: 24px;">
+        <strong>No Electron.</strong> Drafta is a native macOS app — Swift, not a browser in a box. It launches instantly, uses a fraction of the RAM, and feels at home on your Mac.<br><br>
+        <strong>No subscription.</strong> You pay once. Your notes don't expire, your features don't disappear, and you don't get a price increase email in March.<br><br>
+        <strong>No lock-in.</strong> Every note is a <span class="highlight">.md</span> file. Open them in VS Code, Obsidian, or <span class="highlight">cat</span>. Your data belongs to you, in a format that will work in 20 years.
+      </p>
+    </div>
+    <div class="manifesto-specs">
+      <div class="spec-row">
+        <span class="spec-key">Runtime</span>
+        <span class="spec-val good">Native Swift + SwiftUI</span>
+      </div>
+      <div class="spec-row">
+        <span class="spec-key">Editor</span>
+        <span class="spec-val good">CodeMirror 6</span>
+      </div>
+      <div class="spec-row">
+        <span class="spec-key">Storage format</span>
+        <span class="spec-val good">Plain Markdown + YAML</span>
+      </div>
+      <div class="spec-row">
+        <span class="spec-key">Sync</span>
+        <span class="spec-val good">iCloud Drive (your account)</span>
+      </div>
+      <div class="spec-row">
+        <span class="spec-key">Requires account</span>
+        <span class="spec-val good">No</span>
+      </div>
+      <div class="spec-row">
+        <span class="spec-key">Telemetry / tracking</span>
+        <span class="spec-val good">None</span>
+      </div>
+      <div class="spec-row">
+        <span class="spec-key">Pricing model</span>
+        <span class="spec-val good">One-time purchase</span>
+      </div>
+      <div class="spec-row">
+        <span class="spec-key">Platform</span>
+        <span class="spec-val">macOS 14+</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ─── PRICING ─── -->
+<section class="pricing-section">
+  <div class="section-inner" style="text-align: center;">
+    <div class="section-label">Pricing</div>
+    <h2 class="section-title">Simple and honest.</h2>
+    <p class="section-sub" style="margin: 0 auto 0;">One price, one time. No tiers, no upsells. The app you download today gets every feature added while you own it.</p>
+    <div class="pricing-card">
+      <div class="pricing-badge">Free Beta</div>
+      <div class="pricing-price"><span>$</span>0</div>
+      <div class="pricing-billing">Free during beta</div>
+      <div class="pricing-onetime">One-time purchase at stable release · price TBD</div>
+      <ul class="pricing-list">
+        <li><span class="check">✓</span> Full access to all features</li>
+        <li><span class="check">✓</span> All future updates included</li>
+        <li><span class="check">✓</span> No account required</li>
+        <li><span class="check">✓</span> Your notes, your files, your iCloud</li>
+        <li><span class="check">✓</span> Beta builds as they ship</li>
+      </ul>
+      <a class="btn-primary" href="#" style="width: 100%; justify-content: center;">Download free beta</a>
+      <p class="pricing-note">macOS 14 Sonoma or later · Apple Silicon & Intel</p>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ─── ROADMAP ─── -->
+<section class="roadmap-section">
+  <div class="section-inner">
+    <div class="section-label">Roadmap</div>
+    <h2 class="section-title">What's next.</h2>
+    <p class="section-sub">Drafta is actively developed. Here's where things are headed.</p>
+    <div class="roadmap-grid">
+      <div class="roadmap-item">
+        <div class="roadmap-status">
+          <div class="status-dot done"></div>
+          <div class="status-label">Available</div>
+        </div>
+        <div class="roadmap-title">macOS app</div>
+        <div class="roadmap-desc">Native macOS editor with CodeMirror 6, themes, notebooks, revision history.</div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-status">
+          <div class="status-dot progress"></div>
+          <div class="status-label">In progress</div>
+        </div>
+        <div class="roadmap-title">iCloud sync</div>
+        <div class="roadmap-desc">Real-time sync across your Macs via iCloud Drive. Architecture ready, wiring it up.</div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-status">
+          <div class="status-dot planned"></div>
+          <div class="status-label">Planned</div>
+        </div>
+        <div class="roadmap-title">iOS app</div>
+        <div class="roadmap-desc">Drafta on iPhone and iPad. Same notes, same files, same iCloud Drive.</div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-status">
+          <div class="status-dot planned"></div>
+          <div class="status-label">Planned</div>
+        </div>
+        <div class="roadmap-title">AI assistant</div>
+        <div class="roadmap-desc">Native Claude / OpenAI integration. Inline completions and chat — your API key, your data.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">Drafta</div>
+    <div class="footer-meta">
+      Made with care by a solo developer<br>
+      <span style="color: var(--muted-2);">© 2026 Drafta · drafta.org</span>
+    </div>
+    <div class="footer-links">
+      <a href="#">Privacy</a>
+      <a href="#">Contact</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
