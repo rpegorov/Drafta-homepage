@@ -184,13 +184,18 @@ pre code{background:none;border:0;padding:0;color:inherit;font-size:inherit}
 /* ---------- type ---------- */
 
 .eyebrow{
-  display:block;
+  display:inline-flex;
+  align-items:center;
   margin:0 0 var(--space-4);
-  font-size:.8125rem;
-  font-weight:600;
-  letter-spacing:.12em;
+  padding:var(--space-1) var(--space-3);
+  background:var(--accent);
+  border-radius:var(--radius-pill);
+  font-size:.75rem;
+  font-weight:700;
+  letter-spacing:.08em;
+  line-height:1.6;
   text-transform:uppercase;
-  color:var(--accent);
+  color:var(--bg);
 }
 .h1{
   margin:0 0 var(--space-5);
@@ -358,16 +363,19 @@ pre code{background:none;border:0;padding:0;color:inherit;font-size:inherit}
   color:var(--text-dim);
 }
 
-/* ---------- plans ---------- */
+/* ---------- pricing: one plan, two billing cards, one shared list ---------- */
 
+/* Two cards in one row, the block noticeably narrower than the page and
+   left-aligned, with the shared checklist and the trial line spanning both
+   columns underneath (§5b). */
 .plans{
   display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-template-columns:repeat(2,minmax(0,1fr));
   align-items:stretch;
   gap:var(--space-5);
+  max-width:calc(var(--maxw) * 0.78);
 }
 .plan{
-  position:relative;
   display:flex;
   flex-direction:column;
   gap:var(--space-3);
@@ -376,71 +384,56 @@ pre code{background:none;border:0;padding:0;color:inherit;font-size:inherit}
   border:thin solid var(--border);
   border-radius:var(--radius-lg);
 }
+/* The yearly card is the one to sell: a slightly lighter surface and a stronger
+   border, so it reads as the primary choice next to the quiet monthly card. */
 .plan--featured{
+  background-color:var(--bg-3);
+  border-color:var(--border-strong);
+}
+/* A ?plan= on the URL marks its card — styling only, nothing is posted. */
+.plan--selected{
   border-color:var(--accent);
-  background-color:var(--bg-2);
-  background-image:linear-gradient(180deg,var(--accent-bg),transparent var(--space-8));
+  box-shadow:0 0 0 var(--space-1) var(--accent-dim);
 }
-.plan__badge{
-  position:absolute;
-  top:var(--space-5);
-  inset-inline-end:var(--space-5);
-  padding:var(--space-1) var(--space-3);
-  background:var(--accent);
-  border-radius:var(--radius-pill);
-  color:var(--bg);
-  font-size:.75rem;
-  font-weight:700;
-  letter-spacing:.04em;
-  text-transform:uppercase;
-  white-space:nowrap;
-}
-.plan--featured .plan__name{padding-inline-end:var(--space-8)}
 .plan__name{
   margin:0;
   font-size:1.0625rem;
   font-weight:600;
   color:var(--text);
 }
+.plan__period-label{
+  margin:calc(var(--space-3) * -1) 0 0;
+  font-size:.875rem;
+  color:var(--muted);
+}
 .plan__price{
-  margin:var(--space-2) 0 0;
+  margin:0;
   font-size:clamp(1.75rem,3vw,2.25rem);
   font-weight:700;
   line-height:1.1;
   letter-spacing:-.02em;
   color:var(--text);
 }
-.plan__period{margin:0;font-size:.9375rem;color:var(--muted)}
-.plan__equiv{margin:0;font-size:.875rem;color:var(--text-dim)}
+.plan__equiv{
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+}
+.plan__price .plan__period{
+  font-size:1.125rem;
+  font-weight:400;
+  letter-spacing:0;
+  white-space:nowrap;
+  color:var(--muted);
+}
 .plan__note{
-  margin-top:var(--space-2);
-  padding-top:var(--space-4);
-  border-top:thin solid var(--border);
+  margin:0;
   font-size:.875rem;
   color:var(--muted);
 }
-.plan__list{
-  display:grid;
-  gap:var(--space-3);
-  flex:1 1 auto;
-  margin:var(--space-2) 0 0;
-  padding:0;
-  list-style:none;
-  font-size:.9375rem;
-  color:var(--text-dim);
-}
-.plan__list li{position:relative;padding-inline-start:var(--space-5)}
-.plan__list li::before{
-  content:"\2713";
-  position:absolute;
-  inset-inline-start:0;
-  top:0;
-  color:var(--accent);
-  font-size:.9375rem;
-}
 .plan__cta{
   width:100%;
-  margin-top:var(--space-4);
+  margin-top:auto;
+  padding-top:var(--space-3);
 }
 .plan__cta--featured{
   background:var(--accent);
@@ -451,6 +444,37 @@ pre code{background:none;border:0;padding:0;color:inherit;font-size:inherit}
   background:var(--accent-hover);
   border-color:transparent;
   color:var(--bg);
+}
+/* Shared by both cards, below them — never inside a card. */
+.plan__list{
+  grid-column:1 / -1;
+  display:grid;
+  gap:var(--space-3);
+  margin:var(--space-4) 0 0;
+  padding:0;
+  list-style:none;
+  font-size:1rem;
+  color:var(--text-dim);
+}
+.plan__item{
+  position:relative;
+  padding-inline-start:var(--space-6);
+}
+.plan__item + .plan__item{border-top:thin solid var(--border);padding-top:var(--space-3)}
+.plan__tick{
+  position:absolute;
+  inset-inline-start:0;
+  top:0;
+  color:var(--ok);
+  font-size:1rem;
+  line-height:inherit;
+}
+.plan__tick::before{content:"\2713"}
+.plan__trial{
+  grid-column:1 / -1;
+  margin:var(--space-2) 0 0;
+  font-size:.9375rem;
+  color:var(--muted);
 }
 
 /* ---------- trial / info callout ---------- */
@@ -676,7 +700,7 @@ details[open] > .faq__q{margin-bottom:var(--space-3)}
   .footer__inner{gap:var(--space-6)}
   .footer{margin-top:var(--space-8)}
   .plan--featured .plan__name{padding-inline-end:0}
-  .plan__badge{position:static;align-self:flex-start;order:-1}
+  .plans{max-width:none}
 }
 
 @media (prefers-reduced-motion:reduce){

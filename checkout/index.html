@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Checkout — Drafta</title>
-  <meta name="description" content="Choose a Drafta plan. Every new account starts with a 30-day trial, no card needed. The same quota on every plan: 10 GiB of sync storage and 100 000 notes.">
+  <meta name="description" content="One Drafta plan, two ways to pay. Every new account starts with a 30-day trial and needs no card; the storage and note quota comes straight from the accounts API.">
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="canonical" href="https://drafta.org/checkout/">
   <link rel="alternate" hreflang="en" href="https://drafta.org/checkout/">
@@ -12,7 +12,7 @@
   <link rel="alternate" hreflang="x-default" href="https://drafta.org/checkout/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Checkout — Drafta">
-  <meta property="og:description" content="Three plans, one quota. Every new account starts with a 30-day trial and needs no card.">
+  <meta property="og:description" content="One plan, two ways to pay — monthly or yearly. Every new account starts with a 30-day trial and needs no card.">
   <meta property="og:url" content="https://drafta.org/checkout/">
   <meta property="og:image" content="https://drafta.org/assets/img/og.png">
   <meta name="twitter:card" content="summary_large_image">
@@ -63,10 +63,12 @@
   <!-- ── Plans ──────────────────────────────────────────────────────────── -->
   <section class="section" id="plans">
     <div class="wrap">
-      <h2 class="h2">Plans</h2>
-      <p class="lede">Prices are read live from api.drafta.org when this page opens — nothing on this page is a hardcoded price.</p>
+      <p class="eyebrow">Pricing</p>
+      <h2 class="h2">One plan, everything included.</h2>
+      <p class="lede">Monthly or annual billing for the same app, read live from api.drafta.org when this page opens — nothing on this page is a hardcoded price.</p>
       <div class="plans" data-plans></div>
-      <p class="muted">The same quota on every plan: 10 GiB of sync storage and 100 000 notes. These three plans are the whole price list.</p>
+      <p class="muted is-hidden" id="quota-line"></p>
+      <p class="muted">Cloud storage is encrypted end to end, so the service holds ciphertext it cannot read. If you would rather not use the plan’s quota at all, connect your own CouchDB — locally or on a server you control.</p>
     </div>
   </section>
 
@@ -82,7 +84,6 @@
         <p class="form__hint" id="order-note" hidden>The payment provider is not connected yet, so nothing has been charged and no purchase is complete. The rows above are the server's response, unchanged.</p>
         <div class="form__actions">
           <a class="btn btn--ghost" id="order-login" href="/login/?next=/checkout/" hidden>Sign in</a>
-          <button class="btn btn--primary" id="order-confirm" type="button" hidden>Confirm</button>
         </div>
       </div>
     </div>
@@ -96,7 +97,7 @@
         <div class="feature">
           <div class="feature__icon" aria-hidden="true">1</div>
           <div class="feature__title">Pick a plan</div>
-          <p class="feature__body">The three plans are read from the accounts API when this page loads. If the API cannot be reached, the page falls back to the same three plans shipped in the site config — never to a different price.</p>
+          <p class="feature__body">The plan and its two billing periods are read from the accounts API when this page loads. If the API cannot be reached, the page falls back to the same plan shipped in the site config — never to a different price.</p>
         </div>
         <div class="feature">
           <div class="feature__icon" aria-hidden="true">2</div>
@@ -123,7 +124,7 @@
         </div>
         <div class="faq__item">
           <div class="faq__q">Is there a cheaper plan?</div>
-          <div class="faq__a">No. Pro — yearly, Pro — monthly and Lifetime are the whole price list. All three carry the same quota: 10 GiB of sync storage and 100 000 notes.</div>
+          <div class="faq__a">No. There is one plan with two billing periods — monthly and yearly — and no other tier and no lifetime licence. The storage and note quota is the same either way and is read from the accounts API.</div>
         </div>
         <div class="faq__item">
           <div class="faq__q">What happens when the trial ends?</div>
@@ -191,13 +192,14 @@
     sending: 'Sending the request to api.drafta.org…',
     accepted: 'The accounts API accepted the request.',
     selected: 'Plan sent to the server:',
+    quota: 'The plan’s quota, as the accounts API reports it: {value}.',
     retry: 'Nothing was changed. You can try again.',
     expired: 'This session is no longer valid. Sign in again to continue.',
     network: 'Network error — the accounts API could not be reached.',
     signedInAs: 'Signed in as {value}.',
     signedIn: 'Signed in.',
     needsAccount: 'Buying needs an account. Sign in to continue — new accounts start with a 30-day trial.',
-    confirmSelected: 'Selected plan: {value}. Confirm to send the request to the accounts API.',
+    deepLink: 'Selected below: {value}. Press its own button when you are ready — nothing is charged yet.',
     noTransport: 'The accounts API client did not load. Reload the page to try again.',
     noRenderer: 'The plans could not be loaded. Reload the page to try again.'
   };
@@ -210,7 +212,6 @@
   var fieldsEl  = document.getElementById('order-fields');
   var noteEl    = document.getElementById('order-note');
   var loginEl   = document.getElementById('order-login');
-  var confirmEl = document.getElementById('order-confirm');
 
   function shared(name) {
     return (D && typeof D[name] === 'function') ? D[name] : null;
@@ -249,12 +250,13 @@
   }
   function token() { return read('drafta_access'); }
 
-  function busy(on) {
-    var fn = shared('setBusy');
-    if (fn) { try { fn(formEl, !!on); } catch (e) { /* fall through */ } }
-    if (!confirmEl) return;
-    confirmEl.disabled = !!on;
-    if (on) { confirmEl.classList.add('is-busy'); } else { confirmEl.classList.remove('is-busy'); }
+  /* The card's own CTA is the purchase action, so the busy state lives on the
+     button that was pressed rather than on a form-wide submit button. */
+  function busy(button, on) {
+    if (!button) return;
+    button.disabled = !!on;
+    if (on) { button.classList.add('is-busy'); } else { button.classList.remove('is-busy'); }
+    button.setAttribute('aria-busy', on ? 'true' : 'false');
   }
 
   /* The server's response, printed field by field, verbatim. */
@@ -297,7 +299,7 @@
   var sending = false;
 
   /* Choosing a plan needs a session; without one the buyer goes to /login/. */
-  function subscribe(code, name) {
+  function subscribe(code, name, button) {
     if (sending) return;
     var access = token();
     if (!access) { window.location.href = LOGIN_URL; return; }
@@ -311,12 +313,11 @@
     sending = true;
     resetResult();
     say(hintEl, T.sending);
-    hide(confirmEl);
-    busy(true);
+    busy(button, true);
 
     send(D.endpoints.subscribe, { plan: plan }, access).then(function (res) {
       sending = false;
-      busy(false);
+      busy(button, false);
       var status = res ? res.status : 0;
       if (res && res.ok) {
         /* Never claim a completed purchase: show what the server said, nothing more. */
@@ -341,7 +342,7 @@
       }
     }).catch(function () {
       sending = false;
-      busy(false);
+      busy(button, false);
       setError(T.network);
       say(hintEl, T.retry);
     });
@@ -350,63 +351,82 @@
   function onSelect(plan) {
     var code = (plan && plan.code) ? plan.code : plan;
     var name = (plan && plan.name) ? plan.name : String(code || '');
-    subscribe(code, name);
+    /* The card that was pressed, so its own button shows the busy state. */
+    var button = plansEl ? plansEl.querySelector('.plan__cta[data-plan="' + code + '"]') : null;
+    subscribe(code, name, button);
   }
 
-  /* 1 — the plans, rendered by the shared layer against [data-plans]. */
+  /* 1 — the two billing cards and the shared list, rendered by the shared layer
+     against [data-plans]. Each card's own CTA is the purchase action (§11), so
+     the page needs no separate confirm step. */
   function renderPlansBlock() {
-    if (!plansEl) return;
+    if (!plansEl) return null;
     if (!D || typeof D.renderPlans !== 'function') {
       say(hintEl, T.noRenderer);
-      return;
+      return null;
     }
     try {
       var p = D.renderPlans(plansEl, { lang: LANG, mode: 'buy', onSelect: onSelect });
       if (p && typeof p.then === 'function') {
         p.catch(function () { say(hintEl, T.noRenderer); });
+        return p;
       }
     } catch (e) {
       say(hintEl, T.noRenderer);
     }
+    return null;
   }
 
-  /* 2 — "?plan=<code>", the deep link the pricing page produces. */
-  function handleDeepLink() {
+  /* 2 — "?plan=<code>", the deep link a card produces. renderPlans itself marks
+     the matching card as selected (§5b); this only requires a session and tells
+     the buyer which card they followed. Nothing is posted on load (§11). */
+  function handleDeepLink(ready) {
     var wanted = '';
     try {
-      var m = /[?&]plan=([^&]*)/.exec(window.location.search);
-      if (m) wanted = decodeURIComponent(m[1]);
+      var m = /[?&]plan=([^&#]*)/.exec(window.location.search);
+      if (m) wanted = decodeURIComponent(m[1].replace(/\+/g, ' '));
     } catch (e) { wanted = ''; }
     if (!wanted) return;
 
     if (!token()) { window.location.href = LOGIN_URL; return; }
 
-    /* A deep link is a choice already made on another page, so it asks for one
-       explicit confirmation here instead of posting on load. */
-    var label = wanted;
-    if (D && typeof D.loadPlans === 'function') {
-      D.loadPlans().then(function (list) {
+    var chain = (ready && typeof ready.then === 'function') ? ready : Promise.resolve();
+    chain.then(function () {
+      if (!D || typeof D.loadPlans !== 'function') return null;
+      return D.loadPlans().then(function (list) {
+        var plan = null;
         for (var i = 0; i < (list || []).length; i++) {
-          if (list[i] && list[i].code === wanted) { label = list[i].name || wanted; }
+          if (list[i] && String(list[i].code) === String(wanted)) plan = list[i];
         }
-        ask(label);
-      }).catch(function () { ask(label); });
-    } else {
-      ask(label);
-    }
-
-    function ask(name) {
-      say(hintEl, fill(T.confirmSelected, name));
-      if (confirmEl) {
-        show(confirmEl);
-        confirmEl.addEventListener('click', function () { subscribe(wanted, name); });
-      }
-    }
+        if (plan) say(hintEl, fill(T.deepLink, plan.name || wanted));
+        return null;
+      });
+    });
   }
 
-  renderPlansBlock();
+  /* 3 — the quota line, rendered from the plan object (§11): never a literal. */
+  function renderQuotaLine() {
+    var el = document.getElementById('quota-line');
+    if (!el || !D) return;
+    var storage = typeof D.formatStorage === 'function' ? D.formatStorage : null;
+    var notes = typeof D.formatNotes === 'function' ? D.formatNotes : null;
+    if (!storage || !notes || typeof D.loadPlans !== 'function') return;
+    D.loadPlans().then(function (list) {
+      var plan = null;
+      for (var i = 0; i < (list || []).length; i++) {
+        var p = list[i];
+        if (p && (p.billing === 'monthly' || p.billing === 'yearly')) { plan = p; break; }
+      }
+      if (!plan) return;
+      el.textContent = fill(T.quota, storage(plan.quotaBytes, LANG) + ' · ' + notes(plan.quotaNotes, LANG));
+      el.classList.remove('is-hidden');
+    }).catch(function () { /* the shared list already carries both lines */ });
+  }
+
+  var rendered = renderPlansBlock();
   initSession();
-  handleDeepLink();
+  handleDeepLink(rendered);
+  renderQuotaLine();
 })();
 </script>
 

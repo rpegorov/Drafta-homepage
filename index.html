@@ -245,14 +245,57 @@
           <div class="feature__body">Drafta exposes your notes to MCP-capable agents, so a tool can read the note you are looking at instead of asking you to paste it.</div>
         </div>
         <div class="feature">
+          <div class="feature__icon" aria-hidden="true">☁</div>
+          <div class="feature__title">Cloud sync</div>
+          <div class="feature__body">Sync across your Macs through your Drafta account — the default path, covered by the plan's storage quota, and encrypted end to end before anything leaves the machine.</div>
+        </div>
+        <div class="feature">
           <div class="feature__icon" aria-hidden="true">⊙</div>
-          <div class="feature__title">CouchDB sync</div>
-          <div class="feature__body">Sync the library through your own CouchDB when you want one — no vendor account holds your notes.</div>
+          <div class="feature__title">Your own CouchDB</div>
+          <div class="feature__body">Connect your own CouchDB instead if you prefer: it stores with no quota at all, locally or on your own server. The app has a backend setting for it.</div>
         </div>
         <div class="feature">
           <div class="feature__icon" aria-hidden="true">↑</div>
           <div class="feature__title">Auto-update</div>
           <div class="feature__body">Sparkle checks once a day, or on demand from <span class="mono">Drafta → Check for Updates…</span> You are never nagged.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap"><hr class="divider"></div>
+
+  <!-- ── Security ───────────────────────────────────────────────────────── -->
+  <section class="section" id="security">
+    <div class="wrap">
+      <p class="eyebrow">Security</p>
+      <h2 class="h2">Encrypted on the way up, plain files on your disk.</h2>
+      <p class="lede muted">Both halves are the promise: the copy in the cloud is unreadable to us, and the copy on your machine is yours to open, read and keep.</p>
+
+      <div class="grid grid--2">
+        <div class="feature">
+          <div class="feature__title">End-to-end encrypted sync</div>
+          <div class="feature__body">Notes are sealed on your Mac before they are sent. The service stores ciphertext it cannot read — the key never leaves your machine.</div>
+        </div>
+        <div class="feature">
+          <div class="feature__title">PBKDF2-HMAC-SHA256 and AES-256-GCM</div>
+          <div class="feature__body">A 256-bit key is derived from your password with PBKDF2-HMAC-SHA256, using the account's salt and iteration count. Notes are sealed with AES-256-GCM. No hand-waving: those are the exact primitives, and this audience checks.</div>
+        </div>
+        <div class="feature">
+          <div class="feature__title">Your password and key stay with you</div>
+          <div class="feature__body">The server never receives either one. Sign-in proves knowledge of the password through a separate verifier derived from the key, so the service can confirm who you are without being able to decrypt anything.</div>
+        </div>
+        <div class="feature">
+          <div class="feature__title">What the cloud can see</div>
+          <div class="feature__body">For each note the service sees its id — the document key — and its last-updated time, which decides last-writer-wins. The stored envelope also carries the version and the key-derivation parameters needed to open it. Title, body, tags and attachments stay ciphertext.</div>
+        </div>
+        <div class="feature">
+          <div class="feature__title">On your disk: ordinary Markdown</div>
+          <div class="feature__body">The local library stays plain Markdown files. Encryption protects the sync path, not your disk — so you can still open any note in another editor, grep it or commit it to git.</div>
+        </div>
+        <div class="feature">
+          <div class="feature__title">Two places to keep the cloud copy</div>
+          <div class="feature__body">Cloud storage through your Drafta account is the default and is what the plan covers. Connect your own CouchDB instead and it stores with no quota — locally or on a server you control.</div>
         </div>
       </div>
     </div>
@@ -267,7 +310,7 @@
         <div>
           <p class="eyebrow">Local first</p>
           <h2 class="h2">Your notes are files, not rows in someone's database.</h2>
-          <p class="muted">Drafta keeps the library on your disk: one Markdown file per note, YAML front-matter for tags and status, revisions in a folder beside it. No account stands between you and your own writing, and no format change can strand it.</p>
+          <p class="muted">Drafta keeps the library on your disk: one Markdown file per note, YAML front-matter for tags and status, revisions in a folder beside it. No closed format stands between you and your own writing, and changing plan cannot strand it. The cloud copy is encrypted under a key you hold, not one the service holds — so it stays yours even when it is not on your disk.</p>
           <p class="muted">Because it is plain text, the rest of your toolchain already works: <span class="mono">grep</span> across everything, commit the library to git, open a note in VS Code or Obsidian, or <span class="mono">cat</span> it in a terminal. Drafta is a native Swift app — there is no Electron runtime underneath and no bundled browser to keep hot.</p>
         </div>
         <div>
@@ -289,16 +332,16 @@
   <section class="section" id="pricing">
     <div class="wrap">
       <p class="eyebrow">Pricing</p>
-      <h2 class="h2">Three plans. Every new account starts with a trial.</h2>
-      <p class="lede muted">Create an account and the first 30 days are on the house — no card required. After that pick the plan that fits; all three include the same library: 10 GiB of sync storage and 100 000 notes.</p>
+      <h2 class="h2">One plan, everything included.</h2>
+      <p class="lede muted">Monthly or annual billing for the same app. Every new account starts with a 30-day trial — no card needed.</p>
 
       <div class="callout callout--accent">
-        <strong>30-day trial on every new account</strong> — no card required. After the trial, choose Pro yearly, Pro monthly or Lifetime.
+        <strong>30-day trial on every new account</strong> — no card required. After the trial you pick a billing period, monthly or yearly; there is no second tier and no lifetime licence.
       </div>
 
       <div class="plans" data-plans></div>
 
-      <p class="muted">Every plan includes the full app: CodeMirror 6 editor, notebooks, tags, statuses, revision history, themes, import and export. The plans differ in how you pay, not in what you get. Prices are charged in US dollars.</p>
+      <p class="muted">The plan includes the full app: CodeMirror 6 editor, notebooks, tags, statuses, revision history, themes, import and export. The two billing periods differ in how you pay, not in what you get. Prices are charged in US dollars.</p>
     </div>
   </section>
 
@@ -325,7 +368,7 @@
         </div>
         <div class="faq__item">
           <h3 class="faq__q">Is there a trial, and does it need a card?</h3>
-          <p class="faq__a">Every new account gets 30 days. No card is required to start it. When it ends you choose one of the three plans.</p>
+          <p class="faq__a">Every new account gets 30 days. No card is required to start it. When it ends you pick a billing period — monthly or yearly.</p>
         </div>
         <div class="faq__item">
           <h3 class="faq__q">Where do my notes live?</h3>
@@ -333,11 +376,23 @@
         </div>
         <div class="faq__item">
           <h3 class="faq__q">Do I need an account to use the app?</h3>
-          <p class="faq__a">An account is what starts your trial and carries a paid licence. Your notes are local files either way; the account is how the plan is attached to you, not where your writing is kept.</p>
+          <p class="faq__a">An account is what starts your trial, carries your plan and — unless you connect your own CouchDB — gives your notes a cloud copy. That copy is stored as ciphertext we cannot read.</p>
         </div>
         <div class="faq__item">
           <h3 class="faq__q">What does a plan include?</h3>
-          <p class="faq__a">All three plans include the full feature set and the same limits: 10 GiB of sync storage and 100 000 notes. They differ in price and billing period — Pro yearly, Pro monthly, or a one-time Lifetime licence.</p>
+          <p class="faq__a">There is one plan, and you choose how to pay for it: monthly or yearly. The card above shows the storage and note limits read from the accounts API, so this page never quotes a quota the service does not enforce.</p>
+        </div>
+        <div class="faq__item">
+          <h3 class="faq__q">Is my data encrypted?</h3>
+          <p class="faq__a">On the way to the cloud, yes — end to end. Notes are sealed with AES-256-GCM under a 256-bit key derived from your password with PBKDF2-HMAC-SHA256, using the account's salt and iteration count. Be precise about the boundary: this protects the sync path, not your disk. The library on your Mac stays ordinary Markdown files you can read in any editor.</p>
+        </div>
+        <div class="faq__item">
+          <h3 class="faq__q">Can you read my notes?</h3>
+          <p class="faq__a">Not the synced copy. The server never receives your password or your key — sign-in proves knowledge of the password through a separate verifier derived from the key — and what it stores is ciphertext under a key it does not hold. For each note the id and the last-updated timestamp are visible, along with the envelope's version and key-derivation parameters; the timestamp is what decides last-writer-wins between your Macs.</p>
+        </div>
+        <div class="faq__item">
+          <h3 class="faq__q">Where is my data stored?</h3>
+          <p class="faq__a">In two places, and both are yours. Locally: plain Markdown files in your library folder, plus revisions. In the cloud: storage through your Drafta account is the default and is what the plan's quota covers. If you would rather not use it, connect your own CouchDB instead — storage with no quota, locally or on your own server.</p>
         </div>
         <div class="faq__item">
           <h3 class="faq__q">What if I use a PC or Linux?</h3>
@@ -360,7 +415,7 @@
         <div class="roadmap__item">
           <div class="roadmap__status"><span class="dot dot--done"></span> Available</div>
           <h3 class="h3">macOS app</h3>
-          <p class="muted">The full editor: CodeMirror 6, notebooks, tags, statuses, themes, revision history, import and export, AI assistant, MCP server, CouchDB sync, auto-update.</p>
+          <p class="muted">The full editor: CodeMirror 6, notebooks, tags, statuses, themes, revision history, import and export, AI assistant, MCP server, cloud sync and your own CouchDB, auto-update.</p>
         </div>
         <div class="roadmap__item">
           <div class="roadmap__status"><span class="dot dot--progress"></span> In progress</div>
