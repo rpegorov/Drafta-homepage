@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Подтверждение адреса — Drafta</title>
+  <meta name="description" content="Подтвердите адрес почты аккаунта Drafta, открыв ссылку из письма.">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="canonical" href="https://drafta.org/ru/verify/">
+  <link rel="alternate" hreflang="en" href="https://drafta.org/verify/">
+  <link rel="alternate" hreflang="ru" href="https://drafta.org/ru/verify/">
+  <link rel="alternate" hreflang="x-default" href="https://drafta.org/verify/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Подтверждение адреса — Drafta">
+  <meta property="og:description" content="Подтвердите адрес почты аккаунта Drafta, открыв ссылку из письма.">
+  <meta property="og:url" content="https://drafta.org/ru/verify/">
+  <meta property="og:image" content="https://drafta.org/assets/img/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="/assets/css/tokens.css">
+  <link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+  <header class="nav">
+    <nav class="nav__inner wrap">
+      <a class="nav__logo" href="/ru/">Drafta</a>
+      <div class="nav__links">
+        <a class="nav__link" href="/ru/#features">Возможности</a>
+        <a class="nav__link" href="/ru/#pricing">Тарифы</a>
+        <a class="nav__link" href="/ru/#faq">Вопросы</a>
+      </div>
+      <div class="nav__actions">
+        <div class="lang">
+          <a class="lang__btn" href="/verify/" data-lang="en">EN</a>
+          <a class="lang__btn lang__btn--active" href="/ru/verify/" data-lang="ru">RU</a>
+        </div>
+        <a class="btn btn--primary" href="https://github.com/rpegorov/drafta-releases/releases/latest">Скачать</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="section">
+      <div class="wrap">
+        <p class="eyebrow">Аккаунт</p>
+        <h1 class="h1">Подтвердите адрес почты</h1>
+        <p class="lede">Ссылка из письма Drafta открывает эту страницу. Подтверждение адреса и активирует аккаунт.</p>
+        <noscript>
+          <p class="lede">Для подтверждения адреса нужен JavaScript. Включите его и откройте ссылку из письма снова.</p>
+        </noscript>
+
+        <div class="form is-hidden" data-state="checking" hidden role="status">
+          <h2 class="h2">Подтверждаем адрес…</h2>
+          <p class="muted">Обращаемся к службе аккаунтов. Это займёт секунду.</p>
+        </div>
+
+        <div class="form is-hidden" data-state="incomplete" hidden>
+          <h2 class="h2">Ссылка неполная</h2>
+          <p class="muted">В ссылке для подтверждения нет токена, подтверждать нечего. Скопируйте ссылку из письма целиком, как она была отправлена.</p>
+          <p class="muted">Запросить новую ссылку с сайта пока нельзя. Если адрес уже подтверждён, войдите.</p>
+          <div class="form__actions">
+            <a class="btn btn--primary" href="/ru/login/">Войти</a>
+          </div>
+        </div>
+
+        <div class="form is-hidden" data-state="confirmed" hidden role="status">
+          <p class="form__ok">Адрес подтверждён.</p>
+          <h2 class="h2">Адрес почты подтверждён</h2>
+          <p class="muted">Спасибо — служба аккаунтов приняла ссылку. Войдите с этим адресом, чтобы купить лицензию.</p>
+          <div class="form__actions">
+            <a class="btn btn--primary" href="/ru/login/">Войти</a>
+          </div>
+        </div>
+
+        <div class="form is-hidden" data-state="already" hidden role="status">
+          <p class="form__ok">Уже подтверждён.</p>
+          <h2 class="h2">Этот адрес подтвердили раньше</h2>
+          <p class="muted">Делать ничего не нужно — аккаунт уже активирован более ранней ссылкой. Войдите, чтобы продолжить.</p>
+          <div class="form__actions">
+            <a class="btn btn--primary" href="/ru/login/">Войти</a>
+          </div>
+        </div>
+
+        <div class="form is-hidden" data-state="invalid" hidden>
+          <h2 class="h2">Ссылка недействительна или истекла</h2>
+          <p class="muted" data-invalid-reason></p>
+          <p class="muted">Запросить новую ссылку для подтверждения с сайта пока нельзя — повторная отправка не предусмотрена. Если адрес уже подтверждён, войти можно с этой страницы.</p>
+          <div class="form__actions">
+            <a class="btn btn--primary" href="/ru/login/">Войти</a>
+          </div>
+        </div>
+
+        <div class="form is-hidden" data-state="error" hidden>
+          <h2 class="h2">Не удалось подтвердить ссылку</h2>
+          <p class="muted">Служба аккаунтов не ответила. Проверьте соединение и попробуйте снова.</p>
+          <div class="form__actions">
+            <button class="btn btn--ghost" type="button" data-retry>Попробовать снова</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__inner wrap">
+      <div class="footer__brand">Drafta</div>
+      <div class="footer__cols">
+        <div class="footer__col">
+          <div class="footer__col-title">Продукт</div>
+          <a href="/ru/#features">Возможности</a><a href="/ru/#pricing">Тарифы</a>
+          <a href="/ru/checkout/">Купить лицензию</a>
+        </div>
+        <div class="footer__col">
+          <div class="footer__col-title">Аккаунт</div>
+          <a href="/ru/register/">Создать аккаунт</a><a href="/ru/login/">Войти</a>
+          <a href="/ru/#faq">Вопросы</a>
+        </div>
+        <div class="footer__col">
+          <div class="footer__col-title">Загрузки</div>
+          <a href="https://github.com/rpegorov/drafta-releases/releases/latest">Последний релиз</a>
+        </div>
+      </div>
+      <div class="footer__legal">
+        © 2026 Drafta · Apache-2.0 · <a href="/">English</a> · <a href="/ru/">Русский</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/assets/js/config.js"></script>
+  <script src="/assets/js/lang.js"></script>
+  <script src="/assets/js/forms.js"></script>
+  <script>
+    (function () {
+      var D = window.DRAFTA;
+      var states = {
+        checking: document.querySelector('[data-state="checking"]'),
+        incomplete: document.querySelector('[data-state="incomplete"]'),
+        confirmed: document.querySelector('[data-state="confirmed"]'),
+        already: document.querySelector('[data-state="already"]'),
+        invalid: document.querySelector('[data-state="invalid"]'),
+        error: document.querySelector('[data-state="error"]')
+      };
+      var invalidReason = document.querySelector('[data-invalid-reason]');
+      var retryButton = document.querySelector('[data-retry]');
+      var MSG = { invalid: 'Служба аккаунтов отклонила эту ссылку.' };
+
+      function show(name) {
+        Object.keys(states).forEach(function (key) {
+          var el = states[key];
+          if (!el) return;
+          var visible = key === name;
+          el.hidden = !visible;
+          el.classList.toggle('is-hidden', !visible);
+        });
+      }
+
+      function tokenFromQuery() {
+        var match = /[?&]token=([^&#]*)/.exec(window.location.search);
+        if (!match) return '';
+        try {
+          return decodeURIComponent(match[1].replace(/\+/g, ' '));
+        } catch (error) {
+          return match[1];
+        }
+      }
+
+      function alreadyConfirmed(data) {
+        if (!data || typeof data !== 'object') return false;
+        if (data.alreadyVerified === true || data.already_verified === true) return true;
+        var words = [data.status, data.state, data.result, data.message].filter(Boolean).join(' ');
+        return /already/i.test(words);
+      }
+
+      function settle(data) {
+        show(alreadyConfirmed(data) ? 'already' : 'confirmed');
+      }
+
+      function messageOf(res) {
+        return res && res.data && res.data.error ? String(res.data.error) : '';
+      }
+
+      function reject(res) {
+        if (!res || res.status === 0) {
+          show('error');
+          return;
+        }
+        if (invalidReason) invalidReason.textContent = messageOf(res) || MSG.invalid;
+        show('invalid');
+      }
+
+      function getOnce(path, token) {
+        var url = D.api + path + '?token=' + encodeURIComponent(token);
+        return fetch(url, { method: 'GET', headers: { 'Accept': 'application/json' } })
+          .then(function (response) {
+            return response.text().then(function (body) {
+              var data = null;
+              try { data = body ? JSON.parse(body) : null; } catch (error) { data = null; }
+              return { ok: response.ok, status: response.status, data: data };
+            });
+          })
+          .catch(function () {
+            return { ok: false, status: 0, data: null };
+          });
+      }
+
+      if (retryButton) {
+        retryButton.addEventListener('click', function () { window.location.reload(); });
+      }
+
+      var token = tokenFromQuery();
+
+      if (!token) {
+        show('incomplete');
+        return;
+      }
+
+      if (!D || !D.endpoints || !D.endpoints.verify || typeof D.post !== 'function') {
+        show('error');
+        return;
+      }
+
+      show('checking');
+
+      D.post(D.endpoints.verify, { token: token }).then(function (res) {
+        if (res && res.ok) {
+          settle(res.data);
+          return;
+        }
+        var status = res ? res.status : 0;
+        if (status !== 404 && status !== 405) {
+          reject(res);
+          return;
+        }
+        // Эндпоинт может существовать только как GET-маршрут; повторяем один раз.
+        getOnce(D.endpoints.verify, token).then(function (retried) {
+          if (retried && retried.ok) {
+            settle(retried.data);
+            return;
+          }
+          reject(retried);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

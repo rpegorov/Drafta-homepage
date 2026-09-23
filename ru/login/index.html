@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Вход — Drafta</title>
+  <meta name="description" content="Войдите в аккаунт Drafta, чтобы начать 30-дневную пробную версию, купить лицензию и управлять подпиской.">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="canonical" href="https://drafta.org/ru/login/">
+  <link rel="alternate" hreflang="en" href="https://drafta.org/login/">
+  <link rel="alternate" hreflang="ru" href="https://drafta.org/ru/login/">
+  <link rel="alternate" hreflang="x-default" href="https://drafta.org/login/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Вход — Drafta">
+  <meta property="og:description" content="Войдите в аккаунт Drafta, чтобы начать 30-дневную пробную версию, купить лицензию и управлять подпиской.">
+  <meta property="og:url" content="https://drafta.org/ru/login/">
+  <meta property="og:image" content="https://drafta.org/assets/img/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="/assets/css/tokens.css">
+  <link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+  <header class="nav">
+    <nav class="nav__inner wrap">
+      <a class="nav__logo" href="/ru/">Drafta</a>
+      <div class="nav__links">
+        <a class="nav__link" href="/ru/#features">Возможности</a>
+        <a class="nav__link" href="/ru/#pricing">Тарифы</a>
+        <a class="nav__link" href="/ru/#faq">Вопросы</a>
+      </div>
+      <div class="nav__actions">
+        <div class="lang">
+          <a class="lang__btn" href="/login/" data-lang="en">EN</a>
+          <a class="lang__btn lang__btn--active" href="/ru/login/" data-lang="ru">RU</a>
+        </div>
+        <a class="btn btn--primary" href="https://github.com/rpegorov/drafta-releases/releases/latest">Скачать</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="section">
+      <div class="wrap">
+        <p class="eyebrow">Аккаунт</p>
+        <h1 class="h1">Вход</h1>
+        <p class="lede">Создание аккаунта идёт в два шага: ссылка для подтверждения из письма, затем этот вход. Если вы только что зарегистрировались, сначала откройте ссылку из письма — до этого аккаунт не активирован и пароль здесь не сработает.</p>
+        <noscript>
+          <p class="lede">Для входа нужен JavaScript. Включите его и обновите страницу.</p>
+        </noscript>
+
+        <form class="form" method="post" action="" data-login-form novalidate>
+          <div class="form__field">
+            <label class="form__label" for="email">Почта</label>
+            <input class="form__input" id="email" name="email" type="email" autocomplete="email" spellcheck="false" required>
+          </div>
+
+          <div class="form__field">
+            <label class="form__label" for="password">Пароль</label>
+            <input class="form__input" id="password" name="password" type="password" autocomplete="current-password" required>
+          </div>
+
+          <div class="form__actions">
+            <button class="btn btn--primary btn--block" type="submit">Войти</button>
+          </div>
+
+          <p class="form__alt">Ещё нет аккаунта? <a class="btn btn--ghost" href="/ru/register/">Создать аккаунт</a></p>
+        </form>
+
+        <div class="form is-hidden" data-signed-in hidden role="status">
+          <p class="form__ok">Вы вошли.</p>
+          <p class="muted">Сессия хранится только на этом устройстве. Переходим к следующему шагу:</p>
+          <div class="form__actions">
+            <a class="btn btn--primary" href="/ru/checkout/" data-next-link>Перейти к оплате</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__inner wrap">
+      <div class="footer__brand">Drafta</div>
+      <div class="footer__cols">
+        <div class="footer__col">
+          <div class="footer__col-title">Продукт</div>
+          <a href="/ru/#features">Возможности</a><a href="/ru/#pricing">Тарифы</a>
+          <a href="/ru/checkout/">Купить лицензию</a>
+        </div>
+        <div class="footer__col">
+          <div class="footer__col-title">Аккаунт</div>
+          <a href="/ru/register/">Создать аккаунт</a><a href="/ru/login/">Войти</a>
+          <a href="/ru/#faq">Вопросы</a>
+        </div>
+        <div class="footer__col">
+          <div class="footer__col-title">Загрузки</div>
+          <a href="https://github.com/rpegorov/drafta-releases/releases/latest">Последний релиз</a>
+        </div>
+      </div>
+      <div class="footer__legal">
+        © 2026 Drafta · Apache-2.0 · <a href="/">English</a> · <a href="/ru/">Русский</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/assets/js/config.js"></script>
+  <script src="/assets/js/lang.js"></script>
+  <script src="/assets/js/forms.js"></script>
+  <script>
+    (function () {
+      var D = window.DRAFTA;
+      var LANG = document.documentElement.lang === 'ru' ? 'ru' : 'en';
+      var form = document.querySelector('[data-login-form]');
+      var done = document.querySelector('[data-signed-in]');
+      var nextLink = document.querySelector('[data-next-link]');
+      var emailEl = document.getElementById('email');
+      var passwordEl = document.getElementById('password');
+
+      var DEFAULT_NEXT = '/ru/checkout/';
+      var MSG = {
+        passwordRequired: 'Введите пароль.',
+        noSession: 'Сервер принял вход, но не вернул сессию. Попробуйте снова.',
+        noStorage: 'Браузер запретил локальное хранилище, сессию сохранить не удалось. Разрешите хранение для drafta.org и попробуйте снова.'
+      };
+
+      function reveal(el) {
+        if (!el) return;
+        el.hidden = false;
+        el.classList.remove('is-hidden');
+      }
+
+      function conceal(el) {
+        if (!el) return;
+        el.hidden = true;
+        el.classList.add('is-hidden');
+      }
+
+      if (!form || !emailEl || !passwordEl) return;
+      if (!D || !D.endpoints || typeof D.post !== 'function') return;
+
+      /* ?next= принимается только как путь внутри сайта: один ведущий «/» и ни
+         одного обратного слэша или пробела, которые браузер может свернуть в
+         протокол-относительный URL. */
+      function nextTarget() {
+        var match = /[?&]next=([^&#]*)/.exec(window.location.search);
+        if (!match) return DEFAULT_NEXT;
+        var value;
+        try {
+          value = decodeURIComponent(match[1].replace(/\+/g, ' '));
+        } catch (error) {
+          value = match[1];
+        }
+        if (value.charAt(0) !== '/' || value.charAt(1) === '/' || /[\\\s]/.test(value)) return DEFAULT_NEXT;
+        return value;
+      }
+
+      /* Сессия живёт в localStorage: ключ drafta_access читает страница оплаты,
+         drafta_email — по нему она называет аккаунт.
+         «nostorage» и «nosession» различаются, чтобы отличить запрет хранилища
+         в браузере от ответа сервера без токенов. */
+      function saveSession(data, email) {
+        var tokens = data && data.tokens ? data.tokens : null;
+        if (!tokens || !tokens.accessToken) return 'nosession';
+        try {
+          localStorage.setItem('drafta_access', tokens.accessToken);
+          if (tokens.refreshToken) localStorage.setItem('drafta_refresh', tokens.refreshToken);
+          localStorage.setItem('drafta_email', email);
+        } catch (error) {
+          try {
+            localStorage.removeItem('drafta_access');
+            localStorage.removeItem('drafta_refresh');
+            localStorage.removeItem('drafta_email');
+          } catch (ignored) { /* делать нечего */ }
+          return 'nostorage';
+        }
+        return 'ok';
+      }
+
+      function go(target) {
+        try {
+          if (window.location && typeof window.location.assign === 'function') {
+            window.location.assign(target);
+            return;
+          }
+          if (window.location) window.location.href = target;
+        } catch (error) {
+          /* панель на экране уже содержит ту же ссылку */
+        }
+      }
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        D.clearError(form);
+
+        var email = emailEl.value.trim();
+        var password = passwordEl.value;
+        var problem = D.validateEmail(email, LANG) || (password ? '' : MSG.passwordRequired);
+
+        if (problem) {
+          D.showError(form, problem);
+          return;
+        }
+
+        var target = nextTarget();
+        D.setBusy(form, true);
+
+        D.post(D.endpoints.login, { email: email, password: password }).then(function (res) {
+          D.setBusy(form, false);
+
+          if (!res || !res.ok) {
+            var serverMessage = res && res.data && res.data.error ? String(res.data.error) : '';
+            D.showError(form, serverMessage || MSG.noSession);
+            return;
+          }
+
+          var saved = saveSession(res.data, email);
+          if (saved !== 'ok') {
+            D.showError(form, saved === 'nostorage' ? MSG.noStorage : MSG.noSession);
+            return;
+          }
+
+          reveal(done);
+          if (nextLink) nextLink.setAttribute('href', target);
+          conceal(form);
+          go(target);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

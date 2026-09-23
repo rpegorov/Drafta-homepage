@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout — Drafta</title>
+  <meta name="description" content="Choose a Drafta plan. Every new account starts with a 30-day trial, no card needed. The same quota on every plan: 10 GiB of sync storage and 100 000 notes.">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="canonical" href="https://drafta.org/checkout/">
+  <link rel="alternate" hreflang="en" href="https://drafta.org/checkout/">
+  <link rel="alternate" hreflang="ru" href="https://drafta.org/ru/checkout/">
+  <link rel="alternate" hreflang="x-default" href="https://drafta.org/checkout/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Checkout — Drafta">
+  <meta property="og:description" content="Three plans, one quota. Every new account starts with a 30-day trial and needs no card.">
+  <meta property="og:url" content="https://drafta.org/checkout/">
+  <meta property="og:image" content="https://drafta.org/assets/img/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="/assets/css/tokens.css">
+  <link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+
+<header class="nav">
+  <nav class="nav__inner wrap">
+    <a class="nav__logo" href="/">Drafta</a>
+    <div class="nav__links">
+      <a class="nav__link" href="/#features">Features</a>
+      <a class="nav__link" href="/#pricing">Pricing</a>
+      <a class="nav__link" href="/#faq">FAQ</a>
+    </div>
+    <div class="nav__actions">
+      <div class="lang">
+        <a class="lang__btn lang__btn--active" href="/checkout/" data-lang="en" aria-current="page">EN</a>
+        <a class="lang__btn" href="/ru/checkout/" data-lang="ru">RU</a>
+      </div>
+      <a class="btn btn--primary" href="https://github.com/rpegorov/drafta-releases/releases/latest">Download</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ── Opening ────────────────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="wrap">
+      <p class="eyebrow">Checkout</p>
+      <h1 class="h1">Choose the plan for your account</h1>
+      <p class="lede">Every new account starts with a 30-day trial — no card needed. When the trial ends, the plan you pick here takes over. Drafta is a native macOS app and your notes stay plain Markdown files on disk.</p>
+    </div>
+  </section>
+
+  <!-- ── Trial callout ──────────────────────────────────────────────────── -->
+  <section class="section section--tight">
+    <div class="wrap">
+      <div class="callout callout--accent">
+        <h2 class="h3">30 days of the full app, no card</h2>
+        <p>Registration starts a 30-day trial: the full app, with nothing charged while it runs. When it ends, your account continues on the plan you choose below.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Plans ──────────────────────────────────────────────────────────── -->
+  <section class="section" id="plans">
+    <div class="wrap">
+      <h2 class="h2">Plans</h2>
+      <p class="lede">Prices are read live from api.drafta.org when this page opens — nothing on this page is a hardcoded price.</p>
+      <div class="plans" data-plans></div>
+      <p class="muted">The same quota on every plan: 10 GiB of sync storage and 100 000 notes. These three plans are the whole price list.</p>
+    </div>
+  </section>
+
+  <!-- ── Order ──────────────────────────────────────────────────────────── -->
+  <section class="section section--tight" id="order">
+    <div class="wrap">
+      <h2 class="h2">Your order</h2>
+      <div class="form" id="order-form">
+        <p class="form__hint" id="order-hint">Checking your session…</p>
+        <div class="form__error is-hidden" id="order-error" role="alert"></div>
+        <div class="form__ok is-hidden" id="order-ok" role="status"></div>
+        <dl class="mono" id="order-fields" hidden></dl>
+        <p class="form__hint" id="order-note" hidden>The payment provider is not connected yet, so nothing has been charged and no purchase is complete. The rows above are the server's response, unchanged.</p>
+        <div class="form__actions">
+          <a class="btn btn--ghost" id="order-login" href="/login/?next=/checkout/" hidden>Sign in</a>
+          <button class="btn btn--primary" id="order-confirm" type="button" hidden>Confirm</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── How it works ───────────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="wrap">
+      <h2 class="h2">How checkout works right now</h2>
+      <div class="features">
+        <div class="feature">
+          <div class="feature__icon" aria-hidden="true">1</div>
+          <div class="feature__title">Pick a plan</div>
+          <p class="feature__body">The three plans are read from the accounts API when this page loads. If the API cannot be reached, the page falls back to the same three plans shipped in the site config — never to a different price.</p>
+        </div>
+        <div class="feature">
+          <div class="feature__icon" aria-hidden="true">2</div>
+          <div class="feature__title">Buying needs a session</div>
+          <p class="feature__body">An access token, written by the sign-in page, is required. Without it this page sends you to <a href="/login/?next=/checkout/">sign in</a> and brings you straight back here.</p>
+        </div>
+        <div class="feature">
+          <div class="feature__icon" aria-hidden="true">3</div>
+          <div class="feature__title">The server answers, this page repeats it</div>
+          <p class="feature__body">The chosen plan is sent to the accounts API and the response — plan, status, current period end — is printed above exactly as it arrives. Card payment is not wired up yet, so this page never reports a completed purchase on its own.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Questions ──────────────────────────────────────────────────────── -->
+  <section class="section" id="faq">
+    <div class="wrap">
+      <h2 class="h2">Questions</h2>
+      <div class="faq">
+        <div class="faq__item">
+          <div class="faq__q">Can I pay by card yet?</div>
+          <div class="faq__a">Not yet. The payment provider is not connected: subscribing records the request on your account, and this page shows exactly what the server returned. Nothing is charged.</div>
+        </div>
+        <div class="faq__item">
+          <div class="faq__q">Is there a cheaper plan?</div>
+          <div class="faq__a">No. Pro — yearly, Pro — monthly and Lifetime are the whole price list. All three carry the same quota: 10 GiB of sync storage and 100 000 notes.</div>
+        </div>
+        <div class="faq__item">
+          <div class="faq__q">What happens when the trial ends?</div>
+          <div class="faq__a">The 30-day trial starts at registration and needs no card. After it ends, the plan chosen on this page is the one on your account.</div>
+        </div>
+        <div class="faq__item">
+          <div class="faq__q">What does the app need?</div>
+          <div class="faq__a">macOS 26.4, on Apple Silicon and Intel. The app comes from the <a href="https://github.com/rpegorov/drafta-releases/releases/latest">releases page</a> — it is not a web app.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="footer__inner wrap">
+    <div class="footer__brand">Drafta</div>
+    <div class="footer__cols">
+      <div class="footer__col">
+        <div class="footer__col-title">Product</div>
+        <a href="/#features">Features</a><a href="/#pricing">Pricing</a>
+        <a href="/checkout/">Buy a licence</a>
+      </div>
+      <div class="footer__col">
+        <div class="footer__col-title">Account</div>
+        <a href="/register/">Create account</a><a href="/login/">Sign in</a>
+        <a href="/#faq">FAQ</a>
+      </div>
+      <div class="footer__col">
+        <div class="footer__col-title">Downloads</div>
+        <a href="https://github.com/rpegorov/drafta-releases/releases/latest">Latest release</a>
+      </div>
+    </div>
+    <div class="footer__legal">
+      © 2026 Drafta · Apache-2.0 · <a href="/ru/">Русский</a> · <a href="/">English</a>
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/js/config.js"></script>
+<script src="/assets/js/lang.js"></script>
+<script src="/assets/js/plans.js"></script>
+<script src="/assets/js/forms.js"></script>
+<script>
+/*  Checkout page script — EN.
+    There is no /assets/js/checkout.js in the contract's ownership map (§1) and this
+    agent owns only the two checkout HTML files, so the page logic is inline here —
+    the same way the landing page calls the shared renderer inline (§9 skeleton).
+
+    Division of ownership (§5b):
+      · DRAFTA.renderPlans owns everything inside [data-plans].
+      · This script owns #order-form and everything in it.
+    The page never holds a price of its own: it prints whatever the server returns.  */
+(function () {
+  'use strict';
+
+  var D = window.DRAFTA;
+  var LANG = 'en';
+  var LOGIN_URL = '/login/?next=/checkout/';
+  /* §11: the access token is written only by /login/, so a sessionless buyer goes
+     there. /register/ is wrong for a returning customer: it would answer 409. */
+
+  var T = {
+    sending: 'Sending the request to api.drafta.org…',
+    accepted: 'The accounts API accepted the request.',
+    selected: 'Plan sent to the server:',
+    retry: 'Nothing was changed. You can try again.',
+    expired: 'This session is no longer valid. Sign in again to continue.',
+    network: 'Network error — the accounts API could not be reached.',
+    signedInAs: 'Signed in as {value}.',
+    signedIn: 'Signed in.',
+    needsAccount: 'Buying needs an account. Sign in to continue — new accounts start with a 30-day trial.',
+    confirmSelected: 'Selected plan: {value}. Confirm to send the request to the accounts API.',
+    noTransport: 'The accounts API client did not load. Reload the page to try again.',
+    noRenderer: 'The plans could not be loaded. Reload the page to try again.'
+  };
+
+  var plansEl   = document.querySelector('[data-plans]');
+  var formEl    = document.getElementById('order-form');
+  var hintEl    = document.getElementById('order-hint');
+  var errEl     = document.getElementById('order-error');
+  var okEl      = document.getElementById('order-ok');
+  var fieldsEl  = document.getElementById('order-fields');
+  var noteEl    = document.getElementById('order-note');
+  var loginEl   = document.getElementById('order-login');
+  var confirmEl = document.getElementById('order-confirm');
+
+  function shared(name) {
+    return (D && typeof D[name] === 'function') ? D[name] : null;
+  }
+
+  function show(el) { if (el) { el.hidden = false; el.classList.remove('is-hidden'); } }
+  function hide(el) { if (el) { el.hidden = true; el.classList.add('is-hidden'); } }
+  function say(el, text) { if (el) { el.textContent = text; } }
+  function fill(tpl, value) { return tpl.split('{value}').join(value); }
+
+  /* Messages go through forms.js, which owns .form__error / .form__ok (§5b).
+     The local branch keeps the page working if the shared layer is not present. */
+  function setError(text) {
+    var fn = shared('showError');
+    if (fn) { try { fn(formEl, text); return; } catch (e) { /* fall through */ } }
+    say(errEl, text);
+    show(errEl);
+    hide(okEl);
+  }
+  function setOk(text) {
+    var fn = shared('showOk');
+    if (fn) { try { fn(formEl, text); return; } catch (e) { /* fall through */ } }
+    say(okEl, text);
+    show(okEl);
+    hide(errEl);
+  }
+  function clearMessages() {
+    var e = shared('showError'), o = shared('showOk');
+    if (e && o) { try { e(formEl, ''); o(formEl, ''); return; } catch (err) { /* fall through */ } }
+    say(errEl, ''); hide(errEl);
+    say(okEl, ''); hide(okEl);
+  }
+
+  function read(key) {
+    try { return localStorage.getItem(key) || ''; } catch (e) { return ''; }
+  }
+  function token() { return read('drafta_access'); }
+
+  function busy(on) {
+    var fn = shared('setBusy');
+    if (fn) { try { fn(formEl, !!on); } catch (e) { /* fall through */ } }
+    if (!confirmEl) return;
+    confirmEl.disabled = !!on;
+    if (on) { confirmEl.classList.add('is-busy'); } else { confirmEl.classList.remove('is-busy'); }
+  }
+
+  /* The server's response, printed field by field, verbatim. */
+  function renderFields(data) {
+    if (!fieldsEl) return;
+    var src = data || {};
+    var rows = [
+      ['plan', src.plan],
+      ['status', src.status],
+      ['currentPeriodEnd', src.currentPeriodEnd]
+    ];
+    fieldsEl.textContent = '';
+    for (var i = 0; i < rows.length; i++) {
+      var dt = document.createElement('dt');
+      dt.textContent = rows[i][0];
+      var dd = document.createElement('dd');
+      var v = rows[i][1];
+      dd.textContent = (v === undefined || v === null || v === '') ? '—' : String(v);
+      fieldsEl.appendChild(dt);
+      fieldsEl.appendChild(dd);
+    }
+  }
+
+  function resetResult() {
+    clearMessages();
+    hide(fieldsEl); hide(noteEl);
+  }
+
+  function initSession() {
+    if (token()) {
+      var email = read('drafta_email');
+      say(hintEl, email ? fill(T.signedInAs, email) : T.signedIn);
+      hide(loginEl);
+    } else {
+      say(hintEl, T.needsAccount);
+      show(loginEl);
+    }
+  }
+
+  var sending = false;
+
+  /* Choosing a plan needs a session; without one the buyer goes to /login/. */
+  function subscribe(code, name) {
+    if (sending) return;
+    var access = token();
+    if (!access) { window.location.href = LOGIN_URL; return; }
+
+    var plan = String(code || '');
+    if (!plan) return;
+
+    var send = shared('post');
+    if (!send) { setError(T.noTransport); say(hintEl, T.retry); return; }
+
+    sending = true;
+    resetResult();
+    say(hintEl, T.sending);
+    hide(confirmEl);
+    busy(true);
+
+    send(D.endpoints.subscribe, { plan: plan }, access).then(function (res) {
+      sending = false;
+      busy(false);
+      var status = res ? res.status : 0;
+      if (res && res.ok) {
+        /* Never claim a completed purchase: show what the server said, nothing more. */
+        setOk(T.accepted);
+        renderFields(res.data);
+        show(fieldsEl);
+        show(noteEl);
+        say(hintEl, T.selected + ' ' + (name || plan));
+        hide(loginEl);
+      } else {
+        /* The server's own error text, verbatim. */
+        var message = (res && res.data && res.data.error)
+          ? String(res.data.error)
+          : T.network + ' (HTTP ' + status + ')';
+        setError(message);
+        if (status === 401 || status === 403) {
+          say(hintEl, T.expired);
+          show(loginEl);
+        } else {
+          say(hintEl, T.retry);
+        }
+      }
+    }).catch(function () {
+      sending = false;
+      busy(false);
+      setError(T.network);
+      say(hintEl, T.retry);
+    });
+  }
+
+  function onSelect(plan) {
+    var code = (plan && plan.code) ? plan.code : plan;
+    var name = (plan && plan.name) ? plan.name : String(code || '');
+    subscribe(code, name);
+  }
+
+  /* 1 — the plans, rendered by the shared layer against [data-plans]. */
+  function renderPlansBlock() {
+    if (!plansEl) return;
+    if (!D || typeof D.renderPlans !== 'function') {
+      say(hintEl, T.noRenderer);
+      return;
+    }
+    try {
+      var p = D.renderPlans(plansEl, { lang: LANG, mode: 'buy', onSelect: onSelect });
+      if (p && typeof p.then === 'function') {
+        p.catch(function () { say(hintEl, T.noRenderer); });
+      }
+    } catch (e) {
+      say(hintEl, T.noRenderer);
+    }
+  }
+
+  /* 2 — "?plan=<code>", the deep link the pricing page produces. */
+  function handleDeepLink() {
+    var wanted = '';
+    try {
+      var m = /[?&]plan=([^&]*)/.exec(window.location.search);
+      if (m) wanted = decodeURIComponent(m[1]);
+    } catch (e) { wanted = ''; }
+    if (!wanted) return;
+
+    if (!token()) { window.location.href = LOGIN_URL; return; }
+
+    /* A deep link is a choice already made on another page, so it asks for one
+       explicit confirmation here instead of posting on load. */
+    var label = wanted;
+    if (D && typeof D.loadPlans === 'function') {
+      D.loadPlans().then(function (list) {
+        for (var i = 0; i < (list || []).length; i++) {
+          if (list[i] && list[i].code === wanted) { label = list[i].name || wanted; }
+        }
+        ask(label);
+      }).catch(function () { ask(label); });
+    } else {
+      ask(label);
+    }
+
+    function ask(name) {
+      say(hintEl, fill(T.confirmSelected, name));
+      if (confirmEl) {
+        show(confirmEl);
+        confirmEl.addEventListener('click', function () { subscribe(wanted, name); });
+      }
+    }
+  }
+
+  renderPlansBlock();
+  initSession();
+  handleDeepLink();
+})();
+</script>
+
+</body>
+</html>
