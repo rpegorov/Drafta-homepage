@@ -22,7 +22,7 @@
 <body>
   <header class="nav">
     <nav class="nav__inner wrap">
-      <a class="nav__logo" href="/">Drafta</a>
+      <a class="nav__logo" href="/" translate="no">Drafta</a>
       <div class="nav__links">
         <a class="nav__link" href="/#features">Features</a>
         <a class="nav__link" href="/#pricing">Pricing</a>
@@ -39,50 +39,47 @@
   </header>
 
   <main>
-    <section class="section">
-      <div class="wrap">
+    <section class="band band--soft">
+      <div class="wrap wrap--narrow">
         <p class="eyebrow">Account</p>
         <h1 class="h1">Confirm your email address</h1>
         <p class="lede">The link in the email from Drafta opens this page. Confirming the address is what activates the account.</p>
         <noscript>
-          <p class="lede">Confirming your address needs JavaScript. Turn it on and open the link from the email again.</p>
+          <p class="muted">Confirming your address needs JavaScript. Turn it on and open the link from the email again.</p>
         </noscript>
 
         <div class="form is-hidden" data-state="checking" hidden role="status">
-          <h2 class="h2">Confirming your address…</h2>
-          <p class="muted">Talking to the accounts service. This takes a second.</p>
+          <h2 class="h3">Confirming your address…</h2>
+          <p class="callout">Talking to the accounts service. This takes a second.</p>
         </div>
 
         <div class="form is-hidden" data-state="incomplete" hidden>
-          <h2 class="h2">This link is incomplete</h2>
-          <p class="muted">The confirmation link arrived without its token, so there is nothing to confirm. Copy the whole link out of the email exactly as it was sent.</p>
-          <p class="muted">A fresh link cannot be requested from the site yet. If this address is already confirmed, sign in.</p>
+          <h2 class="h3">This link is incomplete</h2>
+          <p class="callout">The confirmation link arrived without its token, so there is nothing to confirm. Copy the whole link out of the email exactly as it was sent — and note that a fresh link cannot be requested from the site yet.</p>
           <div class="form__actions">
             <a class="btn btn--primary" href="/login/">Sign in</a>
           </div>
         </div>
 
         <div class="form is-hidden" data-state="confirmed" hidden role="status">
-          <p class="form__ok">Address confirmed.</p>
-          <h2 class="h2">Your email address is confirmed</h2>
-          <p class="muted">Thanks — the accounts service accepted the link. Sign in with this address to buy a licence.</p>
+          <h2 class="h3">Your email address is confirmed</h2>
+          <p class="form__ok">Thanks — the accounts service accepted the link. Sign in with this address to buy a licence.</p>
           <div class="form__actions">
             <a class="btn btn--primary" href="/login/">Sign in</a>
           </div>
         </div>
 
         <div class="form is-hidden" data-state="already" hidden role="status">
-          <p class="form__ok">Already confirmed.</p>
-          <h2 class="h2">This address was confirmed earlier</h2>
-          <p class="muted">Nothing left to do — the account was already activated with an earlier link. Sign in to carry on.</p>
+          <h2 class="h3">This address was confirmed earlier</h2>
+          <p class="form__ok">Nothing left to do — the account was already activated with an earlier link. Sign in to carry on.</p>
           <div class="form__actions">
             <a class="btn btn--primary" href="/login/">Sign in</a>
           </div>
         </div>
 
         <div class="form is-hidden" data-state="invalid" hidden>
-          <h2 class="h2">This link is invalid or has expired</h2>
-          <p class="muted" data-invalid-reason></p>
+          <h2 class="h3">This link is invalid or has expired</h2>
+          <p class="form__error" data-invalid-reason></p>
           <p class="muted">A fresh confirmation link cannot be requested from the site yet — there is no resend option. If this address is already confirmed, signing in is the way in.</p>
           <div class="form__actions">
             <a class="btn btn--primary" href="/login/">Sign in</a>
@@ -90,10 +87,10 @@
         </div>
 
         <div class="form is-hidden" data-state="error" hidden>
-          <h2 class="h2">We could not confirm this link</h2>
-          <p class="muted">The accounts service did not answer. Check your connection and try again.</p>
+          <h2 class="h3">We could not confirm this link</h2>
+          <p class="form__error">The accounts service did not answer. Check your connection and try again.</p>
           <div class="form__actions">
-            <button class="btn btn--ghost" type="button" data-retry>Try again</button>
+            <button class="btn btn--primary" type="button" data-retry>Try again</button>
           </div>
         </div>
       </div>
@@ -102,7 +99,7 @@
 
   <footer class="footer">
     <div class="footer__inner wrap">
-      <div class="footer__brand">Drafta</div>
+      <div class="footer__brand" translate="no">Drafta</div>
       <div class="footer__cols">
         <div class="footer__col">
           <div class="footer__col-title">Product</div>

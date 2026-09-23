@@ -16,14 +16,32 @@
   <meta property="og:url" content="https://drafta.org/">
   <meta property="og:image" content="https://drafta.org/assets/img/og.png">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#FBF7F0">
   <link rel="stylesheet" href="/assets/css/tokens.css">
   <link rel="stylesheet" href="/assets/css/site.css">
+  <style>
+    /* Page-local, and deliberately short: site.css owns the shared pieces — the skip
+       link, the heading wrapping, and the language switcher's and copyright line's
+       targets. Specific to THIS page: the editorial ratio of the ink band's two columns
+       and its mobile collapse. No colour or px size is declared — values come from the
+       token file. */
+    #features .grid{grid-template-columns:1.45fr 0.55fr;row-gap:var(--space-5)}
+    /* The copyright line's 44px target used to be described here; it moved into
+       site.css with the other shared components, so all ten pages get it. */
+    /* This override has to stay, and has to win: the page-local column rule above has
+       an id in it, so site.css's own breakpoint cannot collapse that grid. */
+    @media (max-width:820px){
+      #features .grid{grid-template-columns:minmax(0,1fr)}
+    }
+  </style>
 </head>
 <body>
 
+<a class="btn btn--primary skip-link" href="#main">Skip to content</a>
+
 <header class="nav">
   <nav class="nav__inner wrap">
-    <a class="nav__logo" href="/">Drafta</a>
+    <a class="nav__logo" href="/" translate="no">Drafta</a>
     <div class="nav__links">
       <a class="nav__link" href="/#features">Features</a>
       <a class="nav__link" href="/#pricing">Pricing</a>
@@ -39,36 +57,36 @@
   </nav>
 </header>
 
-<main>
+<main id="main" tabindex="-1">
 
-  <!-- ── Hero ───────────────────────────────────────────────────────────── -->
+  <!-- ── Band 1 · paper: hero. Its figure crosses into the cream band below ── -->
   <section class="section hero">
     <div class="wrap">
       <p class="eyebrow">Native macOS · CodeMirror 6</p>
       <h1 class="h1">A Markdown editor built for programmers.</h1>
-      <p class="lede">Hierarchical notebooks, 50+ language highlighting, Mermaid and KaTeX preview, tags, statuses, revision history with diffs. Every note is a plain <span class="mono">.md</span> file with YAML front-matter — readable by any editor, forever.</p>
+      <p class="lede">Hierarchical notebooks, 50+ language highlighting, Mermaid and KaTeX preview, tags, statuses, revision history with diffs. Every note is a plain <span class="mono" translate="no">.md</span> file with YAML front-matter — readable by any editor, forever.</p>
       <div class="hero__actions">
         <a class="btn btn--primary btn--lg" href="https://github.com/rpegorov/drafta-releases/releases/latest">Download for macOS</a>
         <a class="btn btn--ghost btn--lg" href="#pricing">See pricing</a>
       </div>
       <p class="hero__meta muted">macOS 26.4 · Apple Silicon &amp; Intel · Apache-2.0</p>
       <div class="hero__shot">
-        <figure class="shot">
-          <div class="shot__frame">
+        <figure class="figure shot">
+          <div class="figure__frame shot__frame">
             <img class="shot__img" src="/assets/img/screenshots/editor.png"
                  alt="Drafta editor window on macOS: the sidebar shows notebooks, note statuses and tags, the note list sits in the middle, and the open Markdown note is in the editor."
-                 width="2400" height="1500" loading="lazy" decoding="async"
+                 width="2400" height="1500" decoding="async"
                  onerror="this.closest('.shot').classList.add('shot--missing'); this.remove();">
-            <div class="shot__ph" aria-hidden="true">Screenshot pending</div>
+            <div class="shot__ph" aria-hidden="true">Editor screenshot — pending capture</div>
           </div>
-          <figcaption class="shot__caption">Sidebar, note list and editor in one window — same layout on every Mac.</figcaption>
+          <figcaption class="figure__caption">Sidebar, note list and editor in one window — same layout on every Mac.</figcaption>
         </figure>
       </div>
     </div>
   </section>
 
-  <!-- ── Trust strip ────────────────────────────────────────────────────── -->
-  <section class="section section--tight">
+  <!-- ── Band 2 · cream: the trust strip ────────────────────────────────── -->
+  <section class="band band--soft">
     <div class="wrap">
       <div class="grid grid--3">
         <div class="feature">
@@ -87,40 +105,39 @@
     </div>
   </section>
 
-  <div class="wrap"><hr class="divider"></div>
-
-  <!-- ── Feature rows ───────────────────────────────────────────────────── -->
-  <section class="section">
+  <!-- ── Band 3 · paper: the editor, as two asymmetric splits ───────────── -->
+  <section class="band">
     <div class="wrap">
-      <p class="eyebrow">What's inside</p>
+      <div class="grid">
+      <p class="eyebrow">What&rsquo;s inside</p>
       <h2 class="h2">Everything a programmer needs from a notes app.</h2>
 
-      <div class="feature-row">
-        <div class="feature-row__text">
+      <div class="split split--reverse">
+        <div class="split__text">
           <h3 class="h3">Editor, preview, or both at once</h3>
           <p class="muted">Three view modes, one keystroke apart: editor only, rendered preview only, or split with synchronised scrolling. Tables get a grid picker, Mermaid and KaTeX render live, and em-dash and spacing are tidied as you type.</p>
           <ul class="feature-row__list">
             <li>Editor, preview and split modes</li>
             <li>Tables, Mermaid and KaTeX live preview</li>
-            <li>Minimap, table of contents, search with ⌘F</li>
+            <li>Minimap, table of contents, search with ⌘&nbsp;F</li>
           </ul>
         </div>
-        <div class="feature-row__media">
-          <figure class="shot">
-            <div class="shot__frame">
+        <div class="split__media">
+          <figure class="figure shot">
+            <div class="figure__frame shot__frame">
               <img class="shot__img" src="/assets/img/screenshots/split.png"
                    alt="Drafta in split mode: raw Markdown on the left, the rendered note with headings, a table and a diagram on the right."
-                   width="2400" height="1500" loading="lazy" decoding="async"
+                   width="2400" height="1500" decoding="async"
                    onerror="this.closest('.shot').classList.add('shot--missing'); this.remove();">
-              <div class="shot__ph" aria-hidden="true">Screenshot pending</div>
+              <div class="shot__ph" aria-hidden="true">Split-view screenshot — pending capture</div>
             </div>
-            <figcaption class="shot__caption">Split mode: your Markdown on the left, the rendered note on the right.</figcaption>
+            <figcaption class="figure__caption">Split mode: your Markdown on the left, the rendered note on the right.</figcaption>
           </figure>
         </div>
       </div>
 
-      <div class="feature-row feature-row--reverse">
-        <div class="feature-row__text">
+      <div class="split">
+        <div class="split__text">
           <h3 class="h3">Notebooks, tags, statuses</h3>
           <p class="muted">Notebooks nest as deep as you need. Tags are extracted from the text automatically and can be managed by hand, with a colour per tag. Notes carry a status — Active, On Hold, Completed, Dropped — so a side project can wait its turn without being deleted.</p>
           <ul class="feature-row__list">
@@ -129,22 +146,28 @@
             <li>Pinned notes, trash, note statuses</li>
           </ul>
         </div>
-        <div class="feature-row__media">
-          <figure class="shot">
-            <div class="shot__frame">
+        <div class="split__media">
+          <figure class="figure shot">
+            <div class="figure__frame shot__frame">
               <img class="shot__img" src="/assets/img/screenshots/tables.png"
                    alt="A Markdown table inside the Drafta editor with the grid picker open for inserting rows and columns."
-                   width="2400" height="1500" loading="lazy" decoding="async"
+                   width="2400" height="1500" decoding="async"
                    onerror="this.closest('.shot').classList.add('shot--missing'); this.remove();">
-              <div class="shot__ph" aria-hidden="true">Screenshot pending</div>
+              <div class="shot__ph" aria-hidden="true">Table-editing screenshot — pending capture</div>
             </div>
-            <figcaption class="shot__caption">Tables have a grid picker, and Tab moves between cells.</figcaption>
+            <figcaption class="figure__caption">Tables have a grid picker, and Tab moves between cells.</figcaption>
           </figure>
         </div>
       </div>
+      </div>
+    </div>
+  </section>
 
-      <div class="feature-row">
-        <div class="feature-row__text">
+  <!-- ── Band 4 · cream: history and export, before the ink band ────────── -->
+  <section class="band band--soft">
+    <div class="wrap">
+      <div class="split">
+        <div class="split__text">
           <h3 class="h3">History you can actually read</h3>
           <p class="muted">Every save becomes a revision — 30 per note, stored on your disk. Open the unified diff, see exactly what changed, restore any version. Nothing is written to your notes without a copy of what was there before.</p>
           <ul class="feature-row__list">
@@ -153,124 +176,85 @@
             <li>Restore any revision in one click</li>
           </ul>
         </div>
-        <div class="feature-row__media">
-          <figure class="shot">
-            <div class="shot__frame">
+        <div class="split__media">
+          <figure class="figure shot">
+            <div class="figure__frame shot__frame">
               <img class="shot__img" src="/assets/img/screenshots/export.png"
-                   alt="Drafta's export options for a note: PDF, DOCX, HTML and Markdown, next to the rendered document."
-                   width="2400" height="1500" loading="lazy" decoding="async"
+                   alt="Drafta&rsquo;s export options for a note: PDF, DOCX, HTML and Markdown, next to the rendered document."
+                   width="2400" height="1500" decoding="async"
                    onerror="this.closest('.shot').classList.add('shot--missing'); this.remove();">
-              <div class="shot__ph" aria-hidden="true">Screenshot pending</div>
+              <div class="shot__ph" aria-hidden="true">Export screenshot — pending capture</div>
             </div>
-            <figcaption class="shot__caption">Out of the app in one step: PDF, DOCX, HTML or Markdown.</figcaption>
+            <figcaption class="figure__caption">Out of the app in one step: PDF, DOCX, HTML or Markdown.</figcaption>
           </figure>
         </div>
       </div>
     </div>
   </section>
 
-  <div class="wrap"><hr class="divider"></div>
-
-  <!-- ── Feature grid ───────────────────────────────────────────────────── -->
-  <section class="section" id="features">
+  <!-- ── Band 5 · ink: what is actually in the box ──────────────────────── -->
+  <section class="band band--ink" id="features">
     <div class="wrap">
       <p class="eyebrow">Shipped in 1.0</p>
       <h2 class="h2">Everything in the box</h2>
-      <p class="lede muted">No feature tiers, no locked panels. This is what the app does today.</p>
+      <p class="lede">No feature tiers, no locked panels. This is what the app does today.</p>
 
-      <div class="features grid grid--3">
+      <!-- Two unequal columns instead of the old grid of icon cells: the wide column
+           carries the two large claims, the narrow one groups the rest. -->
+      <div class="grid grid--2">
         <div class="feature">
-          <div class="feature__icon" aria-hidden="true">⌘</div>
-          <div class="feature__title">CodeMirror 6 editor</div>
-          <div class="feature__body">The same battle-tested editor that powers Inkdrop and a long list of developer tools — mature, fast and extensible.</div>
+          <div class="feature__title" translate="no">CodeMirror 6, 50+ languages</div>
+          <div class="feature__body">The battle-tested editor that also powers <span translate="no">Inkdrop</span>, with syntax highlighting for Python, Rust, TypeScript, Go, SQL, YAML, Bash and forty more. Three view modes — editor only, preview only, or split with synchronised scrolling. Tables get a grid picker, Mermaid and KaTeX render live, and em-dash and spacing are tidied as you type. A minimap, a table of contents and search with ⌘&nbsp;F. <span class="mono" translate="no">$…$</span> fences work as you would expect.</div>
+        </div>
+        </div>
+
+        <div class="grid grid--2">
+        <div class="feature">
+          <div class="feature__title">A library you can steer</div>
+          <div class="feature__body">Hierarchical notebooks nest without limit, with drag and drop between them. Tags are extracted from the text automatically, managed by hand where you want, and can carry a colour each. Notes hold a status — Active, On Hold, Completed, Dropped — and pinned notes, trash and the whole library stay a keystroke away: ⌘&nbsp;P is fuzzy search across every note.</div>
         </div>
         <div class="feature">
-          <div class="feature__icon" aria-hidden="true">#</div>
-          <div class="feature__title">50+ languages highlighted</div>
-          <div class="feature__body">Python, Rust, TypeScript, Go, SQL, YAML, Bash and forty more. A fenced code block is a first-class citizen, not a grey box.</div>
+          <div class="feature__title">Your history and your skins</div>
+          <div class="feature__body">Every save becomes a revision, 30 per note with a unified diff view and one-click restore. Five themes ship — Default Light, Default Dark, Drafta Dark, Dark Islands, Tokyo Night — and a JSON theme of your own drops straight in.</div>
         </div>
         <div class="feature">
-          <div class="feature__icon" aria-hidden="true">◫</div>
-          <div class="feature__title">Three view modes</div>
-          <div class="feature__body">Editor only, preview only, or split with synchronised scrolling. Switch with a keystroke or a swipe.</div>
+          <div class="feature__title">In and out, on your terms</div>
+          <div class="feature__body">Import <span class="mono" translate="no">.md</span> and <span class="mono" translate="no">.html</span> (Bear format) and export PDF, DOCX, HTML or Markdown; local images come along as attachments. The assistant opens on ⌘&nbsp;J with your own API key, an MCP server lets your tools read the note you are looking at, and updates arrive on their own — Sparkle checks once a day, or on demand from <span class="mono" translate="no">Drafta → Check for Updates…</span></div>
         </div>
         <div class="feature">
-          <div class="feature__icon" aria-hidden="true">▦</div>
-          <div class="feature__title">Tables that behave</div>
-          <div class="feature__body">Insert a table with the grid picker, move between cells with Tab. Alignment and pipes are handled for you.</div>
-        </div>
-        <div class="feature">
-          <div class="feature__icon" aria-hidden="true">◈</div>
-          <div class="feature__title">Mermaid and KaTeX preview</div>
-          <div class="feature__body">Diagrams and formulas render live inside the note. Fences and <span class="mono">$…$</span> work exactly as you would expect.</div>
-        </div>
-        <div class="feature">
-          <div class="feature__icon" aria-hidden="true">▤</div>
-          <div class="feature__title">Hierarchical notebooks</div>
-          <div class="feature__body">Unlimited nesting, drag and drop between notebooks, and a sidebar that keeps up with the library.</div>
-        </div>
-        <div class="feature">
-          <div class="feature__icon" aria-hidden="true">◦</div>
-          <div class="feature__title">Tags and statuses</div>
-          <div class="feature__body">Automatic tag extraction from content, manual tags, a colour per tag, and Active / On Hold / Completed / Dropped statuses.</div>
-        </div>
-        <div class="feature">
-          <div class="feature__icon" aria-hidden="true">⌘</div>
-          <div class="feature__title">Quick Open</div>
-          <div class="feature__body">⌘P gives you fuzzy search across every note in the library. Type three letters, land on the note.</div>
-        </div>
-        <div class="feature">
-          <div class="feature__icon" aria-hidden="true">↻</div>
-          <div class="feature__title">Revision history</div>
-          <div class="feature__body">Thirty versions per note with a unified diff view and one-click restore. Stored locally, next to your notes.</div>
-        </div>
-        <div class="feature">
-          <div class="feature__icon" aria-hidden="true">◐</div>
-          <div class="feature__title">Five themes, plus yours</div>
-          <div class="feature__body">Default Light, Default Dark, Drafta Dark, Dark Islands and Tokyo Night — or drop a JSON theme into the app support folder.</div>
-        </div>
-        <div class="feature">
-          <div class="feature__icon" aria-hidden="true">⇄</div>
-          <div class="feature__title">Import and export</div>
-          <div class="feature__body">Import <span class="mono">.md</span> and <span class="mono">.html</span> (Bear format); export PDF, DOCX, HTML or Markdown. Attach local images.</div>
-        </div>
-        <div class="feature">
-          <div class="feature__icon" aria-hidden="true">✦</div>
-          <div class="feature__title">AI assistant, your key</div>
-          <div class="feature__body">⌘J opens the assistant. You bring your own API key — which also means your key stays yours and no prompt goes anywhere you did not ask for.</div>
-        </div>
-        <div class="feature">
-          <div class="feature__icon" aria-hidden="true">⌗</div>
-          <div class="feature__title">MCP server</div>
-          <div class="feature__body">Drafta exposes your notes to MCP-capable agents, so a tool can read the note you are looking at instead of asking you to paste it.</div>
-        </div>
-        <div class="feature">
-          <div class="feature__icon" aria-hidden="true">☁</div>
-          <div class="feature__title">Cloud sync</div>
-          <div class="feature__body">Sync across your Macs through your Drafta account — the default path, covered by the plan's storage quota, and encrypted end to end before anything leaves the machine.</div>
-        </div>
-        <div class="feature">
-          <div class="feature__icon" aria-hidden="true">⊙</div>
-          <div class="feature__title">Your own CouchDB</div>
-          <div class="feature__body">Connect your own CouchDB instead if you prefer: it stores with no quota at all, locally or on your own server. The app has a backend setting for it.</div>
-        </div>
-        <div class="feature">
-          <div class="feature__icon" aria-hidden="true">↑</div>
-          <div class="feature__title">Auto-update</div>
-          <div class="feature__body">Sparkle checks once a day, or on demand from <span class="mono">Drafta → Check for Updates…</span> You are never nagged.</div>
+          <div class="feature__title">Two places to keep the cloud copy</div>
+          <div class="feature__body">Cloud sync through your <span translate="no">Drafta</span> account is the default path, covered by the plan&rsquo;s storage quota and encrypted end to end before anything leaves the machine. Or connect your own CouchDB instead: no quota at all, locally or on your own server.</div>
         </div>
       </div>
     </div>
   </section>
 
-  <div class="wrap"><hr class="divider"></div>
-
-  <!-- ── Security ───────────────────────────────────────────────────────── -->
-  <section class="section" id="security">
+  <!-- ── Band 6 · paper: security — editorial column, pullquote, stat panel ── -->
+  <section class="band" id="security">
     <div class="wrap">
-      <p class="eyebrow">Security</p>
-      <h2 class="h2">Encrypted on the way up, plain files on your disk.</h2>
-      <p class="lede muted">Both halves are the promise: the copy in the cloud is unreadable to us, and the copy on your machine is yours to open, read and keep.</p>
+      <div class="split split--reverse">
+        <div class="split__text">
+          <p class="eyebrow">Security</p>
+          <h2 class="h2">Encrypted on the way up, plain files on your disk.</h2>
+          <p class="muted">Both halves are the promise: the copy in the cloud is unreadable to us, and the copy on your machine is yours to open, read and keep.</p>
+          <blockquote class="pullquote">
+            Unreadable in the cloud. Ordinary Markdown on your Mac.
+            <span class="pullquote__source">The same promise, kept twice</span>
+          </blockquote>
+        </div>
+        <div class="split__media">
+          <div class="grid grid--2">
+            <div class="stat">
+              <span class="stat__value">AES-256-GCM</span>
+              <span class="stat__label">notes sealed on your Mac before they are sent</span>
+            </div>
+            <div class="stat">
+              <span class="stat__value">PBKDF2</span>
+              <span class="stat__label">the key is derived from your password, never uploaded</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div class="grid grid--2">
         <div class="feature">
@@ -279,7 +263,7 @@
         </div>
         <div class="feature">
           <div class="feature__title">PBKDF2-HMAC-SHA256 and AES-256-GCM</div>
-          <div class="feature__body">A 256-bit key is derived from your password with PBKDF2-HMAC-SHA256, using the account's salt and iteration count. Notes are sealed with AES-256-GCM. No hand-waving: those are the exact primitives, and this audience checks.</div>
+          <div class="feature__body">A 256-bit key is derived from your password with PBKDF2-HMAC-SHA256, using the account&rsquo;s salt and iteration count. Notes are sealed with AES-256-GCM. No hand-waving: those are the exact primitives, and this audience checks.</div>
         </div>
         <div class="feature">
           <div class="feature__title">Your password and key stay with you</div>
@@ -301,20 +285,16 @@
     </div>
   </section>
 
-  <div class="wrap"><hr class="divider"></div>
-
-  <!-- ── Your notes are files ───────────────────────────────────────────── -->
-  <section class="section" id="files">
+  <!-- ── Band 7 · cream: your notes are files, with the numbers as an object ── -->
+  <section class="band band--soft" id="files">
     <div class="wrap">
-      <div class="grid grid--2">
-        <div>
+      <div class="split">
+        <div class="split__text">
           <p class="eyebrow">Local first</p>
-          <h2 class="h2">Your notes are files, not rows in someone's database.</h2>
+          <h2 class="h2">Your notes are files, not rows in someone&rsquo;s database.</h2>
           <p class="muted">Drafta keeps the library on your disk: one Markdown file per note, YAML front-matter for tags and status, revisions in a folder beside it. No closed format stands between you and your own writing, and changing plan cannot strand it. The cloud copy is encrypted under a key you hold, not one the service holds — so it stays yours even when it is not on your disk.</p>
-          <p class="muted">Because it is plain text, the rest of your toolchain already works: <span class="mono">grep</span> across everything, commit the library to git, open a note in VS Code or Obsidian, or <span class="mono">cat</span> it in a terminal. Drafta is a native Swift app — there is no Electron runtime underneath and no bundled browser to keep hot.</p>
-        </div>
-        <div>
-          <ul class="plan__list">
+          <p class="muted">Because it is plain text, the rest of your toolchain already works: <span class="mono" translate="no">grep</span> across everything, commit the library to git, open a note in VS Code or Obsidian, or <span class="mono" translate="no">cat</span> it in a terminal. Drafta is a native Swift app — there is no Electron runtime underneath and no bundled browser to keep hot.</p>
+          <ul class="feature-row__list">
             <li>Plain Markdown with YAML front-matter on your disk</li>
             <li>30 revisions per note, stored locally</li>
             <li>No proprietary database, no export-only escape hatch</li>
@@ -322,21 +302,39 @@
             <li>Licensed under Apache-2.0</li>
           </ul>
         </div>
+        <div class="split__media">
+          <div class="grid grid--2">
+            <div class="stat">
+              <span class="stat__value">30</span>
+              <span class="stat__label">revisions per note, on disk</span>
+            </div>
+            <div class="stat">
+              <span class="stat__value">0</span>
+              <span class="stat__label">proprietary databases</span>
+            </div>
+            <div class="stat">
+              <span class="stat__value">50+</span>
+              <span class="stat__label">languages highlighted</span>
+            </div>
+            <div class="stat">
+              <span class="stat__value">.md</span>
+              <span class="stat__label">what every note stays</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
-  <div class="wrap"><hr class="divider"></div>
-
-  <!-- ── Pricing ────────────────────────────────────────────────────────── -->
-  <section class="section" id="pricing">
+  <!-- ── Band 8 · paper: pricing ────────────────────────────────────────── -->
+  <section class="band" id="pricing">
     <div class="wrap">
       <p class="eyebrow">Pricing</p>
       <h2 class="h2">One plan, everything included.</h2>
-      <p class="lede muted">Monthly or annual billing for the same app. Every new account starts with a 30-day trial — no card needed.</p>
+      <p class="lede">Monthly or annual billing for the same app. Every new account starts with a 30-day trial — no card needed.</p>
 
       <div class="callout callout--accent">
-        <strong>30-day trial on every new account</strong> — no card required. After the trial you pick a billing period, monthly or yearly; there is no second tier and no lifetime licence.
+        <p><strong>30-day trial on every new account</strong> — no card required. After the trial you pick a billing period, monthly or yearly; there is no second tier and no lifetime licence.</p>
       </div>
 
       <div class="plans" data-plans></div>
@@ -345,94 +343,95 @@
     </div>
   </section>
 
-  <div class="wrap"><hr class="divider"></div>
-
-  <!-- ── FAQ ────────────────────────────────────────────────────────────── -->
-  <section class="section" id="faq">
+  <!-- ── Band 9 · cream: FAQ ────────────────────────────────────────────── -->
+  <section class="band band--soft" id="faq">
     <div class="wrap">
-      <p class="eyebrow">FAQ</p>
-      <h2 class="h2">Questions worth answering</h2>
-
-      <div class="faq">
-        <div class="faq__item">
-          <h3 class="faq__q">What does Drafta require?</h3>
-          <p class="faq__a">macOS 26.4 or later, on Apple Silicon or Intel. It is a native Swift and SwiftUI app, not a web app and not an Electron shell.</p>
+      <div class="grid grid--2">
+        <div>
+          <p class="eyebrow">FAQ</p>
+          <h2 class="h2">Questions worth answering</h2>
         </div>
-        <div class="faq__item">
-          <h3 class="faq__q">How do I install it?</h3>
-          <p class="faq__a">Download the DMG from the latest release, open it and drag <span class="mono">Drafta.app</span> into Applications. The build is not notarised yet, so the first launch needs right-click → Open → Open; Gatekeeper asks only once.</p>
-        </div>
-        <div class="faq__item">
-          <h3 class="faq__q">How do updates work?</h3>
-          <p class="faq__a">They arrive by themselves. Sparkle checks <span class="mono">drafta.org/appcast.xml</span> once a day, and <span class="mono">Drafta → Check for Updates…</span> does it on demand.</p>
-        </div>
-        <div class="faq__item">
-          <h3 class="faq__q">Is there a trial, and does it need a card?</h3>
-          <p class="faq__a">Every new account gets 30 days. No card is required to start it. When it ends you pick a billing period — monthly or yearly.</p>
-        </div>
-        <div class="faq__item">
-          <h3 class="faq__q">Where do my notes live?</h3>
-          <p class="faq__a">On your disk, one Markdown file per note with YAML front-matter, revisions in a folder beside them. Nothing about the storage format is proprietary — if you stop using Drafta, your notes still open anywhere.</p>
-        </div>
-        <div class="faq__item">
-          <h3 class="faq__q">Do I need an account to use the app?</h3>
-          <p class="faq__a">An account is what starts your trial, carries your plan and — unless you connect your own CouchDB — gives your notes a cloud copy. That copy is stored as ciphertext we cannot read.</p>
-        </div>
-        <div class="faq__item">
-          <h3 class="faq__q">What does a plan include?</h3>
-          <p class="faq__a">There is one plan, and you choose how to pay for it: monthly or yearly. The card above shows the storage and note limits read from the accounts API, so this page never quotes a quota the service does not enforce.</p>
-        </div>
-        <div class="faq__item">
-          <h3 class="faq__q">Is my data encrypted?</h3>
-          <p class="faq__a">On the way to the cloud, yes — end to end. Notes are sealed with AES-256-GCM under a 256-bit key derived from your password with PBKDF2-HMAC-SHA256, using the account's salt and iteration count. Be precise about the boundary: this protects the sync path, not your disk. The library on your Mac stays ordinary Markdown files you can read in any editor.</p>
-        </div>
-        <div class="faq__item">
-          <h3 class="faq__q">Can you read my notes?</h3>
-          <p class="faq__a">Not the synced copy. The server never receives your password or your key — sign-in proves knowledge of the password through a separate verifier derived from the key — and what it stores is ciphertext under a key it does not hold. For each note the id and the last-updated timestamp are visible, along with the envelope's version and key-derivation parameters; the timestamp is what decides last-writer-wins between your Macs.</p>
-        </div>
-        <div class="faq__item">
-          <h3 class="faq__q">Where is my data stored?</h3>
-          <p class="faq__a">In two places, and both are yours. Locally: plain Markdown files in your library folder, plus revisions. In the cloud: storage through your Drafta account is the default and is what the plan's quota covers. If you would rather not use it, connect your own CouchDB instead — storage with no quota, locally or on your own server.</p>
-        </div>
-        <div class="faq__item">
-          <h3 class="faq__q">What if I use a PC or Linux?</h3>
-          <p class="faq__a">Not yet. macOS is available today; Windows and Linux are planned on Rust and Tauri. It is on the roadmap below rather than in the app.</p>
+        <div>
+          <div class="faq">
+            <details class="faq__item">
+              <summary class="faq__q">What does Drafta require?</summary>
+              <p class="faq__a">macOS 26.4 or later, on Apple Silicon or Intel. It is a native Swift and SwiftUI app, not a web app and not an Electron shell.</p>
+            </details>
+            <details class="faq__item">
+              <summary class="faq__q">How do I install it?</summary>
+              <p class="faq__a">Download the DMG from the latest release, open it and drag <span class="mono" translate="no">Drafta.app</span> into Applications. The build is not notarised yet, so the first launch needs right-click → Open → Open; Gatekeeper asks only once.</p>
+            </details>
+            <details class="faq__item">
+              <summary class="faq__q">How do updates work?</summary>
+              <p class="faq__a">They arrive by themselves. Sparkle checks <span class="mono" translate="no">drafta.org/appcast.xml</span> once a day, and <span class="mono" translate="no">Drafta → Check for Updates…</span> does it on demand.</p>
+            </details>
+            <details class="faq__item">
+              <summary class="faq__q">Is there a trial, and does it need a card?</summary>
+              <p class="faq__a">Every new account gets 30 days. No card is required to start it. When it ends you pick a billing period — monthly or yearly.</p>
+            </details>
+            <details class="faq__item">
+              <summary class="faq__q">Where do my notes live?</summary>
+              <p class="faq__a">On your disk, one Markdown file per note with YAML front-matter, revisions in a folder beside them. Nothing about the storage format is proprietary — if you stop using Drafta, your notes still open anywhere.</p>
+            </details>
+            <details class="faq__item">
+              <summary class="faq__q">Do I need an account to use the app?</summary>
+              <p class="faq__a">An account is what starts your trial, carries your plan and — unless you connect your own CouchDB — gives your notes a cloud copy. That copy is stored as ciphertext we cannot read.</p>
+            </details>
+            <details class="faq__item">
+              <summary class="faq__q">What does a plan include?</summary>
+              <p class="faq__a">There is one plan, and you choose how to pay for it: monthly or yearly. The card above shows the storage and note limits read from the accounts API, so this page never quotes a quota the service does not enforce.</p>
+            </details>
+            <details class="faq__item">
+              <summary class="faq__q">Is my data encrypted?</summary>
+              <p class="faq__a">On the way to the cloud, yes — end to end. Notes are sealed with AES-256-GCM under a 256-bit key derived from your password with PBKDF2-HMAC-SHA256, using the account&rsquo;s salt and iteration count. Be precise about the boundary: this protects the sync path, not your disk. The library on your Mac stays ordinary Markdown files you can read in any editor.</p>
+            </details>
+            <details class="faq__item">
+              <summary class="faq__q">Can you read my notes?</summary>
+              <p class="faq__a">Not the synced copy. The server never receives your password or your key — sign-in proves knowledge of the password through a separate verifier derived from the key — and what it stores is ciphertext under a key it does not hold. For each note the id and the last-updated timestamp are visible, along with the envelope&rsquo;s version and key-derivation parameters; the timestamp is what decides last-writer-wins between your Macs.</p>
+            </details>
+            <details class="faq__item">
+              <summary class="faq__q">Where is my data stored?</summary>
+              <p class="faq__a">In two places, and both are yours. Locally: plain Markdown files in your library folder, plus revisions. In the cloud: storage through your Drafta account is the default and is what the plan&rsquo;s quota covers. If you would rather not use it, connect your own CouchDB instead — storage with no quota, locally or on your own server.</p>
+            </details>
+            <details class="faq__item">
+              <summary class="faq__q">What if I use a PC or Linux?</summary>
+              <p class="faq__a">Not yet. macOS is available today; Windows and Linux are planned on Rust and Tauri. It is on the roadmap below rather than in the app.</p>
+            </details>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <div class="wrap"><hr class="divider"></div>
-
-  <!-- ── Roadmap ────────────────────────────────────────────────────────── -->
-  <section class="section" id="roadmap">
+  <!-- ── Band 10 · paper: roadmap ───────────────────────────────────────── -->
+  <section class="band" id="roadmap">
     <div class="wrap">
       <p class="eyebrow">Roadmap</p>
-      <h2 class="h2">What's next, stated plainly</h2>
-      <p class="lede muted">Where things actually stand — including the parts that are not finished.</p>
+      <h2 class="h2">What&rsquo;s next, stated plainly</h2>
+      <p class="lede">Where things actually stand — including the parts that are not finished.</p>
 
-      <div class="roadmap grid grid--2">
-        <div class="roadmap__item">
-          <div class="roadmap__status"><span class="dot dot--done"></span> Available</div>
-          <h3 class="h3">macOS app</h3>
-          <p class="muted">The full editor: CodeMirror 6, notebooks, tags, statuses, themes, revision history, import and export, AI assistant, MCP server, cloud sync and your own CouchDB, auto-update.</p>
-        </div>
-        <div class="roadmap__item">
-          <div class="roadmap__status"><span class="dot dot--progress"></span> In progress</div>
-          <h3 class="h3">Notarisation and Developer ID</h3>
-          <p class="muted">Removes the right-click-on-first-launch step. Until it lands, the DMG stays unsigned and Gatekeeper asks once.</p>
-        </div>
-        <div class="roadmap__item">
-          <div class="roadmap__status"><span class="dot dot--progress"></span> In progress</div>
-          <h3 class="h3">iOS</h3>
-          <p class="muted">An iOS target alongside macOS. Not released — we are not going to date it before it is done.</p>
-        </div>
-        <div class="roadmap__item">
-          <div class="roadmap__status"><span class="dot dot--planned"></span> Planned</div>
-          <h3 class="h3">Windows and Linux</h3>
-          <p class="muted">A Rust and Tauri build. Planned, not started; the macOS app comes first.</p>
-        </div>
-      </div>
+      <ul class="roadmap">
+        <li class="roadmap__item">
+          <span class="dot dot--done"></span>
+          <span><strong>macOS app</strong> — the full editor: CodeMirror 6, notebooks, tags, statuses, themes, revision history, import and export, AI assistant, MCP server, cloud sync and your own CouchDB, auto-update.</span>
+          <span class="roadmap__status">Available</span>
+        </li>
+        <li class="roadmap__item">
+          <span class="dot dot--progress"></span>
+          <span><strong>Notarisation and Developer ID</strong> — removes the right-click-on-first-launch step. Until it lands, the DMG stays unsigned and Gatekeeper asks once.</span>
+          <span class="roadmap__status">In progress</span>
+        </li>
+        <li class="roadmap__item">
+          <span class="dot dot--progress"></span>
+          <span><strong>iOS</strong> — an iOS target alongside macOS. Not released, and we are not going to date it before it is done.</span>
+          <span class="roadmap__status">In progress</span>
+        </li>
+        <li class="roadmap__item">
+          <span class="dot dot--planned"></span>
+          <span><strong>Windows and Linux</strong> — a Rust and Tauri build. Planned, not started; the macOS app comes first.</span>
+          <span class="roadmap__status">Planned</span>
+        </li>
+      </ul>
     </div>
   </section>
 
@@ -440,7 +439,7 @@
 
 <footer class="footer">
   <div class="footer__inner wrap">
-    <div class="footer__brand">Drafta</div>
+    <div class="footer__brand" translate="no">Drafta</div>
     <div class="footer__cols">
       <div class="footer__col">
         <div class="footer__col-title">Product</div>

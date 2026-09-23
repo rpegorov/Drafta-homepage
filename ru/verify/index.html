@@ -22,7 +22,7 @@
 <body>
   <header class="nav">
     <nav class="nav__inner wrap">
-      <a class="nav__logo" href="/ru/">Drafta</a>
+      <a class="nav__logo" href="/ru/" translate="no">Drafta</a>
       <div class="nav__links">
         <a class="nav__link" href="/ru/#features">Возможности</a>
         <a class="nav__link" href="/ru/#pricing">Тарифы</a>
@@ -39,50 +39,47 @@
   </header>
 
   <main>
-    <section class="section">
-      <div class="wrap">
+    <section class="band band--soft">
+      <div class="wrap wrap--narrow">
         <p class="eyebrow">Аккаунт</p>
         <h1 class="h1">Подтвердите адрес почты</h1>
         <p class="lede">Ссылка из письма Drafta открывает эту страницу. Подтверждение адреса и активирует аккаунт.</p>
         <noscript>
-          <p class="lede">Для подтверждения адреса нужен JavaScript. Включите его и откройте ссылку из письма снова.</p>
+          <p class="muted">Для подтверждения адреса нужен JavaScript. Включите его и откройте ссылку из письма снова.</p>
         </noscript>
 
         <div class="form is-hidden" data-state="checking" hidden role="status">
-          <h2 class="h2">Подтверждаем адрес…</h2>
-          <p class="muted">Обращаемся к службе аккаунтов. Это займёт секунду.</p>
+          <h2 class="h3">Подтверждаем адрес…</h2>
+          <p class="callout">Обращаемся к службе аккаунтов. Это займёт секунду.</p>
         </div>
 
         <div class="form is-hidden" data-state="incomplete" hidden>
-          <h2 class="h2">Ссылка неполная</h2>
-          <p class="muted">В ссылке для подтверждения нет токена, подтверждать нечего. Скопируйте ссылку из письма целиком, как она была отправлена.</p>
-          <p class="muted">Запросить новую ссылку с сайта пока нельзя. Если адрес уже подтверждён, войдите.</p>
+          <h2 class="h3">Ссылка неполная</h2>
+          <p class="callout">В ссылке для подтверждения нет токена, подтверждать нечего. Скопируйте ссылку из письма целиком, как она была отправлена — и учтите, что запросить новую ссылку с сайта пока нельзя.</p>
           <div class="form__actions">
             <a class="btn btn--primary" href="/ru/login/">Войти</a>
           </div>
         </div>
 
         <div class="form is-hidden" data-state="confirmed" hidden role="status">
-          <p class="form__ok">Адрес подтверждён.</p>
-          <h2 class="h2">Адрес почты подтверждён</h2>
-          <p class="muted">Спасибо — служба аккаунтов приняла ссылку. Войдите с этим адресом, чтобы купить лицензию.</p>
+          <h2 class="h3">Адрес почты подтверждён</h2>
+          <p class="form__ok">Спасибо — служба аккаунтов приняла ссылку. Войдите с этим адресом, чтобы купить лицензию.</p>
           <div class="form__actions">
             <a class="btn btn--primary" href="/ru/login/">Войти</a>
           </div>
         </div>
 
         <div class="form is-hidden" data-state="already" hidden role="status">
-          <p class="form__ok">Уже подтверждён.</p>
-          <h2 class="h2">Этот адрес подтвердили раньше</h2>
-          <p class="muted">Делать ничего не нужно — аккаунт уже активирован более ранней ссылкой. Войдите, чтобы продолжить.</p>
+          <h2 class="h3">Этот адрес подтвердили раньше</h2>
+          <p class="form__ok">Делать ничего не нужно — аккаунт уже активирован более ранней ссылкой. Войдите, чтобы продолжить.</p>
           <div class="form__actions">
             <a class="btn btn--primary" href="/ru/login/">Войти</a>
           </div>
         </div>
 
         <div class="form is-hidden" data-state="invalid" hidden>
-          <h2 class="h2">Ссылка недействительна или истекла</h2>
-          <p class="muted" data-invalid-reason></p>
+          <h2 class="h3">Ссылка недействительна или истекла</h2>
+          <p class="form__error" data-invalid-reason></p>
           <p class="muted">Запросить новую ссылку для подтверждения с сайта пока нельзя — повторная отправка не предусмотрена. Если адрес уже подтверждён, войти можно с этой страницы.</p>
           <div class="form__actions">
             <a class="btn btn--primary" href="/ru/login/">Войти</a>
@@ -90,10 +87,10 @@
         </div>
 
         <div class="form is-hidden" data-state="error" hidden>
-          <h2 class="h2">Не удалось подтвердить ссылку</h2>
-          <p class="muted">Служба аккаунтов не ответила. Проверьте соединение и попробуйте снова.</p>
+          <h2 class="h3">Не удалось подтвердить ссылку</h2>
+          <p class="form__error">Служба аккаунтов не ответила. Проверьте соединение и попробуйте снова.</p>
           <div class="form__actions">
-            <button class="btn btn--ghost" type="button" data-retry>Попробовать снова</button>
+            <button class="btn btn--primary" type="button" data-retry>Попробовать снова</button>
           </div>
         </div>
       </div>
@@ -102,7 +99,7 @@
 
   <footer class="footer">
     <div class="footer__inner wrap">
-      <div class="footer__brand">Drafta</div>
+      <div class="footer__brand" translate="no">Drafta</div>
       <div class="footer__cols">
         <div class="footer__col">
           <div class="footer__col-title">Продукт</div>

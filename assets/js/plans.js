@@ -118,14 +118,6 @@
     return group(whole, pageLang(lang)) + ' ' + c.note(whole);
   };
 
-  /* The plan's own name with the billing suffix removed: "Pro — yearly" and
-     "Pro — monthly" both display as "Pro" (§5b). */
-  function planName(plan) {
-    var name = plan && plan.name ? String(plan.name) : 'Pro';
-    var stem = name.replace(/\s*[\u2014\u2013-]\s*(yearly|monthly|annual|year|month)\b.*$/i, '').trim();
-    return stem || name;
-  }
-
   /* §5b, mode "link": the frozen EN shape is /checkout/?plan=<code>. On a Russian
      page the twin of that page is /ru/checkout/ (§6, all internal links on /ru/
      pages carry the /ru prefix), so the language decides the prefix. */
@@ -164,8 +156,7 @@
 
     return '<article class="plan' + (isFeatured ? ' plan--featured' : '')
       + (selected ? ' plan--selected' : '') + '" data-period="' + esc(plan.billing) + '">'
-      + '<h3 class="plan__name">' + esc(planName(plan)) + '</h3>'
-      + '<div class="plan__period-label">' + esc(c.periodLabel[plan.billing] || '') + '</div>'
+      + '<h3 class="plan__name">' + esc(c.periodLabel[plan.billing] || '') + '</h3>'
       + '<div class="' + priceClass + '">' + esc(DRAFTA.formatPrice(headline, lang))
       + '<span class="plan__period"> / ' + esc(unit) + '</span></div>'
       + (equivalent

@@ -16,14 +16,32 @@
   <meta property="og:url" content="https://drafta.org/ru/">
   <meta property="og:image" content="https://drafta.org/assets/img/og.png">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#FBF7F0">
   <link rel="stylesheet" href="/assets/css/tokens.css">
   <link rel="stylesheet" href="/assets/css/site.css">
+  <style>
+    /* Страничная правка, намеренно короткая: общие куски теперь в site.css — skip-ссылка,
+       перенос заголовков, цели переключателя языка и строки копирайта. К этой странице
+       относятся только редакторская разбивка двух колонок чернильной полосы и её
+       мобильное схлопывание. Ни цвет, ни размер в px здесь не объявляются: значения
+       берутся из файла токенов. */
+    #features .grid{grid-template-columns:1.45fr 0.55fr;row-gap:var(--space-5)}
+    /* Цель 44px в строке копирайта переехала в site.css вместе с остальными общими
+       компонентами, поэтому теперь она есть на всех десяти страницах. */
+    /* Это переопределение обязано остаться и победить: в правиле колонок выше есть id,
+       поэтому собственный брейкпоинт site.css эту сетку не схлопывает. */
+    @media (max-width:820px){
+      #features .grid{grid-template-columns:minmax(0,1fr)}
+    }
+  </style>
 </head>
 <body>
 
+<a class="btn btn--primary skip-link" href="#main">Перейти к содержанию</a>
+
 <header class="nav">
   <nav class="nav__inner wrap">
-    <a class="nav__logo" href="/ru/">Drafta</a>
+    <a class="nav__logo" href="/ru/" translate="no">Drafta</a>
     <div class="nav__links">
       <a class="nav__link" href="/ru/#features">Возможности</a>
       <a class="nav__link" href="/ru/#pricing">Тарифы</a>
@@ -39,36 +57,36 @@
   </nav>
 </header>
 
-<main>
+<main id="main" tabindex="-1">
 
-  <!-- ── Hero ───────────────────────────────────────────────────────────── -->
+  <!-- ── Полоса 1 · бумага: герой. Его фигура переходит в кремовую полосу ниже ── -->
   <section class="section hero">
     <div class="wrap">
       <p class="eyebrow">Нативный macOS · CodeMirror 6</p>
       <h1 class="h1">Редактор Markdown, сделанный для программистов.</h1>
-      <p class="lede">Иерархические блокноты, подсветка 50+ языков, предпросмотр Mermaid и KaTeX, теги, статусы, история ревизий с диффами. Каждая заметка — обычный файл <span class="mono">.md</span> с YAML front-matter, который откроет любой редактор. И так будет всегда.</p>
+      <p class="lede">Иерархические блокноты, подсветка 50+ языков, предпросмотр Mermaid и KaTeX, теги, статусы, история ревизий с диффами. Каждая заметка — обычный файл <span class="mono" translate="no">.md</span> с YAML front-matter, который откроет любой редактор. И так будет всегда.</p>
       <div class="hero__actions">
         <a class="btn btn--primary btn--lg" href="https://github.com/rpegorov/drafta-releases/releases/latest">Скачать для macOS</a>
         <a class="btn btn--ghost btn--lg" href="#pricing">Смотреть тарифы</a>
       </div>
       <p class="hero__meta muted">macOS 26.4 · Apple Silicon и Intel · Apache-2.0</p>
       <div class="hero__shot">
-        <figure class="shot">
-          <div class="shot__frame">
+        <figure class="figure shot">
+          <div class="figure__frame shot__frame">
             <img class="shot__img" src="/assets/img/screenshots/editor.png"
                  alt="Окно редактора Drafta на macOS: в сайдбаре блокноты, статусы заметок и теги, в центре список заметок, справа открытая заметка в Markdown."
-                 width="2400" height="1500" loading="lazy" decoding="async"
+                 width="2400" height="1500" decoding="async"
                  onerror="this.closest('.shot').classList.add('shot--missing'); this.remove();">
-            <div class="shot__ph" aria-hidden="true">Скриншот готовится</div>
+            <div class="shot__ph" aria-hidden="true">Скриншот редактора — ждёт съёмки</div>
           </div>
-          <figcaption class="shot__caption">Сайдбар, список заметок и редактор в одном окне — одинаково на любом Mac.</figcaption>
+          <figcaption class="figure__caption">Сайдбар, список заметок и редактор в одном окне — одинаково на любом Mac.</figcaption>
         </figure>
       </div>
     </div>
   </section>
 
-  <!-- ── Trust strip ────────────────────────────────────────────────────── -->
-  <section class="section section--tight">
+  <!-- ── Полоса 2 · кремовая: короткие обещания ─────────────────────────── -->
+  <section class="band band--soft">
     <div class="wrap">
       <div class="grid grid--3">
         <div class="feature">
@@ -87,40 +105,39 @@
     </div>
   </section>
 
-  <div class="wrap"><hr class="divider"></div>
-
-  <!-- ── Feature rows ───────────────────────────────────────────────────── -->
-  <section class="section">
+  <!-- ── Полоса 3 · бумага: редактор — двумя асимметричными разворотами ── -->
+  <section class="band">
     <div class="wrap">
+      <div class="grid">
       <p class="eyebrow">Что внутри</p>
       <h2 class="h2">Всё, что программист ждёт от приложения для заметок.</h2>
 
-      <div class="feature-row">
-        <div class="feature-row__text">
+      <div class="split split--reverse">
+        <div class="split__text">
           <h3 class="h3">Редактор, предпросмотр — или сразу оба</h3>
           <p class="muted">Три режима в одном нажатии: только редактор, только отрендеренная заметка или split с синхронной прокруткой. Таблицы вставляются сеткой, Mermaid и KaTeX рисуются на лету, а тире и пробелы приводятся в порядок прямо во время набора.</p>
           <ul class="feature-row__list">
             <li>Режимы редактора, предпросмотра и split</li>
             <li>Живой предпросмотр таблиц, Mermaid и KaTeX</li>
-            <li>Миникарта, оглавление, поиск по ⌘F</li>
+            <li>Миникарта, оглавление, поиск по ⌘&nbsp;F</li>
           </ul>
         </div>
-        <div class="feature-row__media">
-          <figure class="shot">
-            <div class="shot__frame">
+        <div class="split__media">
+          <figure class="figure shot">
+            <div class="figure__frame shot__frame">
               <img class="shot__img" src="/assets/img/screenshots/split.png"
                    alt="Drafta в режиме split: слева исходный Markdown, справа отрендеренная заметка с заголовками, таблицей и диаграммой."
-                   width="2400" height="1500" loading="lazy" decoding="async"
+                   width="2400" height="1500" decoding="async"
                    onerror="this.closest('.shot').classList.add('shot--missing'); this.remove();">
-              <div class="shot__ph" aria-hidden="true">Скриншот готовится</div>
+              <div class="shot__ph" aria-hidden="true">Скриншот режима split — ждёт съёмки</div>
             </div>
-            <figcaption class="shot__caption">Режим split: слева ваш Markdown, справа отрендеренная заметка.</figcaption>
+            <figcaption class="figure__caption">Режим split: слева ваш Markdown, справа отрендеренная заметка.</figcaption>
           </figure>
         </div>
       </div>
 
-      <div class="feature-row feature-row--reverse">
-        <div class="feature-row__text">
+      <div class="split">
+        <div class="split__text">
           <h3 class="h3">Блокноты, теги, статусы</h3>
           <p class="muted">Блокноты вкладываются на любую глубину. Теги подхватываются из текста автоматически, их можно вести и руками, задав цвет каждому. У заметки есть статус — Active, On Hold, Completed, Dropped, — так что побочный проект может подождать своей очереди, а не отправиться в удалённые.</p>
           <ul class="feature-row__list">
@@ -129,22 +146,28 @@
             <li>Закреплённые заметки, корзина, статусы заметок</li>
           </ul>
         </div>
-        <div class="feature-row__media">
-          <figure class="shot">
-            <div class="shot__frame">
+        <div class="split__media">
+          <figure class="figure shot">
+            <div class="figure__frame shot__frame">
               <img class="shot__img" src="/assets/img/screenshots/tables.png"
                    alt="Таблица в Markdown внутри редактора Drafta с открытым гридом для вставки строк и столбцов."
-                   width="2400" height="1500" loading="lazy" decoding="async"
+                   width="2400" height="1500" decoding="async"
                    onerror="this.closest('.shot').classList.add('shot--missing'); this.remove();">
-              <div class="shot__ph" aria-hidden="true">Скриншот готовится</div>
+              <div class="shot__ph" aria-hidden="true">Скриншот работы с таблицами — ждёт съёмки</div>
             </div>
-            <figcaption class="shot__caption">Таблицы вставляются сеткой, Tab переходит между ячейками.</figcaption>
+            <figcaption class="figure__caption">Таблицы вставляются сеткой, Tab переходит между ячейками.</figcaption>
           </figure>
         </div>
       </div>
+      </div>
+    </div>
+  </section>
 
-      <div class="feature-row">
-        <div class="feature-row__text">
+  <!-- ── Полоса 4 · кремовая: история и экспорт, перед чернильной полосой ── -->
+  <section class="band band--soft">
+    <div class="wrap">
+      <div class="split">
+        <div class="split__text">
           <h3 class="h3">История, которую действительно видно</h3>
           <p class="muted">Каждое сохранение становится ревизией — 30 версий на заметку, и все лежат у вас на диске. Откройте unified diff, посмотрите, что именно изменилось, восстановите любую версию. Ничего не перезаписывается без копии того, что было раньше.</p>
           <ul class="feature-row__list">
@@ -153,124 +176,85 @@
             <li>Восстановление любой ревизии одним кликом</li>
           </ul>
         </div>
-        <div class="feature-row__media">
-          <figure class="shot">
-            <div class="shot__frame">
+        <div class="split__media">
+          <figure class="figure shot">
+            <div class="figure__frame shot__frame">
               <img class="shot__img" src="/assets/img/screenshots/export.png"
                    alt="Экспорт заметки в Drafta: варианты PDF, DOCX, HTML и Markdown рядом с готовым документом."
-                   width="2400" height="1500" loading="lazy" decoding="async"
+                   width="2400" height="1500" decoding="async"
                    onerror="this.closest('.shot').classList.add('shot--missing'); this.remove();">
-              <div class="shot__ph" aria-hidden="true">Скриншот готовится</div>
+              <div class="shot__ph" aria-hidden="true">Скриншот экспорта — ждёт съёмки</div>
             </div>
-            <figcaption class="shot__caption">Из приложения одним шагом: PDF, DOCX, HTML или Markdown.</figcaption>
+            <figcaption class="figure__caption">Из приложения одним шагом: PDF, DOCX, HTML или Markdown.</figcaption>
           </figure>
         </div>
       </div>
     </div>
   </section>
 
-  <div class="wrap"><hr class="divider"></div>
-
-  <!-- ── Feature grid ───────────────────────────────────────────────────── -->
-  <section class="section" id="features">
+  <!-- ── Полоса 5 · чернильная: что действительно в комплекте ───────────── -->
+  <section class="band band--ink" id="features">
     <div class="wrap">
       <p class="eyebrow">Уже в 1.0</p>
       <h2 class="h2">Всё в комплекте</h2>
-      <p class="lede muted">Никаких уровней с обрезанными возможностями и запертых панелей. Это то, что приложение умеет сегодня.</p>
+      <p class="lede">Никаких уровней с обрезанными возможностями и запертых панелей. Это то, что приложение умеет сегодня.</p>
 
-      <div class="features grid grid--3">
+      <!-- Две неравные колонки вместо прежней сетки из ячеек с иконками: широкая
+           несёт три крупных утверждения, узкая собирает остальное. -->
+      <div class="grid grid--2">
         <div class="feature">
-          <div class="feature__icon" aria-hidden="true">⌘</div>
-          <div class="feature__title">Редактор CodeMirror 6</div>
-          <div class="feature__body">Тот же проверенный редактор, на котором работают Inkdrop и десятки инструментов для разработчиков: зрелый, быстрый, расширяемый.</div>
+          <div class="feature__title" translate="no">CodeMirror 6, 50+ языков</div>
+          <div class="feature__body">Тот же проверенный редактор, на котором работает <span translate="no">Inkdrop</span>, с подсветкой Python, Rust, TypeScript, Go, SQL, YAML, Bash и ещё сорока языков. Три режима просмотра — только редактор, только предпросмотр или split с синхронной прокруткой. Таблицы вставляются сеткой, Mermaid и KaTeX рисуются на лету, тире и пробелы приводятся в порядок во время набора. Миникарта, оглавление и поиск по ⌘&nbsp;F. Блоки <span class="mono" translate="no">$…$</span> работают ровно так, как вы ждёте.</div>
+        </div>
+        </div>
+
+        <div class="grid grid--2">
+        <div class="feature">
+          <div class="feature__title">Библиотека, которой можно управлять</div>
+          <div class="feature__body">Иерархические блокноты вкладываются без ограничений, заметки переносятся между ними мышью. Теги подхватываются из текста автоматически, там, где нужно, ведутся вручную и получают свой цвет. У заметки есть статус — Active, On Hold, Completed, Dropped, — а закреплённые заметки, корзина и вся библиотека остаются на расстоянии нажатия: ⌘&nbsp;P — нечёткий поиск по всем заметкам.</div>
         </div>
         <div class="feature">
-          <div class="feature__icon" aria-hidden="true">#</div>
-          <div class="feature__title">Подсветка 50+ языков</div>
-          <div class="feature__body">Python, Rust, TypeScript, Go, SQL, YAML, Bash и ещё сорок. Блок кода в заметке — полноценный объект, а не серый прямоугольник.</div>
+          <div class="feature__title">Ваша история и ваши темы</div>
+          <div class="feature__body">Каждое сохранение становится ревизией: 30 версий на заметку, unified diff и восстановление одним кликом. В комплекте пять тем — Default Light, Default Dark, Drafta Dark, Dark Islands, Tokyo Night, — а своя тема в JSON просто кладётся рядом.</div>
         </div>
         <div class="feature">
-          <div class="feature__icon" aria-hidden="true">◫</div>
-          <div class="feature__title">Три режима просмотра</div>
-          <div class="feature__body">Только редактор, только предпросмотр или split с синхронной прокруткой. Переключение — нажатием или свайпом.</div>
+          <div class="feature__title">Внутрь и наружу — на ваших условиях</div>
+          <div class="feature__body">Импорт <span class="mono" translate="no">.md</span> и <span class="mono" translate="no">.html</span> (формат Bear) и экспорт в PDF, DOCX, HTML или Markdown; локальные картинки едут вместе как вложения. Ассистент открывается по ⌘&nbsp;J с вашим собственным ключом API, MCP-сервер даёт инструментам читать заметку, которую вы смотрите, а обновления приходят сами — Sparkle проверяет раз в сутки или по запросу из <span class="mono" translate="no">Drafta → Check for Updates…</span></div>
         </div>
         <div class="feature">
-          <div class="feature__icon" aria-hidden="true">▦</div>
-          <div class="feature__title">Таблицы, которые слушаются</div>
-          <div class="feature__body">Вставка таблицы сеткой, переход между ячейками по Tab. Выравнивание и разделители берутся на себя.</div>
-        </div>
-        <div class="feature">
-          <div class="feature__icon" aria-hidden="true">◈</div>
-          <div class="feature__title">Предпросмотр Mermaid и KaTeX</div>
-          <div class="feature__body">Диаграммы и формулы рисуются прямо в заметке. Ограждённые блоки и <span class="mono">$…$</span> работают ровно так, как вы ждёте.</div>
-        </div>
-        <div class="feature">
-          <div class="feature__icon" aria-hidden="true">▤</div>
-          <div class="feature__title">Иерархические блокноты</div>
-          <div class="feature__body">Вложенность без ограничений, перенос заметок мышью между блокнотами, сайдбар, который успевает за библиотекой.</div>
-        </div>
-        <div class="feature">
-          <div class="feature__icon" aria-hidden="true">◦</div>
-          <div class="feature__title">Теги и статусы</div>
-          <div class="feature__body">Автоматическое извлечение тегов из текста, теги вручную, цвет каждому тегу и статусы Active / On Hold / Completed / Dropped.</div>
-        </div>
-        <div class="feature">
-          <div class="feature__icon" aria-hidden="true">⌘</div>
-          <div class="feature__title">Быстрый переход</div>
-          <div class="feature__body">⌘P — нечёткий поиск по всем заметкам библиотеки. Три буквы, и нужная заметка уже открыта.</div>
-        </div>
-        <div class="feature">
-          <div class="feature__icon" aria-hidden="true">↻</div>
-          <div class="feature__title">История ревизий</div>
-          <div class="feature__body">Тридцать версий на заметку, unified diff и восстановление одним кликом. Всё хранится локально, рядом с заметками.</div>
-        </div>
-        <div class="feature">
-          <div class="feature__icon" aria-hidden="true">◐</div>
-          <div class="feature__title">Пять тем и ваша собственная</div>
-          <div class="feature__body">Default Light, Default Dark, Drafta Dark, Dark Islands и Tokyo Night — или свой JSON-файл темы в папке поддержки приложения.</div>
-        </div>
-        <div class="feature">
-          <div class="feature__icon" aria-hidden="true">⇄</div>
-          <div class="feature__title">Импорт и экспорт</div>
-          <div class="feature__body">Импорт <span class="mono">.md</span> и <span class="mono">.html</span> (формат Bear); экспорт в PDF, DOCX, HTML или Markdown. Локальные картинки как вложения.</div>
-        </div>
-        <div class="feature">
-          <div class="feature__icon" aria-hidden="true">✦</div>
-          <div class="feature__title">AI-ассистент на вашем ключе</div>
-          <div class="feature__body">⌘J открывает ассистента. Ключ API — ваш собственный, а значит он остаётся у вас и ни один запрос не уходит туда, куда вы не просили.</div>
-        </div>
-        <div class="feature">
-          <div class="feature__icon" aria-hidden="true">⌗</div>
-          <div class="feature__title">MCP-сервер</div>
-          <div class="feature__body">Drafta отдаёт заметки MCP-агентам, чтобы инструмент мог прочитать заметку, которую вы смотрите, а не просить вас вставить её руками.</div>
-        </div>
-        <div class="feature">
-          <div class="feature__icon" aria-hidden="true">☁</div>
-          <div class="feature__title">Облачная синхронизация</div>
-          <div class="feature__body">Синхронизация между вашими Mac через аккаунт Drafta — путь по умолчанию, он входит в квоту тарифа, а заметки шифруются end-to-end ещё до того, как покинут машину.</div>
-        </div>
-        <div class="feature">
-          <div class="feature__icon" aria-hidden="true">⊙</div>
-          <div class="feature__title">Свой CouchDB</div>
-          <div class="feature__body">Вместо этого можно подключить собственный CouchDB: он хранит заметки вообще без квоты — локально или на вашем сервере. В приложении для этого есть настройка бэкенда.</div>
-        </div>
-        <div class="feature">
-          <div class="feature__icon" aria-hidden="true">↑</div>
-          <div class="feature__title">Автообновление</div>
-          <div class="feature__body">Sparkle проверяет обновления раз в сутки, а по запросу — из <span class="mono">Drafta → Check for Updates…</span> Никаких навязчивых напоминаний.</div>
+          <div class="feature__title">Два места для облачной копии</div>
+          <div class="feature__body">Облачная синхронизация через аккаунт <span translate="no">Drafta</span> — путь по умолчанию, он входит в квоту тарифа, а заметки шифруются end-to-end ещё до того, как покинут машину. Либо подключите собственный CouchDB: вообще без квоты, локально или на вашем сервере.</div>
         </div>
       </div>
     </div>
   </section>
 
-  <div class="wrap"><hr class="divider"></div>
-
-  <!-- ── Security ───────────────────────────────────────────────────────── -->
-  <section class="section" id="security">
+  <!-- ── Полоса 6 · бумага: безопасность — колонка, цитата, панель цифр ── -->
+  <section class="band" id="security">
     <div class="wrap">
-      <p class="eyebrow">Безопасность</p>
-      <h2 class="h2">Зашифровано по дороге, обычные файлы у вас на диске.</h2>
-      <p class="lede muted">Обе половины — это одно обещание: копию в облаке прочитать не сможем мы, а копия на вашей машине остаётся вашей — открывайте, читайте, храните.</p>
+      <div class="split split--reverse">
+        <div class="split__text">
+          <p class="eyebrow">Безопасность</p>
+          <h2 class="h2">Зашифровано по дороге, обычные файлы у вас на диске.</h2>
+          <p class="muted">Обе половины — это одно обещание: копию в облаке прочитать не сможем мы, а копия на вашей машине остаётся вашей — открывайте, читайте, храните.</p>
+          <blockquote class="pullquote">
+            В облаке прочитать нельзя. На вашем Mac — обычный Markdown.
+            <span class="pullquote__source">Одно обещание, сдержанное дважды</span>
+          </blockquote>
+        </div>
+        <div class="split__media">
+          <div class="grid grid--2">
+            <div class="stat">
+              <span class="stat__value">AES-256-GCM</span>
+              <span class="stat__label">заметки шифруются на вашем Mac до отправки</span>
+            </div>
+            <div class="stat">
+              <span class="stat__value">PBKDF2</span>
+              <span class="stat__label">ключ выводится из пароля и не отправляется на сервер</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div class="grid grid--2">
         <div class="feature">
@@ -286,7 +270,7 @@
           <div class="feature__body">Сервер не получает ни то, ни другое. Вход лишь подтверждает знание пароля через отдельный верификатор, выведенный из ключа, — сервис может убедиться, кто вы, но расшифровать заметки не может.</div>
         </div>
         <div class="feature">
-          <div class="feature__title">Мы видим id и время</div>
+          <div class="feature__title">Что видит облако</div>
           <div class="feature__body">Для каждой заметки сервис видит её id — ключ документа — и время последнего изменения, по которому решается, чья версия новее. В самом конверте лежат ещё версия и параметры вывода ключа, без них заметку не открыть. Заголовок, текст, теги и вложения остаются шифротекстом.</div>
         </div>
         <div class="feature">
@@ -301,20 +285,16 @@
     </div>
   </section>
 
-  <div class="wrap"><hr class="divider"></div>
-
-  <!-- ── Your notes are files ───────────────────────────────────────────── -->
-  <section class="section" id="files">
+  <!-- ── Полоса 7 · кремовая: заметки — это файлы, а цифры — объект ─────── -->
+  <section class="band band--soft" id="files">
     <div class="wrap">
-      <div class="grid grid--2">
-        <div>
+      <div class="split">
+        <div class="split__text">
           <p class="eyebrow">Локальные файлы</p>
           <h2 class="h2">Ваши заметки — это файлы, а не строки в чужой базе.</h2>
           <p class="muted">Drafta держит библиотеку у вас на диске: один Markdown-файл на заметку, YAML front-matter для тегов и статуса, ревизии в папке рядом. Между вами и вашими текстами не стоит закрытый формат, и смена тарифа не может их забрать. Облачная копия шифруется под ключом, который есть у вас, а не у сервиса, — она остаётся вашей даже тогда, когда лежит не на вашем диске.</p>
-          <p class="muted">Раз это обычный текст, остальной инструментарий уже работает: ищите по всей библиотеке через <span class="mono">grep</span>, коммитьте её в git, открывайте заметку в VS Code или Obsidian, читайте через <span class="mono">cat</span> в терминале. Drafta — нативное приложение на Swift: под ним нет ни среды Electron, ни встроенного браузера, который надо держать запущенным.</p>
-        </div>
-        <div>
-          <ul class="plan__list">
+          <p class="muted">Раз это обычный текст, остальной инструментарий уже работает: ищите по всей библиотеке через <span class="mono" translate="no">grep</span>, коммитьте её в git, открывайте заметку в VS Code или Obsidian, читайте через <span class="mono" translate="no">cat</span> в терминале. Drafta — нативное приложение на Swift: под ним нет ни среды Electron, ни встроенного браузера, который надо держать запущенным.</p>
+          <ul class="feature-row__list">
             <li>Обычный Markdown с YAML front-matter у вас на диске</li>
             <li>30 ревизий на заметку, локально</li>
             <li>Ни закрытой базы, ни экспорта как единственного выхода</li>
@@ -322,21 +302,39 @@
             <li>Лицензия Apache-2.0</li>
           </ul>
         </div>
+        <div class="split__media">
+          <div class="grid grid--2">
+            <div class="stat">
+              <span class="stat__value">30</span>
+              <span class="stat__label">ревизий на заметку, на диске</span>
+            </div>
+            <div class="stat">
+              <span class="stat__value">0</span>
+              <span class="stat__label">закрытых баз данных</span>
+            </div>
+            <div class="stat">
+              <span class="stat__value">50+</span>
+              <span class="stat__label">языков с подсветкой</span>
+            </div>
+            <div class="stat">
+              <span class="stat__value">.md</span>
+              <span class="stat__label">формат, которым остаётся заметка</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
-  <div class="wrap"><hr class="divider"></div>
-
-  <!-- ── Pricing ────────────────────────────────────────────────────────── -->
-  <section class="section" id="pricing">
+  <!-- ── Полоса 8 · бумага: тарифы ──────────────────────────────────────── -->
+  <section class="band" id="pricing">
     <div class="wrap">
       <p class="eyebrow">Тарифы</p>
       <h2 class="h2">Один тариф — всё включено.</h2>
-      <p class="lede muted">Оплата раз в месяц или раз в год, приложение одно и то же. Каждый новый аккаунт начинается с 30-дневного триала — карта не нужна.</p>
+      <p class="lede">Оплата раз в месяц или раз в год, приложение одно и то же. Каждый новый аккаунт начинается с 30-дневного триала — карта не нужна.</p>
 
       <div class="callout callout--accent">
-        <strong>Триал 30 дней на каждом новом аккаунте</strong> — карта не нужна, списаний в этот период нет. После триала вы выбираете период оплаты: месяц или год. Второго тарифа и пожизненной лицензии нет.
+        <p><strong>Триал 30 дней на каждом новом аккаунте</strong> — карта не нужна, списаний в этот период нет. После триала вы выбираете период оплаты: месяц или год. Второго тарифа и пожизненной лицензии нет.</p>
       </div>
 
       <div class="plans" data-plans></div>
@@ -345,94 +343,95 @@
     </div>
   </section>
 
-  <div class="wrap"><hr class="divider"></div>
-
-  <!-- ── FAQ ────────────────────────────────────────────────────────────── -->
-  <section class="section" id="faq">
+  <!-- ── Полоса 9 · кремовая: вопросы ───────────────────────────────────── -->
+  <section class="band band--soft" id="faq">
     <div class="wrap">
-      <p class="eyebrow">Вопросы</p>
-      <h2 class="h2">На вопросы стоит отвечать прямо</h2>
-
-      <div class="faq">
-        <div class="faq__item">
-          <h3 class="faq__q">Что нужно для работы Drafta?</h3>
-          <p class="faq__a">macOS 26.4 или новее, Apple Silicon или Intel. Это нативное приложение на Swift и SwiftUI — не веб-приложение и не оболочка Electron.</p>
+      <div class="grid grid--2">
+        <div>
+          <p class="eyebrow">Вопросы</p>
+          <h2 class="h2">На вопросы стоит отвечать прямо</h2>
         </div>
-        <div class="faq__item">
-          <h3 class="faq__q">Как установить?</h3>
-          <p class="faq__a">Скачайте DMG из последнего релиза, откройте его и перетащите <span class="mono">Drafta.app</span> в Applications. Сборка пока не нотаризована, поэтому при первом запуске нужно правым кликом → «Открыть» → «Открыть». Gatekeeper спросит только один раз.</p>
-        </div>
-        <div class="faq__item">
-          <h3 class="faq__q">Как приходят обновления?</h3>
-          <p class="faq__a">Сами. Sparkle раз в сутки проверяет <span class="mono">drafta.org/appcast.xml</span>, а <span class="mono">Drafta → Check for Updates…</span> делает это по требованию.</p>
-        </div>
-        <div class="faq__item">
-          <h3 class="faq__q">Есть ли триал и нужна ли карта?</h3>
-          <p class="faq__a">Каждому новому аккаунту — 30 дней. Карта для старта не нужна. Когда триал закончится, выберите период оплаты: месяц или год.</p>
-        </div>
-        <div class="faq__item">
-          <h3 class="faq__q">Где лежат мои заметки?</h3>
-          <p class="faq__a">У вас на диске: один Markdown-файл на заметку с YAML front-matter, ревизии — в папке рядом. В формате хранения нет ничего закрытого: если вы перестанете пользоваться Drafta, заметки всё равно откроются где угодно.</p>
-        </div>
-        <div class="faq__item">
-          <h3 class="faq__q">Нужен ли аккаунт, чтобы пользоваться приложением?</h3>
-          <p class="faq__a">Аккаунт запускает триал, закрепляет за вами тариф и — если вы не подключили свой CouchDB — даёт заметкам облачную копию в рамках квоты тарифа. Эта копия хранится шифротекстом, который мы не можем прочитать.</p>
-        </div>
-        <div class="faq__item">
-          <h3 class="faq__q">Что входит в тариф?</h3>
-          <p class="faq__a">Тариф один, а платить можно ежемесячно или раз в год. Лимиты хранилища и заметок на карточке выше читаются из API аккаунтов — страница не называет квоту, которую сервис не обеспечивает.</p>
-        </div>
-        <div class="faq__item">
-          <h3 class="faq__q">Мои данные зашифрованы?</h3>
-          <p class="faq__a">По дороге в облако — да, end-to-end. Заметки закрываются алгоритмом AES-256-GCM под 256-битным ключом, который выводится из вашего пароля по PBKDF2-HMAC-SHA256, с солью и числом итераций, заданными для аккаунта. И сразу о границе честно: это защищает путь синхронизации, а не ваш диск. Библиотека на Mac остаётся обычными Markdown-файлами, которые откроет любой редактор.</p>
-        </div>
-        <div class="faq__item">
-          <h3 class="faq__q">Вы можете прочитать мои заметки?</h3>
-          <p class="faq__a">Синхронизированную копию — нет. Сервер не получает ни ваш пароль, ни ключ: вход подтверждает знание пароля через отдельный верификатор, выведенный из ключа, а хранится там шифротекст под ключом, которого у сервиса нет. По каждой заметке видны её id, время последнего изменения — именно оно решает, чья версия новее на ваших Mac, — и служебная обвязка конверта: версия и параметры вывода ключа.</p>
-        </div>
-        <div class="faq__item">
-          <h3 class="faq__q">Где хранятся мои данные?</h3>
-          <p class="faq__a">В двух местах, и оба — ваши. Локально: обычные Markdown-файлы в папке библиотеки плюс ревизии. В облаке: по умолчанию это хранилище через ваш аккаунт Drafta, и оно входит в квоту тарифа. Если пользоваться им не хотите, подключите свой CouchDB — хранение вообще без квоты, локально или на вашем сервере.</p>
-        </div>
-        <div class="faq__item">
-          <h3 class="faq__q">А если у меня Windows или Linux?</h3>
-          <p class="faq__a">Пока нет. macOS доступен сегодня; Windows и Linux запланированы на Rust и Tauri. Это в роадмапе ниже, а не в приложении.</p>
+        <div>
+          <div class="faq">
+            <details class="faq__item">
+              <summary class="faq__q">Что нужно для работы Drafta?</summary>
+              <p class="faq__a">macOS 26.4 или новее, Apple Silicon или Intel. Это нативное приложение на Swift и SwiftUI — не веб-приложение и не оболочка Electron.</p>
+            </details>
+            <details class="faq__item">
+              <summary class="faq__q">Как установить?</summary>
+              <p class="faq__a">Скачайте DMG из последнего релиза, откройте его и перетащите <span class="mono" translate="no">Drafta.app</span> в Applications. Сборка пока не нотаризована, поэтому при первом запуске нужно правым кликом → «Открыть» → «Открыть». Gatekeeper спросит только один раз.</p>
+            </details>
+            <details class="faq__item">
+              <summary class="faq__q">Как приходят обновления?</summary>
+              <p class="faq__a">Сами. Sparkle раз в сутки проверяет <span class="mono" translate="no">drafta.org/appcast.xml</span>, а <span class="mono" translate="no">Drafta → Check for Updates…</span> делает это по требованию.</p>
+            </details>
+            <details class="faq__item">
+              <summary class="faq__q">Есть ли триал и нужна ли карта?</summary>
+              <p class="faq__a">Каждому новому аккаунту — 30 дней. Карта для старта не нужна. Когда триал закончится, выберите период оплаты: месяц или год.</p>
+            </details>
+            <details class="faq__item">
+              <summary class="faq__q">Где лежат мои заметки?</summary>
+              <p class="faq__a">У вас на диске: один Markdown-файл на заметку с YAML front-matter, ревизии — в папке рядом. В формате хранения нет ничего закрытого: если вы перестанете пользоваться Drafta, заметки всё равно откроются где угодно.</p>
+            </details>
+            <details class="faq__item">
+              <summary class="faq__q">Нужен ли аккаунт, чтобы пользоваться приложением?</summary>
+              <p class="faq__a">Аккаунт запускает триал, закрепляет за вами тариф и — если вы не подключили свой CouchDB — даёт заметкам облачную копию в рамках квоты тарифа. Эта копия хранится шифротекстом, который мы не можем прочитать.</p>
+            </details>
+            <details class="faq__item">
+              <summary class="faq__q">Что входит в тариф?</summary>
+              <p class="faq__a">Тариф один, а платить можно ежемесячно или раз в год. Лимиты хранилища и заметок на карточке выше читаются из API аккаунтов — страница не называет квоту, которую сервис не обеспечивает.</p>
+            </details>
+            <details class="faq__item">
+              <summary class="faq__q">Мои данные зашифрованы?</summary>
+              <p class="faq__a">По дороге в облако — да, end-to-end. Заметки закрываются алгоритмом AES-256-GCM под 256-битным ключом, который выводится из вашего пароля по PBKDF2-HMAC-SHA256, с солью и числом итераций, заданными для аккаунта. И сразу о границе честно: это защищает путь синхронизации, а не ваш диск. Библиотека на Mac остаётся обычными Markdown-файлами, которые откроет любой редактор.</p>
+            </details>
+            <details class="faq__item">
+              <summary class="faq__q">Вы можете прочитать мои заметки?</summary>
+              <p class="faq__a">Синхронизированную копию — нет. Сервер не получает ни ваш пароль, ни ключ: вход подтверждает знание пароля через отдельный верификатор, выведенный из ключа, а хранится там шифротекст под ключом, которого у сервиса нет. По каждой заметке видны её id, время последнего изменения — именно оно решает, чья версия новее на ваших Mac, — и служебная обвязка конверта: версия и параметры вывода ключа.</p>
+            </details>
+            <details class="faq__item">
+              <summary class="faq__q">Где хранятся мои данные?</summary>
+              <p class="faq__a">В двух местах, и оба — ваши. Локально: обычные Markdown-файлы в папке библиотеки плюс ревизии. В облаке: по умолчанию это хранилище через ваш аккаунт Drafta, и оно входит в квоту тарифа. Если пользоваться им не хотите, подключите свой CouchDB — хранение вообще без квоты, локально или на вашем сервере.</p>
+            </details>
+            <details class="faq__item">
+              <summary class="faq__q">А если у меня Windows или Linux?</summary>
+              <p class="faq__a">Пока нет. macOS доступен сегодня; Windows и Linux запланированы на Rust и Tauri. Это в роадмапе ниже, а не в приложении.</p>
+            </details>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <div class="wrap"><hr class="divider"></div>
-
-  <!-- ── Roadmap ────────────────────────────────────────────────────────── -->
-  <section class="section" id="roadmap">
+  <!-- ── Полоса 10 · бумага: роадмап ────────────────────────────────────── -->
+  <section class="band" id="roadmap">
     <div class="wrap">
       <p class="eyebrow">Роадмап</p>
       <h2 class="h2">Что дальше — без прикрас</h2>
-      <p class="lede muted">Как обстоят дела на самом деле, включая то, что ещё не доделано.</p>
+      <p class="lede">Как обстоят дела на самом деле, включая то, что ещё не доделано.</p>
 
-      <div class="roadmap grid grid--2">
-        <div class="roadmap__item">
-          <div class="roadmap__status"><span class="dot dot--done"></span> Доступно</div>
-          <h3 class="h3">Приложение для macOS</h3>
-          <p class="muted">Редактор целиком: CodeMirror 6, блокноты, теги, статусы, темы, история ревизий, импорт и экспорт, AI-ассистент, MCP-сервер, облачная синхронизация и собственный CouchDB, автообновление.</p>
-        </div>
-        <div class="roadmap__item">
-          <div class="roadmap__status"><span class="dot dot--progress"></span> В работе</div>
-          <h3 class="h3">Нотаризация и Developer ID</h3>
-          <p class="muted">Уберёт шаг с правым кликом при первом запуске. Пока этого нет, DMG остаётся неподписанным и Gatekeeper спрашивает один раз.</p>
-        </div>
-        <div class="roadmap__item">
-          <div class="roadmap__status"><span class="dot dot--progress"></span> В работе</div>
-          <h3 class="h3">iOS</h3>
-          <p class="muted">Цель iOS рядом с macOS. Релиза нет — и мы не станем называть дату, пока не будет готово.</p>
-        </div>
-        <div class="roadmap__item">
-          <div class="roadmap__status"><span class="dot dot--planned"></span> Запланировано</div>
-          <h3 class="h3">Windows и Linux</h3>
-          <p class="muted">Сборка на Rust и Tauri. Запланировано, но не начато: приложение для macOS идёт первым.</p>
-        </div>
-      </div>
+      <ul class="roadmap">
+        <li class="roadmap__item">
+          <span class="dot dot--done"></span>
+          <span><strong>Приложение для macOS</strong> — редактор целиком: CodeMirror 6, блокноты, теги, статусы, темы, история ревизий, импорт и экспорт, AI-ассистент, MCP-сервер, облачная синхронизация и собственный CouchDB, автообновление.</span>
+          <span class="roadmap__status">Доступно</span>
+        </li>
+        <li class="roadmap__item">
+          <span class="dot dot--progress"></span>
+          <span><strong>Нотаризация и Developer ID</strong> — уберёт шаг с правым кликом при первом запуске. Пока этого нет, DMG остаётся неподписанным и Gatekeeper спрашивает один раз.</span>
+          <span class="roadmap__status">В работе</span>
+        </li>
+        <li class="roadmap__item">
+          <span class="dot dot--progress"></span>
+          <span><strong>iOS</strong> — цель iOS рядом с macOS. Релиза нет, и мы не станем называть дату, пока не будет готово.</span>
+          <span class="roadmap__status">В работе</span>
+        </li>
+        <li class="roadmap__item">
+          <span class="dot dot--planned"></span>
+          <span><strong>Windows и Linux</strong> — сборка на Rust и Tauri. Запланировано, но не начато: приложение для macOS идёт первым.</span>
+          <span class="roadmap__status">Запланировано</span>
+        </li>
+      </ul>
     </div>
   </section>
 
@@ -440,7 +439,7 @@
 
 <footer class="footer">
   <div class="footer__inner wrap">
-    <div class="footer__brand">Drafta</div>
+    <div class="footer__brand" translate="no">Drafta</div>
     <div class="footer__cols">
       <div class="footer__col">
         <div class="footer__col-title">Продукт</div>

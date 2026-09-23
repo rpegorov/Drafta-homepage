@@ -22,7 +22,7 @@
 <body>
   <header class="nav">
     <nav class="nav__inner wrap">
-      <a class="nav__logo" href="/">Drafta</a>
+      <a class="nav__logo" href="/" translate="no">Drafta</a>
       <div class="nav__links">
         <a class="nav__link" href="/#features">Features</a>
         <a class="nav__link" href="/#pricing">Pricing</a>
@@ -39,19 +39,19 @@
   </header>
 
   <main>
-    <section class="section">
-      <div class="wrap">
+    <section class="band band--soft">
+      <div class="wrap wrap--narrow">
         <p class="eyebrow">Account</p>
         <h1 class="h1">Sign in</h1>
         <p class="lede">Creating an account comes in two steps: the confirmation link we mail you, then this sign-in. If you have just registered, open the link from the email first — until you do, the account is not activated and the password will not work here.</p>
         <noscript>
-          <p class="lede">Signing in needs JavaScript. Turn it on and reload this page.</p>
+          <p class="muted">Signing in needs JavaScript. Turn it on and reload this page.</p>
         </noscript>
 
         <form class="form" method="post" action="" data-login-form novalidate>
           <div class="form__field">
             <label class="form__label" for="email">Email</label>
-            <input class="form__input" id="email" name="email" type="email" autocomplete="email" spellcheck="false" required>
+            <input class="form__input" id="email" name="email" type="email" autocomplete="email" spellcheck="false" autofocus required>
           </div>
 
           <div class="form__field">
@@ -79,7 +79,7 @@
 
   <footer class="footer">
     <div class="footer__inner wrap">
-      <div class="footer__brand">Drafta</div>
+      <div class="footer__brand" translate="no">Drafta</div>
       <div class="footer__cols">
         <div class="footer__col">
           <div class="footer__col-title">Product</div>

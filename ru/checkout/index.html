@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Оплата — Drafta</title>
-  <meta name="description" content="Один тариф Drafta и два периода оплаты. Новый аккаунт начинается с 30-дневного пробного периода — карта не нужна; квота хранилища и заметок берётся из API аккаунтов.">
+  <meta name="description" content="Один тариф и два периода оплаты — месяц или год. Новый аккаунт начинается с 30-дневного пробного периода, карта не нужна; лимиты хранилища и заметок берутся из API аккаунтов.">
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="canonical" href="https://drafta.org/ru/checkout/">
   <link rel="alternate" hreflang="en" href="https://drafta.org/checkout/">
@@ -12,7 +12,7 @@
   <link rel="alternate" hreflang="x-default" href="https://drafta.org/checkout/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Оплата — Drafta">
-  <meta property="og:description" content="Один тариф, два способа оплаты — месяц или год. Новый аккаунт начинается с 30-дневного пробного периода, карта не нужна.">
+  <meta property="og:description" content="Один тариф, оплата раз в месяц или раз в год. 30-дневный пробный период, карта не нужна; лимиты берутся из API аккаунтов.">
   <meta property="og:url" content="https://drafta.org/ru/checkout/">
   <meta property="og:image" content="https://drafta.org/assets/img/og.png">
   <meta name="twitter:card" content="summary_large_image">
@@ -23,7 +23,7 @@
 
 <header class="nav">
   <nav class="nav__inner wrap">
-    <a class="nav__logo" href="/ru/">Drafta</a>
+    <a class="nav__logo" href="/ru/" translate="no">Drafta</a>
     <div class="nav__links">
       <a class="nav__link" href="/ru/#features">Возможности</a>
       <a class="nav__link" href="/ru/#pricing">Тарифы</a>
@@ -41,40 +41,33 @@
 
 <main>
 
-  <!-- ── Начало ─────────────────────────────────────────────────────────── -->
-  <section class="section">
-    <div class="wrap">
+  <!-- ── Начало — полоса-бумага ─────────────────────────────────────────── -->
+  <section class="band">
+    <div class="wrap wrap--narrow">
       <p class="eyebrow">Оплата</p>
-      <h1 class="h1">Выберите тариф для аккаунта</h1>
-      <p class="lede">Каждый новый аккаунт начинается с 30-дневного пробного периода — карта не нужна. Когда он закончится, аккаунт продолжит работу на выбранном здесь тарифе. Drafta — нативное приложение для macOS, а заметки остаются обычными файлами Markdown на диске.</p>
-    </div>
-  </section>
-
-  <!-- ── Пробный период ─────────────────────────────────────────────────── -->
-  <section class="section section--tight">
-    <div class="wrap">
+      <h1 class="h1">Один тариф. Два периода оплаты.</h1>
+      <p class="lede">Оплата раз в месяц или раз в год — приложение одно и то же, а заметки остаются обычными файлами Markdown на диске.</p>
       <div class="callout callout--accent">
-        <h2 class="h3">30 дней полного приложения, без карты</h2>
-        <p>Регистрация запускает 30-дневный пробный период: полное приложение, и пока он идёт, списаний нет. После него аккаунт продолжает работу на тарифе, выбранном ниже.</p>
+        <p><strong>30 дней полного приложения, без карты.</strong> Каждый новый аккаунт начинается с 30-дневного пробного периода: пока он идёт, списаний нет, а передумать можно в любой момент.</p>
       </div>
     </div>
   </section>
 
-  <!-- ── Тарифы ─────────────────────────────────────────────────────────── -->
-  <section class="section" id="plans">
+  <!-- ── Тарифы — мягкая полоса; две карточки — якорь страницы ─────────── -->
+  <section class="band band--soft" id="plans">
     <div class="wrap">
       <p class="eyebrow">Тарифы</p>
-      <h2 class="h2">Один тариф — всё включено.</h2>
-      <p class="lede">Оплата раз в месяц или раз в год для одного и того же приложения; цены читаются напрямую из api.drafta.org при открытии страницы — ни одна цена здесь не зашита в разметку.</p>
+      <h2 class="h2">Всё включено в один тариф.</h2>
+      <p class="lede">Цены приходят напрямую из API аккаунтов при открытии страницы — зашитых цифр здесь нет.</p>
       <div class="plans" data-plans></div>
       <p class="muted is-hidden" id="quota-line"></p>
       <p class="muted">Облачное хранилище зашифровано end-to-end, поэтому сервис хранит шифротекст, который не может прочитать. Если не хотите тратить квоту тарифа, подключите собственный CouchDB — локально или на сервере, который вы контролируете.</p>
     </div>
   </section>
 
-  <!-- ── Заказ ──────────────────────────────────────────────────────────── -->
-  <section class="section section--tight" id="order">
-    <div class="wrap">
+  <!-- ── Заказ — полоса-бумага; здесь появляется ответ сервера ─────────── -->
+  <section class="band" id="order">
+    <div class="wrap wrap--narrow">
       <h2 class="h2">Ваш заказ</h2>
       <div class="form" id="order-form">
         <p class="form__hint" id="order-hint">Проверяем сессию…</p>
@@ -89,42 +82,23 @@
     </div>
   </section>
 
-  <!-- ── Как это работает ───────────────────────────────────────────────── -->
-  <section class="section">
-    <div class="wrap">
-      <h2 class="h2">Как оплата работает сейчас</h2>
-      <div class="features">
-        <div class="feature">
-          <div class="feature__icon" aria-hidden="true">1</div>
-          <div class="feature__title">Выберите тариф</div>
-          <p class="feature__body">Тариф и два периода оплаты читаются из API аккаунтов при загрузке страницы. Если API недоступен, страница покажет тот же тариф из конфигурации сайта — но никогда другие цены.</p>
-        </div>
-        <div class="feature">
-          <div class="feature__icon" aria-hidden="true">2</div>
-          <div class="feature__title">Для покупки нужна сессия</div>
-          <p class="feature__body">Нужен токен доступа, который записывает страница входа. Без него страница отправит вас <a href="/ru/login/?next=/ru/checkout/">войти</a> и сразу вернёт обратно.</p>
-        </div>
-        <div class="feature">
-          <div class="feature__icon" aria-hidden="true">3</div>
-          <div class="feature__title">Сервер отвечает — страница повторяет</div>
-          <p class="feature__body">Выбранный тариф уходит в API аккаунтов, а ответ — тариф, статус, конец периода — печатается выше ровно в том виде, в каком пришёл. Оплата картой ещё не подключена, поэтому страница никогда не сообщает о завершённой покупке сама.</p>
-        </div>
-      </div>
+  <!-- ── Единственная тёмная полоса: прямой ответ про деньги ───────────── -->
+  <section class="band band--ink">
+    <div class="wrap wrap--narrow">
+      <h2 class="h2">Оплата картой пока не подключена.</h2>
+      <p>Подписка фиксирует запрос в аккаунте, а страница печатает ответ сервера дословно: тариф, статус и конец периода. Деньги не списываются, и страница никогда не сообщает о покупке, которой не было.</p>
+      <blockquote class="pullquote">Что вернул сервер — то вы здесь и читаете. Включая его ошибки.<span class="pullquote__source">Страница оплаты: честно по построению</span></blockquote>
     </div>
   </section>
 
-  <!-- ── Вопросы ────────────────────────────────────────────────────────── -->
-  <section class="section" id="faq">
-    <div class="wrap">
+  <!-- ── Вопросы — полоса-бумага, три строки ───────────────────────────── -->
+  <section class="band" id="faq">
+    <div class="wrap wrap--narrow">
       <h2 class="h2">Вопросы</h2>
       <div class="faq">
         <div class="faq__item">
-          <div class="faq__q">Можно уже оплатить картой?</div>
-          <div class="faq__a">Пока нет. Платёжный провайдер не подключён: подписка фиксирует запрос в аккаунте, а страница показывает ответ сервера без изменений. Деньги не списываются.</div>
-        </div>
-        <div class="faq__item">
           <div class="faq__q">Есть ли тариф дешевле?</div>
-          <div class="faq__a">Нет. Тариф один, а периодов оплаты два — месяц и год; второго тарифа и пожизненной лицензии нет. Квота хранилища и заметок в обоих случаях одна и та же, и она читается из API аккаунтов.</div>
+          <div class="faq__a">Нет. Тариф один, а периодов оплаты два — месяц и год; второго тарифа и пожизненной лицензии нет. Лимиты хранилища и заметок в обоих случаях одинаковые, и они приходят из API аккаунтов.</div>
         </div>
         <div class="faq__item">
           <div class="faq__q">Что будет после пробного периода?</div>
@@ -142,7 +116,7 @@
 
 <footer class="footer">
   <div class="footer__inner wrap">
-    <div class="footer__brand">Drafta</div>
+    <div class="footer__brand" translate="no">Drafta</div>
     <div class="footer__cols">
       <div class="footer__col">
         <div class="footer__col-title">Продукт</div>
