@@ -1,0 +1,7 @@
+# Cloudflare Pages: the site is served from the repository root, so working files
+# (docs sources waiting for the Astro move, planning notes) are reachable by URL.
+# Keep them out of search results until they are published as real pages.
+/content/*
+  X-Robots-Tag: noindex
+/PLATFORM.md
+  X-Robots-Tag: noindex
