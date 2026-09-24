@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, follow">
   <title>Создать аккаунт — Drafta</title>
   <meta name="description" content="Аккаунт Drafta: 30 дней пробной версии на каждом новом аккаунте, без карты. Мы пришлём ссылку для подтверждения адреса — до этого аккаунт не активирован.">
   <link rel="icon" type="image/png" href="/favicon.png">
@@ -23,7 +24,8 @@
   <header class="nav">
     <nav class="nav__inner wrap">
       <a class="nav__logo" href="/ru/" translate="no">Drafta</a>
-      <div class="nav__links">
+      <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links" hidden><span class="nav__toggle-icon" aria-hidden="true"></span><span class="nav__toggle-label">Меню</span></button>
+      <div class="nav__links" id="nav-links">
         <a class="nav__link" href="/ru/#features">Возможности</a>
         <a class="nav__link" href="/ru/#pricing">Тарифы</a>
         <a class="nav__link" href="/ru/#faq">Вопросы</a>
@@ -43,7 +45,7 @@
       <div class="wrap wrap--narrow">
         <p class="eyebrow">Аккаунт</p>
         <h1 class="h1">Создайте аккаунт</h1>
-        <p class="lede">Аккаунт хранит вашу пробную версию и лицензию. Данные этой страницы остаются на устройстве, пока служба аккаунтов не подтвердит адрес.</p>
+        <p class="lede">Аккаунт хранит вашу пробную версию и тариф. Данные этой страницы остаются на устройстве, пока служба аккаунтов не подтвердит адрес.</p>
         <noscript>
           <p class="muted">Для создания аккаунта нужен JavaScript. Включите его и обновите страницу.</p>
         </noscript>
@@ -75,7 +77,7 @@
         <div class="form is-hidden" data-register-sent hidden role="status">
           <p class="form__ok">Проверьте почту.</p>
           <p class="muted">Мы отправили ссылку для подтверждения на <span class="mono" data-sent-email></span>. Откройте её, чтобы подтвердить адрес — до этого аккаунт не активирован.</p>
-          <p class="muted">Когда адрес подтверждён, войдите с этой почтой, чтобы купить лицензию.</p>
+          <p class="muted">Когда адрес подтверждён, войдите с этой почтой, чтобы выбрать тариф.</p>
           <div class="form__actions">
             <a class="btn btn--primary" href="/ru/login/">Войти</a>
           </div>
@@ -91,7 +93,7 @@
         <div class="footer__col">
           <div class="footer__col-title">Продукт</div>
           <a href="/ru/#features">Возможности</a><a href="/ru/#pricing">Тарифы</a>
-          <a href="/ru/checkout/">Купить лицензию</a>
+          <a href="/ru/checkout/">Тарифы</a>
         </div>
         <div class="footer__col">
           <div class="footer__col-title">Аккаунт</div>
@@ -104,13 +106,14 @@
         </div>
       </div>
       <div class="footer__legal">
-        © 2026 Drafta · Apache-2.0 · <a href="/">English</a> · <a href="/ru/">Русский</a>
+        © 2026 Drafta · Apache-2.0 · <a href="/" lang="en" data-lang="en">English</a> · <a href="/ru/" lang="ru" data-lang="ru">Русский</a>
       </div>
     </div>
   </footer>
 
   <script src="/assets/js/config.js"></script>
   <script src="/assets/js/lang.js"></script>
+  <script src="/assets/js/nav.js"></script>
   <script src="/assets/js/forms.js"></script>
   <script>
     (function () {

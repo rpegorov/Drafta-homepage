@@ -17,6 +17,8 @@
   <meta property="og:image" content="https://drafta.org/assets/img/og.png">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="theme-color" content="#FBF7F0">
+  <link rel="preload" href="/assets/fonts/golos-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/lora-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/tokens.css">
   <link rel="stylesheet" href="/assets/css/site.css">
   <style>
@@ -34,6 +36,51 @@
       #features .grid{grid-template-columns:minmax(0,1fr)}
     }
   </style>
+  <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Drafta",
+    "url": "https://drafta.org/",
+    "inLanguage": "en",
+    "description": "A native macOS Markdown editor for programmers: CodeMirror 6, 50+ languages, Mermaid and KaTeX preview, notebooks, tags, revision history, an AI assistant and a built-in MCP server. Notes stay plain .md files on your Mac; sync is end-to-end encrypted.",
+    "applicationCategory": "DeveloperApplication",
+    "applicationSubCategory": "Markdown editor",
+    "operatingSystem": "macOS 26 or later",
+    "softwareVersion": "1.0",
+    "downloadUrl": "https://github.com/rpegorov/drafta-releases/releases/latest",
+    "license": "https://www.apache.org/licenses/LICENSE-2.0",
+    "image": "https://drafta.org/assets/img/og.png",
+    "offers": [
+      {
+        "@type": "Offer",
+        "name": "Monthly",
+        "price": "9.99",
+        "priceCurrency": "USD",
+        "url": "https://drafta.org/checkout/?plan=pro_monthly",
+        "priceSpecification": {
+          "@type": "UnitPriceSpecification",
+          "price": "9.99",
+          "priceCurrency": "USD",
+          "billingDuration": "P1M"
+        }
+      },
+      {
+        "@type": "Offer",
+        "name": "Annual",
+        "price": "95.88",
+        "priceCurrency": "USD",
+        "url": "https://drafta.org/checkout/?plan=pro_yearly",
+        "priceSpecification": {
+          "@type": "UnitPriceSpecification",
+          "price": "95.88",
+          "priceCurrency": "USD",
+          "billingDuration": "P1Y"
+        }
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
 
@@ -42,7 +89,8 @@
 <header class="nav">
   <nav class="nav__inner wrap">
     <a class="nav__logo" href="/" translate="no">Drafta</a>
-    <div class="nav__links">
+    <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links" hidden><span class="nav__toggle-icon" aria-hidden="true"></span><span class="nav__toggle-label">Menu</span></button>
+    <div class="nav__links" id="nav-links">
       <a class="nav__link" href="/#features">Features</a>
       <a class="nav__link" href="/#pricing">Pricing</a>
       <a class="nav__link" href="/#faq">FAQ</a>
@@ -115,11 +163,11 @@
       <div class="split split--reverse">
         <div class="split__text">
           <h3 class="h3">Editor, preview, or both at once</h3>
-          <p class="muted">Three view modes, one keystroke apart: editor only, rendered preview only, or split with synchronised scrolling. Tables get a grid picker, Mermaid and KaTeX render live, and em-dash and spacing are tidied as you type.</p>
+          <p class="muted">Three view modes, one click apart: editor only, rendered preview only, or split with synchronised scrolling. Tables get a grid picker, Mermaid and KaTeX render live, and em-dash and spacing are tidied as you type.</p>
           <ul class="feature-row__list">
             <li>Editor, preview and split modes</li>
             <li>Tables, Mermaid and KaTeX live preview</li>
-            <li>Minimap, table of contents, search with ⌘&nbsp;F</li>
+            <li>Table of contents, backlinks, search with ⌘&nbsp;F</li>
           </ul>
         </div>
         <div class="split__media">
@@ -169,9 +217,9 @@
       <div class="split">
         <div class="split__text">
           <h3 class="h3">History you can actually read</h3>
-          <p class="muted">Every save becomes a revision — 30 per note, stored on your disk. Open the unified diff, see exactly what changed, restore any version. Nothing is written to your notes without a copy of what was there before.</p>
+          <p class="muted">Drafta keeps up to 30 revisions per note, stored on your disk — including a copy of the old text whenever an assistant rewrites a note through MCP. Open the unified diff, see exactly what changed, restore any version.</p>
           <ul class="feature-row__list">
-            <li>30 revisions per note</li>
+            <li>Up to 30 revisions per note</li>
             <li>Unified diff view</li>
             <li>Restore any revision in one click</li>
           </ul>
@@ -204,7 +252,7 @@
       <div class="grid grid--2">
         <div class="feature">
           <div class="feature__title" translate="no">CodeMirror 6, 50+ languages</div>
-          <div class="feature__body">The battle-tested editor that also powers <span translate="no">Inkdrop</span>, with syntax highlighting for Python, Rust, TypeScript, Go, SQL, YAML, Bash and forty more. Three view modes — editor only, preview only, or split with synchronised scrolling. Tables get a grid picker, Mermaid and KaTeX render live, and em-dash and spacing are tidied as you type. A minimap, a table of contents and search with ⌘&nbsp;F. <span class="mono" translate="no">$…$</span> fences work as you would expect.</div>
+          <div class="feature__body">The battle-tested editor that also powers <span translate="no">Inkdrop</span>, with syntax highlighting for Python, Rust, TypeScript, Go, SQL, YAML, Bash and forty more. Three view modes — editor only, preview only, or split with synchronised scrolling. Tables get a grid picker, Mermaid and KaTeX render live, and em-dash and spacing are tidied as you type. A table of contents, backlinks, a graph of linked notes and search with ⌘&nbsp;F. <span class="mono" translate="no">$…$</span> fences work as you would expect.</div>
         </div>
         </div>
 
@@ -215,15 +263,15 @@
         </div>
         <div class="feature">
           <div class="feature__title">Your history and your skins</div>
-          <div class="feature__body">Every save becomes a revision, 30 per note with a unified diff view and one-click restore. Five themes ship — Default Light, Default Dark, Drafta Dark, Dark Islands, Tokyo Night — and a JSON theme of your own drops straight in.</div>
+          <div class="feature__body">Up to 30 revisions per note, with a unified diff view and one-click restore. Eleven themes ship: five signature ones — Graphite &amp; Ochre, Vellum, Fjord, Phosphor, Amethyst Glass — plus Default Light, Default Dark, Drafta Dark, Dark Islands, Tokyo Night and Solarized Dark. A JSON theme of your own drops straight in.</div>
         </div>
         <div class="feature">
           <div class="feature__title">In and out, on your terms</div>
-          <div class="feature__body">Import <span class="mono" translate="no">.md</span> and <span class="mono" translate="no">.html</span> (Bear format) and export PDF, DOCX, HTML or Markdown; local images come along as attachments. The assistant opens on ⌘&nbsp;J with your own API key, an MCP server lets your tools read the note you are looking at, and updates arrive on their own — Sparkle checks once a day, or on demand from <span class="mono" translate="no">Drafta → Check for Updates…</span></div>
+          <div class="feature__body">Import <span class="mono" translate="no">.md</span> and <span class="mono" translate="no">.html</span> (Bear format) and export PDF, DOCX, HTML or Markdown; local images come along as attachments. Updates arrive on their own — Sparkle checks once a day, or on demand from <span class="mono" translate="no">Drafta → Check for Updates…</span></div>
         </div>
         <div class="feature">
-          <div class="feature__title">Two places to keep the cloud copy</div>
-          <div class="feature__body">Cloud sync through your <span translate="no">Drafta</span> account is the default path, covered by the plan&rsquo;s storage quota and encrypted end to end before anything leaves the machine. Or connect your own CouchDB instead: no quota at all, locally or on your own server.</div>
+          <div class="feature__title">An assistant, and an MCP server</div>
+          <div class="feature__body">The assistant opens on ⌘&nbsp;J with your own API key: Anthropic (<span class="mono" translate="no">claude-haiku-4-5</span>), OpenAI (<span class="mono" translate="no">gpt-4o-mini</span>) or DeepSeek (<span class="mono" translate="no">deepseek-chat</span>). The MCP server ships inside the app and gives Claude and other MCP clients 12 tools to search, read and write your whole library — or run it read-only and the write tools disappear.</div>
         </div>
       </div>
     </div>
@@ -249,8 +297,8 @@
               <span class="stat__label">notes sealed on your Mac before they are sent</span>
             </div>
             <div class="stat">
-              <span class="stat__value">PBKDF2</span>
-              <span class="stat__label">the key is derived from your password, never uploaded</span>
+              <span class="stat__value">2</span>
+              <span class="stat__label">passwords: one signs you in, the library one never leaves your Mac</span>
             </div>
           </div>
         </div>
@@ -259,23 +307,23 @@
       <div class="grid grid--2">
         <div class="feature">
           <div class="feature__title">End-to-end encrypted sync</div>
-          <div class="feature__body">Notes are sealed on your Mac before they are sent. The service stores ciphertext it cannot read — the key never leaves your machine.</div>
+          <div class="feature__body">Notes are sealed with AES-256-GCM on your Mac before they are sent, under a key that comes from your library password through PBKDF2-HMAC-SHA256. The service stores ciphertext and never holds the key. No hand-waving: those are the exact primitives, and this audience checks.</div>
         </div>
         <div class="feature">
-          <div class="feature__title">PBKDF2-HMAC-SHA256 and AES-256-GCM</div>
-          <div class="feature__body">A 256-bit key is derived from your password with PBKDF2-HMAC-SHA256, using the account&rsquo;s salt and iteration count. Notes are sealed with AES-256-GCM. No hand-waving: those are the exact primitives, and this audience checks.</div>
-        </div>
-        <div class="feature">
-          <div class="feature__title">Your password and key stay with you</div>
-          <div class="feature__body">The server never receives either one. Sign-in proves knowledge of the password through a separate verifier derived from the key, so the service can confirm who you are without being able to decrypt anything.</div>
+          <div class="feature__title">Two passwords, two jobs</div>
+          <div class="feature__body">Your account password signs you in: it goes to the server over TLS, like any sign-in. Your library password is separate, never leaves your Mac and is what the encryption key comes from. So the server can tell it is you, but it cannot decrypt your notes.</div>
         </div>
         <div class="feature">
           <div class="feature__title">What the cloud can see</div>
-          <div class="feature__body">For each note the service sees its id — the document key — and its last-updated time, which decides last-writer-wins. The stored envelope also carries the version and the key-derivation parameters needed to open it. Title, body, tags and attachments stay ciphertext.</div>
+          <div class="feature__body">Your account email and plan, and for each note its id and last-updated time — the time decides last-writer-wins between your Macs — plus the size of the encrypted payload. Title, body, tags and attachments stay ciphertext.</div>
         </div>
         <div class="feature">
           <div class="feature__title">On your disk: ordinary Markdown</div>
-          <div class="feature__body">The local library stays plain Markdown files. Encryption protects the sync path, not your disk — so you can still open any note in another editor, grep it or commit it to git.</div>
+          <div class="feature__body">The library on your Mac stays plain Markdown files. Encryption protects the sync path, not your disk — <span class="mono" translate="no">grep</span>, git and Obsidian keep working, and FileVault is what protects the disk itself.</div>
+        </div>
+        <div class="feature">
+          <div class="feature__title">A library password we cannot reset</div>
+          <div class="feature__body">The server never had it, so nobody can recover it for you. Your notes on this Mac stay readable files either way; the encrypted cloud copy opens only with that password.</div>
         </div>
         <div class="feature">
           <div class="feature__title">Two places to keep the cloud copy</div>
@@ -296,7 +344,7 @@
           <p class="muted">Because it is plain text, the rest of your toolchain already works: <span class="mono" translate="no">grep</span> across everything, commit the library to git, open a note in VS Code or Obsidian, or <span class="mono" translate="no">cat</span> it in a terminal. Drafta is a native Swift app — there is no Electron runtime underneath and no bundled browser to keep hot.</p>
           <ul class="feature-row__list">
             <li>Plain Markdown with YAML front-matter on your disk</li>
-            <li>30 revisions per note, stored locally</li>
+            <li>Up to 30 revisions per note, stored locally</li>
             <li>No proprietary database, no export-only escape hatch</li>
             <li>Version control, grep and any other editor keep working</li>
             <li>Licensed under Apache-2.0</li>
@@ -306,7 +354,7 @@
           <div class="grid grid--2">
             <div class="stat">
               <span class="stat__value">30</span>
-              <span class="stat__label">revisions per note, on disk</span>
+              <span class="stat__label">revisions per note kept on disk</span>
             </div>
             <div class="stat">
               <span class="stat__value">0</span>
@@ -334,7 +382,7 @@
       <p class="lede">Monthly or annual billing for the same app. Every new account starts with a 30-day trial — no card needed.</p>
 
       <div class="callout callout--accent">
-        <p><strong>30-day trial on every new account</strong> — no card required. After the trial you pick a billing period, monthly or yearly; there is no second tier and no lifetime licence.</p>
+        <p><strong>30-day trial on every new account</strong> — no card required. When it ends, the app turns read-only until you pick a billing period, monthly or yearly: every note stays on your Mac and stays readable. There is no second tier and no lifetime licence. Card payment is not connected yet, so nothing is charged today.</p>
       </div>
 
       <div class="plans" data-plans></div>
@@ -359,7 +407,7 @@
             </details>
             <details class="faq__item">
               <summary class="faq__q">How do I install it?</summary>
-              <p class="faq__a">Download the DMG from the latest release, open it and drag <span class="mono" translate="no">Drafta.app</span> into Applications. The build is not notarised yet, so the first launch needs right-click → Open → Open; Gatekeeper asks only once.</p>
+              <p class="faq__a">Download the DMG from the latest release, open it and drag <span class="mono" translate="no">Drafta.app</span> into Applications. The build is not notarised yet, so macOS blocks the first launch: open System Settings → Privacy &amp; Security, scroll to the message about Drafta and click <strong>Open Anyway</strong>, then confirm. macOS asks only once.</p>
             </details>
             <details class="faq__item">
               <summary class="faq__q">How do updates work?</summary>
@@ -367,7 +415,7 @@
             </details>
             <details class="faq__item">
               <summary class="faq__q">Is there a trial, and does it need a card?</summary>
-              <p class="faq__a">Every new account gets 30 days. No card is required to start it. When it ends you pick a billing period — monthly or yearly.</p>
+              <p class="faq__a">Every new account gets 30 days. No card is required to start it. When it ends, Drafta becomes read-only: you can open, search and read every note, while creating, editing and exporting wait for a plan — monthly or yearly. Card payment is not connected yet.</p>
             </details>
             <details class="faq__item">
               <summary class="faq__q">Where do my notes live?</summary>
@@ -375,7 +423,7 @@
             </details>
             <details class="faq__item">
               <summary class="faq__q">Do I need an account to use the app?</summary>
-              <p class="faq__a">An account is what starts your trial, carries your plan and — unless you connect your own CouchDB — gives your notes a cloud copy. That copy is stored as ciphertext we cannot read.</p>
+              <p class="faq__a">Yes. The account starts your trial, carries your plan and — unless you connect your own CouchDB — keeps an encrypted cloud copy of your notes. Its password only signs you in; the notes are encrypted with a separate library password that stays on your Mac.</p>
             </details>
             <details class="faq__item">
               <summary class="faq__q">What does a plan include?</summary>
@@ -383,11 +431,23 @@
             </details>
             <details class="faq__item">
               <summary class="faq__q">Is my data encrypted?</summary>
-              <p class="faq__a">On the way to the cloud, yes — end to end. Notes are sealed with AES-256-GCM under a 256-bit key derived from your password with PBKDF2-HMAC-SHA256, using the account&rsquo;s salt and iteration count. Be precise about the boundary: this protects the sync path, not your disk. The library on your Mac stays ordinary Markdown files you can read in any editor.</p>
+              <p class="faq__a">On the way to the cloud, yes — end to end. Notes are sealed with AES-256-GCM on your Mac under a key that comes from your library password through PBKDF2-HMAC-SHA256. Be precise about the boundary: this protects the sync path, not your disk. The library on your Mac stays ordinary Markdown files you can read in any editor; FileVault protects the disk.</p>
             </details>
             <details class="faq__item">
               <summary class="faq__q">Can you read my notes?</summary>
-              <p class="faq__a">Not the synced copy. The server never receives your password or your key — sign-in proves knowledge of the password through a separate verifier derived from the key — and what it stores is ciphertext under a key it does not hold. For each note the id and the last-updated timestamp are visible, along with the envelope&rsquo;s version and key-derivation parameters; the timestamp is what decides last-writer-wins between your Macs.</p>
+              <p class="faq__a">Not the synced copy. There are two passwords: the account password is sent to the server to sign you in, and the library password never leaves your Mac — the encryption key comes from it. The server can authenticate you, but it stores only ciphertext and has no key to open it. For each note it sees the id, the last-updated time — which decides last-writer-wins between your Macs — and the size of the encrypted payload.</p>
+            </details>
+            <details class="faq__item">
+              <summary class="faq__q">What if I forget my library password?</summary>
+              <p class="faq__a">We cannot reset it: it never reached the server. The notes on your Mac stay plain Markdown files, but the encrypted cloud copy can only be opened with that password — keep it in a password manager.</p>
+            </details>
+            <details class="faq__item">
+              <summary class="faq__q">Which AI providers does the assistant use?</summary>
+              <p class="faq__a">The one you bring a key for: Anthropic (<span class="mono" translate="no">claude-haiku-4-5</span>), OpenAI (<span class="mono" translate="no">gpt-4o-mini</span>) or DeepSeek (<span class="mono" translate="no">deepseek-chat</span>). Keys are stored in the macOS Keychain.</p>
+            </details>
+            <details class="faq__item">
+              <summary class="faq__q">What can the MCP server do?</summary>
+              <p class="faq__a">It ships inside the app and gives Claude and other MCP clients 12 tools over your whole library: search and read notes, list notebooks and tags, read the formatting guide, and create, append to, update, tag, re-status and trash notes, or create notebooks. Rewrites keep the previous text as a revision. Want an assistant that only looks? Run the server read-only and the write tools disappear.</p>
             </details>
             <details class="faq__item">
               <summary class="faq__q">Where is my data stored?</summary>
@@ -412,22 +472,22 @@
 
       <ul class="roadmap">
         <li class="roadmap__item">
-          <span class="dot dot--done"></span>
+          <span class="dot dot--done" aria-hidden="true"></span>
           <span><strong>macOS app</strong> — the full editor: CodeMirror 6, notebooks, tags, statuses, themes, revision history, import and export, AI assistant, MCP server, cloud sync and your own CouchDB, auto-update.</span>
           <span class="roadmap__status">Available</span>
         </li>
         <li class="roadmap__item">
-          <span class="dot dot--progress"></span>
-          <span><strong>Notarisation and Developer ID</strong> — removes the right-click-on-first-launch step. Until it lands, the DMG stays unsigned and Gatekeeper asks once.</span>
+          <span class="dot dot--progress" aria-hidden="true"></span>
+          <span><strong>Notarisation and Developer ID</strong> — removes the Open Anyway step on first launch. Until it lands, the DMG is not notarised and macOS asks you to confirm once.</span>
           <span class="roadmap__status">In progress</span>
         </li>
         <li class="roadmap__item">
-          <span class="dot dot--progress"></span>
+          <span class="dot dot--progress" aria-hidden="true"></span>
           <span><strong>iOS</strong> — an iOS target alongside macOS. Not released, and we are not going to date it before it is done.</span>
           <span class="roadmap__status">In progress</span>
         </li>
         <li class="roadmap__item">
-          <span class="dot dot--planned"></span>
+          <span class="dot dot--planned" aria-hidden="true"></span>
           <span><strong>Windows and Linux</strong> — a Rust and Tauri build. Planned, not started; the macOS app comes first.</span>
           <span class="roadmap__status">Planned</span>
         </li>
@@ -444,7 +504,7 @@
       <div class="footer__col">
         <div class="footer__col-title">Product</div>
         <a href="/#features">Features</a><a href="/#pricing">Pricing</a>
-        <a href="/checkout/">Buy a licence</a>
+        <a href="/checkout/">Plans</a>
       </div>
       <div class="footer__col">
         <div class="footer__col-title">Account</div>
@@ -457,13 +517,14 @@
       </div>
     </div>
     <div class="footer__legal">
-      © 2026 Drafta · Apache-2.0 · <a href="/ru/">Русский</a> · <a href="/">English</a>
+      © 2026 Drafta · Apache-2.0 · <a href="/ru/" lang="ru" data-lang="ru">Русский</a> · <a href="/" lang="en" data-lang="en">English</a>
     </div>
   </div>
 </footer>
 
 <script src="/assets/js/config.js"></script>
 <script src="/assets/js/lang.js"></script>
+<script src="/assets/js/nav.js"></script>
 <script src="/assets/js/plans.js"></script>
 <script>
   (function () {

@@ -58,10 +58,16 @@
   function slot(formEl, className, create) {
     if (!formEl || typeof formEl.querySelector !== 'function') return null;
     var node = formEl.querySelector('.' + className);
-    if (node || !create) return node;
-    node = document.createElement('p');
-    node.className = className;
-    formEl.appendChild(node);
+    if (!node && create) {
+      node = document.createElement('p');
+      node.className = className;
+      formEl.appendChild(node);
+    }
+    /* Announced to screen readers the moment text lands: an error interrupts,
+       a confirmation waits its turn. */
+    if (node && !node.hasAttribute('role')) {
+      node.setAttribute('role', className === 'form__error' ? 'alert' : 'status');
+    }
     return node;
   }
 

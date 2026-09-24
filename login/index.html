@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, follow">
   <title>Sign in — Drafta</title>
-  <meta name="description" content="Sign in to your Drafta account to start a 30-day trial, buy a licence and manage your subscription.">
+  <meta name="description" content="Sign in to your Drafta account to start a 30-day trial and choose your plan.">
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="canonical" href="https://drafta.org/login/">
   <link rel="alternate" hreflang="en" href="https://drafta.org/login/">
@@ -12,7 +13,7 @@
   <link rel="alternate" hreflang="x-default" href="https://drafta.org/login/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Sign in — Drafta">
-  <meta property="og:description" content="Sign in to your Drafta account to start a 30-day trial, buy a licence and manage your subscription.">
+  <meta property="og:description" content="Sign in to your Drafta account to start a 30-day trial and choose your plan.">
   <meta property="og:url" content="https://drafta.org/login/">
   <meta property="og:image" content="https://drafta.org/assets/img/og.png">
   <meta name="twitter:card" content="summary_large_image">
@@ -23,7 +24,8 @@
   <header class="nav">
     <nav class="nav__inner wrap">
       <a class="nav__logo" href="/" translate="no">Drafta</a>
-      <div class="nav__links">
+      <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links" hidden><span class="nav__toggle-icon" aria-hidden="true"></span><span class="nav__toggle-label">Menu</span></button>
+      <div class="nav__links" id="nav-links">
         <a class="nav__link" href="/#features">Features</a>
         <a class="nav__link" href="/#pricing">Pricing</a>
         <a class="nav__link" href="/#faq">FAQ</a>
@@ -84,7 +86,7 @@
         <div class="footer__col">
           <div class="footer__col-title">Product</div>
           <a href="/#features">Features</a><a href="/#pricing">Pricing</a>
-          <a href="/checkout/">Buy a licence</a>
+          <a href="/checkout/">Plans</a>
         </div>
         <div class="footer__col">
           <div class="footer__col-title">Account</div>
@@ -97,13 +99,14 @@
         </div>
       </div>
       <div class="footer__legal">
-        © 2026 Drafta · Apache-2.0 · <a href="/ru/">Русский</a> · <a href="/">English</a>
+        © 2026 Drafta · Apache-2.0 · <a href="/ru/" lang="ru" data-lang="ru">Русский</a> · <a href="/" lang="en" data-lang="en">English</a>
       </div>
     </div>
   </footer>
 
   <script src="/assets/js/config.js"></script>
   <script src="/assets/js/lang.js"></script>
+  <script src="/assets/js/nav.js"></script>
   <script src="/assets/js/forms.js"></script>
   <script>
     (function () {
@@ -118,6 +121,8 @@
       var DEFAULT_NEXT = '/checkout/';
       var MSG = {
         passwordRequired: 'Enter your password.',
+        badCredentials: 'Wrong email or password.',
+        failed: 'Sign-in failed (HTTP {status}). Please try again.',
         noSession: 'The server accepted the sign-in but returned no session. Please try again.',
         noStorage: 'This browser blocked local storage, so the session could not be kept. Allow storage for drafta.org and try again.'
       };
@@ -208,7 +213,10 @@
 
           if (!res || !res.ok) {
             var serverMessage = res && res.data && res.data.error ? String(res.data.error) : '';
-            D.showError(form, serverMessage || MSG.noSession);
+            var rejected = res && (res.status === 401 || res.status === 403);
+            D.showError(form, serverMessage || (rejected
+              ? MSG.badCredentials
+              : MSG.failed.replace('{status}', String(res ? res.status : 0))));
             return;
           }
 

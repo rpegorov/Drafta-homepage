@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, follow">
   <title>Checkout — Drafta</title>
   <meta name="description" content="One plan, two ways to pay — monthly or annually. Every new account starts with a 30-day trial and needs no card, and the storage and note limits come straight from the accounts API.">
   <link rel="icon" type="image/png" href="/favicon.png">
@@ -24,7 +25,8 @@
 <header class="nav">
   <nav class="nav__inner wrap">
     <a class="nav__logo" href="/" translate="no">Drafta</a>
-    <div class="nav__links">
+    <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links" hidden><span class="nav__toggle-icon" aria-hidden="true"></span><span class="nav__toggle-label">Menu</span></button>
+    <div class="nav__links" id="nav-links">
       <a class="nav__link" href="/#features">Features</a>
       <a class="nav__link" href="/#pricing">Pricing</a>
       <a class="nav__link" href="/#faq">FAQ</a>
@@ -102,7 +104,7 @@
         </div>
         <div class="faq__item">
           <div class="faq__q">What happens when the trial ends?</div>
-          <div class="faq__a">The 30-day trial starts at registration and needs no card. After it, the plan chosen on this page is the one on your account.</div>
+          <div class="faq__a">The 30-day trial starts at registration and needs no card. After it, the app is read-only until a plan is on your account: your notes stay readable, while creating, editing and exporting need the plan chosen on this page.</div>
         </div>
         <div class="faq__item">
           <div class="faq__q">What does the app need?</div>
@@ -121,7 +123,7 @@
       <div class="footer__col">
         <div class="footer__col-title">Product</div>
         <a href="/#features">Features</a><a href="/#pricing">Pricing</a>
-        <a href="/checkout/">Buy a licence</a>
+        <a href="/checkout/">Plans</a>
       </div>
       <div class="footer__col">
         <div class="footer__col-title">Account</div>
@@ -134,13 +136,14 @@
       </div>
     </div>
     <div class="footer__legal">
-      © 2026 Drafta · Apache-2.0 · <a href="/ru/">Русский</a> · <a href="/">English</a>
+      © 2026 Drafta · Apache-2.0 · <a href="/ru/" lang="ru" data-lang="ru">Русский</a> · <a href="/" lang="en" data-lang="en">English</a>
     </div>
   </div>
 </footer>
 
 <script src="/assets/js/config.js"></script>
 <script src="/assets/js/lang.js"></script>
+<script src="/assets/js/nav.js"></script>
 <script src="/assets/js/plans.js"></script>
 <script src="/assets/js/forms.js"></script>
 <script>
@@ -158,7 +161,9 @@
 
   var D = window.DRAFTA;
   var LANG = 'en';
-  var LOGIN_URL = '/login/?next=/checkout/';
+  /* The login page returns here with the query intact, so a ?plan= the app or a
+     pricing card opened with survives the sign-in (§11). */
+  var LOGIN_URL = '/login/?next=' + encodeURIComponent(location.pathname + location.search);
   /* §11: the access token is written only by /login/, so a sessionless buyer goes
      there. /register/ is wrong for a returning customer: it would answer 409. */
 
@@ -186,6 +191,7 @@
   var fieldsEl  = document.getElementById('order-fields');
   var noteEl    = document.getElementById('order-note');
   var loginEl   = document.getElementById('order-login');
+  if (loginEl) loginEl.setAttribute('href', LOGIN_URL);
 
   function shared(name) {
     return (D && typeof D[name] === 'function') ? D[name] : null;

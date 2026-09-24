@@ -17,6 +17,8 @@
   <meta property="og:image" content="https://drafta.org/assets/img/og.png">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="theme-color" content="#FBF7F0">
+  <link rel="preload" href="/assets/fonts/golos-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/lora-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/tokens.css">
   <link rel="stylesheet" href="/assets/css/site.css">
   <style>
@@ -34,6 +36,51 @@
       #features .grid{grid-template-columns:minmax(0,1fr)}
     }
   </style>
+  <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Drafta",
+    "url": "https://drafta.org/ru/",
+    "inLanguage": "ru",
+    "description": "Нативный редактор Markdown для macOS для программистов: CodeMirror 6, 50+ языков, предпросмотр Mermaid и KaTeX, блокноты, теги, история ревизий, AI-ассистент и встроенный MCP-сервер. Заметки остаются обычными файлами .md на вашем Mac; синхронизация зашифрована end-to-end.",
+    "applicationCategory": "DeveloperApplication",
+    "applicationSubCategory": "Markdown editor",
+    "operatingSystem": "macOS 26 or later",
+    "softwareVersion": "1.0",
+    "downloadUrl": "https://github.com/rpegorov/drafta-releases/releases/latest",
+    "license": "https://www.apache.org/licenses/LICENSE-2.0",
+    "image": "https://drafta.org/assets/img/og.png",
+    "offers": [
+      {
+        "@type": "Offer",
+        "name": "На месяц",
+        "price": "9.99",
+        "priceCurrency": "USD",
+        "url": "https://drafta.org/ru/checkout/?plan=pro_monthly",
+        "priceSpecification": {
+          "@type": "UnitPriceSpecification",
+          "price": "9.99",
+          "priceCurrency": "USD",
+          "billingDuration": "P1M"
+        }
+      },
+      {
+        "@type": "Offer",
+        "name": "На год",
+        "price": "95.88",
+        "priceCurrency": "USD",
+        "url": "https://drafta.org/ru/checkout/?plan=pro_yearly",
+        "priceSpecification": {
+          "@type": "UnitPriceSpecification",
+          "price": "95.88",
+          "priceCurrency": "USD",
+          "billingDuration": "P1Y"
+        }
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
 
@@ -42,7 +89,8 @@
 <header class="nav">
   <nav class="nav__inner wrap">
     <a class="nav__logo" href="/ru/" translate="no">Drafta</a>
-    <div class="nav__links">
+    <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links" hidden><span class="nav__toggle-icon" aria-hidden="true"></span><span class="nav__toggle-label">Меню</span></button>
+    <div class="nav__links" id="nav-links">
       <a class="nav__link" href="/ru/#features">Возможности</a>
       <a class="nav__link" href="/ru/#pricing">Тарифы</a>
       <a class="nav__link" href="/ru/#faq">Вопросы</a>
@@ -115,11 +163,11 @@
       <div class="split split--reverse">
         <div class="split__text">
           <h3 class="h3">Редактор, предпросмотр — или сразу оба</h3>
-          <p class="muted">Три режима в одном нажатии: только редактор, только отрендеренная заметка или split с синхронной прокруткой. Таблицы вставляются сеткой, Mermaid и KaTeX рисуются на лету, а тире и пробелы приводятся в порядок прямо во время набора.</p>
+          <p class="muted">Три режима в один клик: только редактор, только отрендеренная заметка или split с синхронной прокруткой. Таблицы вставляются сеткой, Mermaid и KaTeX рисуются на лету, а тире и пробелы приводятся в порядок прямо во время набора.</p>
           <ul class="feature-row__list">
             <li>Режимы редактора, предпросмотра и split</li>
             <li>Живой предпросмотр таблиц, Mermaid и KaTeX</li>
-            <li>Миникарта, оглавление, поиск по ⌘&nbsp;F</li>
+            <li>Оглавление, обратные ссылки, поиск по ⌘&nbsp;F</li>
           </ul>
         </div>
         <div class="split__media">
@@ -169,9 +217,9 @@
       <div class="split">
         <div class="split__text">
           <h3 class="h3">История, которую действительно видно</h3>
-          <p class="muted">Каждое сохранение становится ревизией — 30 версий на заметку, и все лежат у вас на диске. Откройте unified diff, посмотрите, что именно изменилось, восстановите любую версию. Ничего не перезаписывается без копии того, что было раньше.</p>
+          <p class="muted">Drafta хранит до 30 ревизий на заметку у вас на диске — в том числе копию прежнего текста всякий раз, когда ассистент переписывает заметку через MCP. Откройте unified diff, посмотрите, что именно изменилось, восстановите любую версию.</p>
           <ul class="feature-row__list">
-            <li>30 ревизий на заметку</li>
+            <li>До 30 ревизий на заметку</li>
             <li>Просмотр unified diff</li>
             <li>Восстановление любой ревизии одним кликом</li>
           </ul>
@@ -204,7 +252,7 @@
       <div class="grid grid--2">
         <div class="feature">
           <div class="feature__title" translate="no">CodeMirror 6, 50+ языков</div>
-          <div class="feature__body">Тот же проверенный редактор, на котором работает <span translate="no">Inkdrop</span>, с подсветкой Python, Rust, TypeScript, Go, SQL, YAML, Bash и ещё сорока языков. Три режима просмотра — только редактор, только предпросмотр или split с синхронной прокруткой. Таблицы вставляются сеткой, Mermaid и KaTeX рисуются на лету, тире и пробелы приводятся в порядок во время набора. Миникарта, оглавление и поиск по ⌘&nbsp;F. Блоки <span class="mono" translate="no">$…$</span> работают ровно так, как вы ждёте.</div>
+          <div class="feature__body">Тот же проверенный редактор, на котором работает <span translate="no">Inkdrop</span>, с подсветкой Python, Rust, TypeScript, Go, SQL, YAML, Bash и ещё сорока языков. Три режима просмотра — только редактор, только предпросмотр или split с синхронной прокруткой. Таблицы вставляются сеткой, Mermaid и KaTeX рисуются на лету, тире и пробелы приводятся в порядок во время набора. Оглавление, обратные ссылки, граф связанных заметок и поиск по ⌘&nbsp;F. Блоки <span class="mono" translate="no">$…$</span> работают ровно так, как вы ждёте.</div>
         </div>
         </div>
 
@@ -215,15 +263,15 @@
         </div>
         <div class="feature">
           <div class="feature__title">Ваша история и ваши темы</div>
-          <div class="feature__body">Каждое сохранение становится ревизией: 30 версий на заметку, unified diff и восстановление одним кликом. В комплекте пять тем — Default Light, Default Dark, Drafta Dark, Dark Islands, Tokyo Night, — а своя тема в JSON просто кладётся рядом.</div>
+          <div class="feature__body">До 30 ревизий на заметку, unified diff и восстановление одним кликом. В комплекте одиннадцать тем: пять фирменных — Graphite &amp; Ochre, Vellum, Fjord, Phosphor, Amethyst Glass — и ещё Default Light, Default Dark, Drafta Dark, Dark Islands, Tokyo Night и Solarized Dark. Своя тема в JSON просто кладётся рядом.</div>
         </div>
         <div class="feature">
           <div class="feature__title">Внутрь и наружу — на ваших условиях</div>
-          <div class="feature__body">Импорт <span class="mono" translate="no">.md</span> и <span class="mono" translate="no">.html</span> (формат Bear) и экспорт в PDF, DOCX, HTML или Markdown; локальные картинки едут вместе как вложения. Ассистент открывается по ⌘&nbsp;J с вашим собственным ключом API, MCP-сервер даёт инструментам читать заметку, которую вы смотрите, а обновления приходят сами — Sparkle проверяет раз в сутки или по запросу из <span class="mono" translate="no">Drafta → Check for Updates…</span></div>
+          <div class="feature__body">Импорт <span class="mono" translate="no">.md</span> и <span class="mono" translate="no">.html</span> (формат Bear) и экспорт в PDF, DOCX, HTML или Markdown; локальные картинки едут вместе как вложения. Обновления приходят сами — Sparkle проверяет раз в сутки или по запросу из <span class="mono" translate="no">Drafta → Check for Updates…</span></div>
         </div>
         <div class="feature">
-          <div class="feature__title">Два места для облачной копии</div>
-          <div class="feature__body">Облачная синхронизация через аккаунт <span translate="no">Drafta</span> — путь по умолчанию, он входит в квоту тарифа, а заметки шифруются end-to-end ещё до того, как покинут машину. Либо подключите собственный CouchDB: вообще без квоты, локально или на вашем сервере.</div>
+          <div class="feature__title">Ассистент и MCP-сервер</div>
+          <div class="feature__body">Ассистент открывается по ⌘&nbsp;J и работает с вашим собственным ключом API: Anthropic (<span class="mono" translate="no">claude-haiku-4-5</span>), OpenAI (<span class="mono" translate="no">gpt-4o-mini</span>) или DeepSeek (<span class="mono" translate="no">deepseek-chat</span>). MCP-сервер встроен в приложение и даёт Claude и другим MCP-клиентам 12 инструментов, чтобы искать, читать и вести всю библиотеку. А в режиме только для чтения инструменты записи просто исчезают.</div>
         </div>
       </div>
     </div>
@@ -249,8 +297,8 @@
               <span class="stat__label">заметки шифруются на вашем Mac до отправки</span>
             </div>
             <div class="stat">
-              <span class="stat__value">PBKDF2</span>
-              <span class="stat__label">ключ выводится из пароля и не отправляется на сервер</span>
+              <span class="stat__value">2</span>
+              <span class="stat__label">пароля: один для входа, пароль библиотеки не покидает ваш Mac</span>
             </div>
           </div>
         </div>
@@ -259,23 +307,23 @@
       <div class="grid grid--2">
         <div class="feature">
           <div class="feature__title">Синхронизация с end-to-end шифрованием</div>
-          <div class="feature__body">Заметки шифруются на вашем Mac до отправки. Сервис хранит шифротекст, который не может прочитать, — ключ не покидает вашу машину.</div>
+          <div class="feature__body">Заметки шифруются алгоритмом AES-256-GCM на вашем Mac до отправки, ключом, который получается из пароля библиотеки через PBKDF2-HMAC-SHA256. Сервис хранит шифротекст, а ключа у него нет. Без общих слов: это точные примитивы, и такая аудитория их проверяет.</div>
         </div>
         <div class="feature">
-          <div class="feature__title">PBKDF2-HMAC-SHA256 и AES-256-GCM</div>
-          <div class="feature__body">256-битный ключ выводится из вашего пароля по PBKDF2-HMAC-SHA256, с солью и числом итераций, заданными для аккаунта. Сами заметки закрываются алгоритмом AES-256-GCM. Без общих слов: это точные примитивы, и такая аудитория их проверяет.</div>
-        </div>
-        <div class="feature">
-          <div class="feature__title">Пароль и ключ остаются у вас</div>
-          <div class="feature__body">Сервер не получает ни то, ни другое. Вход лишь подтверждает знание пароля через отдельный верификатор, выведенный из ключа, — сервис может убедиться, кто вы, но расшифровать заметки не может.</div>
+          <div class="feature__title">Два пароля — две задачи</div>
+          <div class="feature__body">Пароль аккаунта нужен для входа: он уходит на сервер по TLS, как при любом входе. Пароль библиотеки — отдельный, он не покидает ваш Mac, и именно из него получается ключ шифрования. Сервер может убедиться, что это вы, но расшифровать заметки не может.</div>
         </div>
         <div class="feature">
           <div class="feature__title">Что видит облако</div>
-          <div class="feature__body">Для каждой заметки сервис видит её id — ключ документа — и время последнего изменения, по которому решается, чья версия новее. В самом конверте лежат ещё версия и параметры вывода ключа, без них заметку не открыть. Заголовок, текст, теги и вложения остаются шифротекстом.</div>
+          <div class="feature__body">Email и тариф вашего аккаунта, а по каждой заметке — её id и время последнего изменения (по нему решается, чья версия новее на ваших Mac), плюс размер зашифрованных данных. Заголовок, текст, теги и вложения остаются шифротекстом.</div>
         </div>
         <div class="feature">
           <div class="feature__title">На диске — обычный Markdown</div>
-          <div class="feature__body">Локальная библиотека остаётся обычными Markdown-файлами. Шифрование защищает путь синхронизации, а не диск, — поэтому любую заметку по-прежнему можно открыть в другом редакторе, найти через grep или закоммитить в git.</div>
+          <div class="feature__body">Библиотека на вашем Mac остаётся обычными Markdown-файлами. Шифрование защищает путь синхронизации, а не диск: <span class="mono" translate="no">grep</span>, git и Obsidian продолжают работать, а сам диск защищает FileVault.</div>
+        </div>
+        <div class="feature">
+          <div class="feature__title">Пароль библиотеки не сбросить</div>
+          <div class="feature__body">У сервера его никогда не было, поэтому восстановить его не сможет никто. Заметки на этом Mac в любом случае остаются читаемыми файлами, а зашифрованная копия в облаке открывается только этим паролем.</div>
         </div>
         <div class="feature">
           <div class="feature__title">Два места для облачной копии</div>
@@ -296,7 +344,7 @@
           <p class="muted">Раз это обычный текст, остальной инструментарий уже работает: ищите по всей библиотеке через <span class="mono" translate="no">grep</span>, коммитьте её в git, открывайте заметку в VS Code или Obsidian, читайте через <span class="mono" translate="no">cat</span> в терминале. Drafta — нативное приложение на Swift: под ним нет ни среды Electron, ни встроенного браузера, который надо держать запущенным.</p>
           <ul class="feature-row__list">
             <li>Обычный Markdown с YAML front-matter у вас на диске</li>
-            <li>30 ревизий на заметку, локально</li>
+            <li>До 30 ревизий на заметку, локально</li>
             <li>Ни закрытой базы, ни экспорта как единственного выхода</li>
             <li>Git, grep и любой другой редактор продолжают работать</li>
             <li>Лицензия Apache-2.0</li>
@@ -306,7 +354,7 @@
           <div class="grid grid--2">
             <div class="stat">
               <span class="stat__value">30</span>
-              <span class="stat__label">ревизий на заметку, на диске</span>
+              <span class="stat__label">ревизий на заметку хранится на диске</span>
             </div>
             <div class="stat">
               <span class="stat__value">0</span>
@@ -334,7 +382,7 @@
       <p class="lede">Оплата раз в месяц или раз в год, приложение одно и то же. Каждый новый аккаунт начинается с 30-дневного триала — карта не нужна.</p>
 
       <div class="callout callout--accent">
-        <p><strong>Триал 30 дней на каждом новом аккаунте</strong> — карта не нужна, списаний в этот период нет. После триала вы выбираете период оплаты: месяц или год. Второго тарифа и пожизненной лицензии нет.</p>
+        <p><strong>Триал 30 дней на каждом новом аккаунте</strong> — карта не нужна, списаний в этот период нет. Когда он закончится, приложение перейдёт в режим только для чтения, пока вы не выберете период оплаты — месяц или год: все заметки остаются на вашем Mac и читаются. Второго тарифа и пожизненной лицензии нет. Оплата картой пока не подключена, так что сегодня ничего не списывается.</p>
       </div>
 
       <div class="plans" data-plans></div>
@@ -359,7 +407,7 @@
             </details>
             <details class="faq__item">
               <summary class="faq__q">Как установить?</summary>
-              <p class="faq__a">Скачайте DMG из последнего релиза, откройте его и перетащите <span class="mono" translate="no">Drafta.app</span> в Applications. Сборка пока не нотаризована, поэтому при первом запуске нужно правым кликом → «Открыть» → «Открыть». Gatekeeper спросит только один раз.</p>
+              <p class="faq__a">Скачайте DMG из последнего релиза, откройте его и перетащите <span class="mono" translate="no">Drafta.app</span> в Applications. Сборка пока не нотаризована, поэтому macOS заблокирует первый запуск: откройте «Системные настройки» → «Конфиденциальность и безопасность», пролистайте до сообщения о Drafta, нажмите <strong>«Всё равно открыть»</strong> и подтвердите. macOS спросит только один раз.</p>
             </details>
             <details class="faq__item">
               <summary class="faq__q">Как приходят обновления?</summary>
@@ -367,7 +415,7 @@
             </details>
             <details class="faq__item">
               <summary class="faq__q">Есть ли триал и нужна ли карта?</summary>
-              <p class="faq__a">Каждому новому аккаунту — 30 дней. Карта для старта не нужна. Когда триал закончится, выберите период оплаты: месяц или год.</p>
+              <p class="faq__a">Каждому новому аккаунту — 30 дней. Карта для старта не нужна. Когда триал закончится, Drafta перейдёт в режим только для чтения: открывать, искать и читать заметки можно, а создание, правка и экспорт ждут тарифа — на месяц или на год. Оплата картой пока не подключена.</p>
             </details>
             <details class="faq__item">
               <summary class="faq__q">Где лежат мои заметки?</summary>
@@ -375,7 +423,7 @@
             </details>
             <details class="faq__item">
               <summary class="faq__q">Нужен ли аккаунт, чтобы пользоваться приложением?</summary>
-              <p class="faq__a">Аккаунт запускает триал, закрепляет за вами тариф и — если вы не подключили свой CouchDB — даёт заметкам облачную копию в рамках квоты тарифа. Эта копия хранится шифротекстом, который мы не можем прочитать.</p>
+              <p class="faq__a">Да. Аккаунт запускает триал, закрепляет за вами тариф и — если вы не подключили свой CouchDB — хранит зашифрованную облачную копию заметок в рамках квоты тарифа. Его пароль нужен только для входа; заметки шифруются отдельным паролем библиотеки, который остаётся на вашем Mac.</p>
             </details>
             <details class="faq__item">
               <summary class="faq__q">Что входит в тариф?</summary>
@@ -383,11 +431,23 @@
             </details>
             <details class="faq__item">
               <summary class="faq__q">Мои данные зашифрованы?</summary>
-              <p class="faq__a">По дороге в облако — да, end-to-end. Заметки закрываются алгоритмом AES-256-GCM под 256-битным ключом, который выводится из вашего пароля по PBKDF2-HMAC-SHA256, с солью и числом итераций, заданными для аккаунта. И сразу о границе честно: это защищает путь синхронизации, а не ваш диск. Библиотека на Mac остаётся обычными Markdown-файлами, которые откроет любой редактор.</p>
+              <p class="faq__a">По дороге в облако — да, end-to-end. Заметки шифруются алгоритмом AES-256-GCM на вашем Mac ключом, который получается из пароля библиотеки через PBKDF2-HMAC-SHA256. И сразу о границе честно: это защищает путь синхронизации, а не ваш диск. Библиотека на Mac остаётся обычными Markdown-файлами, которые откроет любой редактор; диск защищает FileVault.</p>
             </details>
             <details class="faq__item">
               <summary class="faq__q">Вы можете прочитать мои заметки?</summary>
-              <p class="faq__a">Синхронизированную копию — нет. Сервер не получает ни ваш пароль, ни ключ: вход подтверждает знание пароля через отдельный верификатор, выведенный из ключа, а хранится там шифротекст под ключом, которого у сервиса нет. По каждой заметке видны её id, время последнего изменения — именно оно решает, чья версия новее на ваших Mac, — и служебная обвязка конверта: версия и параметры вывода ключа.</p>
+              <p class="faq__a">Синхронизированную копию — нет. Паролей два: пароль аккаунта отправляется на сервер для входа, а пароль библиотеки не покидает ваш Mac — из него и получается ключ шифрования. Сервер может убедиться, что это вы, но хранит только шифротекст, и ключа к нему у него нет. По каждой заметке он видит id, время последнего изменения — именно оно решает, чья версия новее на ваших Mac, — и размер зашифрованных данных.</p>
+            </details>
+            <details class="faq__item">
+              <summary class="faq__q">Что, если я забуду пароль библиотеки?</summary>
+              <p class="faq__a">Сбросить его мы не можем: на сервер он не попадал. Заметки на вашем Mac остаются обычными Markdown-файлами, но зашифрованную копию в облаке без этого пароля не открыть — храните его в менеджере паролей.</p>
+            </details>
+            <details class="faq__item">
+              <summary class="faq__q">С какими AI-провайдерами работает ассистент?</summary>
+              <p class="faq__a">С тем, для которого у вас есть ключ: Anthropic (<span class="mono" translate="no">claude-haiku-4-5</span>), OpenAI (<span class="mono" translate="no">gpt-4o-mini</span>) или DeepSeek (<span class="mono" translate="no">deepseek-chat</span>). Ключи хранятся в связке ключей macOS.</p>
+            </details>
+            <details class="faq__item">
+              <summary class="faq__q">Что умеет MCP-сервер?</summary>
+              <p class="faq__a">Он встроен в приложение и даёт Claude и другим MCP-клиентам 12 инструментов для всей библиотеки: искать и читать заметки, смотреть блокноты и теги, читать справку по форматированию, а также создавать, дописывать, переписывать, тегировать, менять статус и отправлять в корзину заметки и создавать блокноты. При переписывании прежний текст сохраняется ревизией. Нужен ассистент, который только смотрит? Запустите сервер в режиме только для чтения — инструменты записи исчезнут.</p>
             </details>
             <details class="faq__item">
               <summary class="faq__q">Где хранятся мои данные?</summary>
@@ -412,22 +472,22 @@
 
       <ul class="roadmap">
         <li class="roadmap__item">
-          <span class="dot dot--done"></span>
+          <span class="dot dot--done" aria-hidden="true"></span>
           <span><strong>Приложение для macOS</strong> — редактор целиком: CodeMirror 6, блокноты, теги, статусы, темы, история ревизий, импорт и экспорт, AI-ассистент, MCP-сервер, облачная синхронизация и собственный CouchDB, автообновление.</span>
           <span class="roadmap__status">Доступно</span>
         </li>
         <li class="roadmap__item">
-          <span class="dot dot--progress"></span>
-          <span><strong>Нотаризация и Developer ID</strong> — уберёт шаг с правым кликом при первом запуске. Пока этого нет, DMG остаётся неподписанным и Gatekeeper спрашивает один раз.</span>
+          <span class="dot dot--progress" aria-hidden="true"></span>
+          <span><strong>Нотаризация и Developer ID</strong> — уберёт шаг «Всё равно открыть» при первом запуске. Пока этого нет, DMG не нотаризован и macOS один раз просит подтвердить запуск.</span>
           <span class="roadmap__status">В работе</span>
         </li>
         <li class="roadmap__item">
-          <span class="dot dot--progress"></span>
+          <span class="dot dot--progress" aria-hidden="true"></span>
           <span><strong>iOS</strong> — цель iOS рядом с macOS. Релиза нет, и мы не станем называть дату, пока не будет готово.</span>
           <span class="roadmap__status">В работе</span>
         </li>
         <li class="roadmap__item">
-          <span class="dot dot--planned"></span>
+          <span class="dot dot--planned" aria-hidden="true"></span>
           <span><strong>Windows и Linux</strong> — сборка на Rust и Tauri. Запланировано, но не начато: приложение для macOS идёт первым.</span>
           <span class="roadmap__status">Запланировано</span>
         </li>
@@ -444,7 +504,7 @@
       <div class="footer__col">
         <div class="footer__col-title">Продукт</div>
         <a href="/ru/#features">Возможности</a><a href="/ru/#pricing">Тарифы</a>
-        <a href="/ru/checkout/">Купить лицензию</a>
+        <a href="/ru/checkout/">Тарифы</a>
       </div>
       <div class="footer__col">
         <div class="footer__col-title">Аккаунт</div>
@@ -457,13 +517,14 @@
       </div>
     </div>
     <div class="footer__legal">
-      © 2026 Drafta · Apache-2.0 · <a href="/">English</a> · <a href="/ru/">Русский</a>
+      © 2026 Drafta · Apache-2.0 · <a href="/" lang="en" data-lang="en">English</a> · <a href="/ru/" lang="ru" data-lang="ru">Русский</a>
     </div>
   </div>
 </footer>
 
 <script src="/assets/js/config.js"></script>
 <script src="/assets/js/lang.js"></script>
+<script src="/assets/js/nav.js"></script>
 <script src="/assets/js/plans.js"></script>
 <script>
   (function () {

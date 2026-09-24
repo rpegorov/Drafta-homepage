@@ -238,10 +238,19 @@
     return Array.isArray(list) ? list.slice() : [];
   }
 
+  /* One request per page load: the checkout renders cards, a quota line and a
+     deep-link hint from the same list, and each caller shares this promise. */
+  var pending = null;
+
   /* Promise<plan[]> — API first, planFallback on any failure or bad shape. The
      array is returned as the service sent it; keeping only the sellable periods
      is the renderer's job (§5b). */
   DRAFTA.loadPlans = function () {
+    if (!pending) pending = fetchPlans();
+    return pending.then(function (plans) { return plans.slice(); });
+  };
+
+  function fetchPlans() {
     var url = String(DRAFTA.api || '') + String((DRAFTA.endpoints || {}).plans || '');
     return fetch(url, { headers: { Accept: 'application/json' } })
       .then(function (response) {
@@ -254,7 +263,7 @@
         return plans;
       })
       .catch(function () { return fallback(); });
-  };
+  }
 
   /* Fills el with the .plans markup: two billing cards, the shared list below
      them and the trial line. Returns Promise<void>. */

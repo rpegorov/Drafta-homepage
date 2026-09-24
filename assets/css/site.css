@@ -76,6 +76,22 @@
   unicode-range:U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
 }
 
+/* Metric-matched fallbacks. While a woff2 is still loading, text is set in a
+   local face scaled to the web font's average advance and vertical metrics, so
+   the swap moves nothing (it was the whole of the page's layout shift). Ratios
+   measured from the shipped subsets against Arial and Georgia, Latin and
+   Cyrillic averaged. */
+@font-face{
+  font-family:'Golos Fallback';
+  src:local('Arial'), local('ArialMT'), local('Liberation Sans');
+  size-adjust:108.5%; ascent-override:90.3%; descent-override:20.3%; line-gap-override:0%;
+}
+@font-face{
+  font-family:'Lora Fallback';
+  src:local('Georgia');
+  size-adjust:104.5%; ascent-override:96.3%; descent-override:26.2%; line-gap-override:0%;
+}
+
 /* ---------- reset + base ---------- */
 
 *,*::before,*::after{box-sizing:border-box}
@@ -309,6 +325,51 @@ pre code{background:none;border:0;padding:0;color:inherit;font-size:inherit}
   align-items:center;
   gap:var(--space-5);
   margin-inline-start:auto;
+}
+
+/* The section-menu toggle exists only below the breakpoint, and only once
+   nav.js has wired it (the button ships `hidden`). Its label is for screen
+   readers; the three bars are drawn from the current text colour. */
+.nav__toggle{
+  display:none;
+  order:3;
+  align-items:center;
+  justify-content:center;
+  inline-size:calc(var(--space-7) - var(--space-1));
+  block-size:calc(var(--space-7) - var(--space-1));
+  padding:0;
+  border:1px solid var(--border);
+  border-radius:var(--radius-pill);
+  background:transparent;
+  color:var(--text);
+  cursor:pointer;
+}
+.nav__toggle:hover{border-color:var(--border-strong)}
+.nav__toggle-icon,
+.nav__toggle-icon::before,
+.nav__toggle-icon::after{
+  display:block;
+  inline-size:calc(var(--space-4) + var(--space-1) / 2);
+  block-size:2px;
+  border-radius:var(--radius-pill);
+  background:currentColor;
+  transition:transform .15s ease, opacity .15s ease;
+}
+.nav__toggle-icon{position:relative}
+.nav__toggle-icon::before,
+.nav__toggle-icon::after{content:"";position:absolute;inset-inline-start:0}
+.nav__toggle-icon::before{transform:translateY(calc(var(--space-1) * -1.5))}
+.nav__toggle-icon::after{transform:translateY(calc(var(--space-1) * 1.5))}
+.nav.is-open .nav__toggle-icon{background:transparent}
+.nav.is-open .nav__toggle-icon::before{background:var(--text);transform:rotate(45deg)}
+.nav.is-open .nav__toggle-icon::after{background:var(--text);transform:rotate(-45deg)}
+.nav__toggle-label{
+  position:absolute;
+  inline-size:1px;
+  block-size:1px;
+  overflow:hidden;
+  clip-path:inset(50%);
+  white-space:nowrap;
 }
 
 /* ---------- language switcher ---------- */
@@ -928,8 +989,27 @@ details[open] > .faq__q{margin-bottom:var(--space-3)}
 
   /* Nav links hide; the language switcher and the primary CTA stay, so the row
      has to be tightened to fit a 375px viewport (logo + switcher + CTA). */
-  .nav__links{display:none}
-  .nav__inner{gap:var(--space-2)}
+  /* Without nav.js the section links wrap onto a second row; with it they fold
+     behind the toggle and open as a panel under the header row. */
+  .nav__inner{gap:var(--space-2);flex-wrap:wrap}
+  .nav__links{order:4;flex-basis:100%;gap:var(--space-5)}
+  .nav--menu .nav__toggle:not([hidden]){display:inline-flex}
+  .nav--menu .nav__links{display:none}
+  .nav--menu.is-open .nav__links{
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    gap:0;
+    padding-block-start:var(--space-2);
+  }
+  .nav--menu .nav__link{
+    display:flex;
+    align-items:center;
+    min-block-size:calc(var(--space-7) - var(--space-1));
+    border-block-start:1px solid var(--border);
+    font-size:var(--step-1);
+    color:var(--text);
+  }
   .nav__actions{gap:var(--space-2)}
   .nav .lang__btn{padding:var(--space-1) var(--space-2)}
   .nav .btn{padding:var(--space-2) var(--space-4)}
@@ -942,6 +1022,11 @@ details[open] > .faq__q{margin-bottom:var(--space-3)}
   /* Stacked, the 48px that separates two side-by-side cards becomes a vertical
      gap of its own, so it drops back to the section rhythm. */
   .plans{max-width:none;gap:var(--space-6)}
+  /* The status label would not fit beside a long line on a phone: it drops
+     under the text, aligned with it rather than with the dot. */
+  .roadmap__item{flex-wrap:wrap;row-gap:var(--space-1)}
+  .roadmap__item > span:nth-child(2){flex:1 1 0;min-inline-size:0}
+  .roadmap__status{flex-basis:100%;padding-inline-start:calc(var(--space-2) + var(--space-5))}
   .mark{display:none}
 }
 

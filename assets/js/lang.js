@@ -44,6 +44,12 @@
     return String(list[0] || '').toLowerCase();
   }
 
+  /* A same-site ?next= (the login page's return address) follows the visitor to
+     the Russian twin too, so signing in does not land them on an English page. */
+  function ruSearch(search) {
+    return String(search || '').replace(/([?&]next=)(%2F|\/)(?!ru(%2F|\/))/i, '$1$2ru$2');
+  }
+
   /* (2) explicit choice — the link still navigates by itself. */
   document.addEventListener('click', function (event) {
     var node = event.target;
@@ -58,6 +64,6 @@
      visitor to the Russian twin, keeping the query string and hash so that a
      confirmation link (?token=…) is not stripped. */
   if (!isRuPage() && !stored() && preferredLanguage().indexOf('ru') === 0) {
-    location.replace(twinUrl() + location.search + location.hash);
+    location.replace(twinUrl() + ruSearch(location.search) + location.hash);
   }
 })();

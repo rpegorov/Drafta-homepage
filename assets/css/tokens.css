@@ -47,8 +47,8 @@
   --syn-fn:#2F5FE0; --syn-type:#8A5A1F; --syn-comment:#9A9186;
 
   /* type — every family below MUST carry a full Cyrillic subset */
-  --font-display:'Lora',Georgia,'Times New Roman',serif;
-  --font-sans:'Golos Text',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  --font-display:'Lora','Lora Fallback',Georgia,'Times New Roman',serif;
+  --font-sans:'Golos Text','Golos Fallback',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
   --font-mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
 
   /* type scale — fluid, and still no px font size anywhere */

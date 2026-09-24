@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, follow">
+  <meta name="referrer" content="no-referrer">
   <title>Confirm your email — Drafta</title>
   <meta name="description" content="Confirm the email address of your Drafta account by opening the link we mailed you.">
   <link rel="icon" type="image/png" href="/favicon.png">
@@ -23,7 +25,8 @@
   <header class="nav">
     <nav class="nav__inner wrap">
       <a class="nav__logo" href="/" translate="no">Drafta</a>
-      <div class="nav__links">
+      <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links" hidden><span class="nav__toggle-icon" aria-hidden="true"></span><span class="nav__toggle-label">Menu</span></button>
+      <div class="nav__links" id="nav-links">
         <a class="nav__link" href="/#features">Features</a>
         <a class="nav__link" href="/#pricing">Pricing</a>
         <a class="nav__link" href="/#faq">FAQ</a>
@@ -63,7 +66,7 @@
 
         <div class="form is-hidden" data-state="confirmed" hidden role="status">
           <h2 class="h3">Your email address is confirmed</h2>
-          <p class="form__ok">Thanks — the accounts service accepted the link. Sign in with this address to buy a licence.</p>
+          <p class="form__ok">Thanks — the accounts service accepted the link. Sign in with this address to choose a plan.</p>
           <div class="form__actions">
             <a class="btn btn--primary" href="/login/">Sign in</a>
           </div>
@@ -104,7 +107,7 @@
         <div class="footer__col">
           <div class="footer__col-title">Product</div>
           <a href="/#features">Features</a><a href="/#pricing">Pricing</a>
-          <a href="/checkout/">Buy a licence</a>
+          <a href="/checkout/">Plans</a>
         </div>
         <div class="footer__col">
           <div class="footer__col-title">Account</div>
@@ -117,13 +120,14 @@
         </div>
       </div>
       <div class="footer__legal">
-        © 2026 Drafta · Apache-2.0 · <a href="/ru/">Русский</a> · <a href="/">English</a>
+        © 2026 Drafta · Apache-2.0 · <a href="/ru/" lang="ru" data-lang="ru">Русский</a> · <a href="/" lang="en" data-lang="en">English</a>
       </div>
     </div>
   </footer>
 
   <script src="/assets/js/config.js"></script>
   <script src="/assets/js/lang.js"></script>
+  <script src="/assets/js/nav.js"></script>
   <script src="/assets/js/forms.js"></script>
   <script>
     (function () {
