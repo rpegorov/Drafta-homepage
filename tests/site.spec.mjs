@@ -190,6 +190,18 @@ describe('ЗАДАЧА-1.6 routing and feeds', () => {
     expect(doc.getElementsByTagName('channel').length).toBe(1);
   });
 
+  it('[-] /appcast.xml keeps the released versions: apps already in the field read this feed for updates', () => {
+    const doc = new new JSDOM('').window.DOMParser().parseFromString(readDist('appcast.xml'), 'application/xml');
+    const items = [...doc.getElementsByTagName('item')];
+    expect(items.length, 'the shipped feed has no releases, so installed apps would never see an update').toBeGreaterThan(0);
+    for (const item of items) {
+      const version = item.getElementsByTagNameNS(SPARKLE_NS, 'version')[0]?.textContent?.trim();
+      const enclosure = item.getElementsByTagName('enclosure')[0]?.getAttribute('url');
+      expect(version, 'every release names its sparkle:version').toBeTruthy();
+      expect(enclosure, `release ${version} links its download`).toMatch(/^https:\/\//);
+    }
+  });
+
   it('[-] the sitemap lists the landing but no noindex page', () => {
     const index = loadXml(readDist('sitemap-index.xml'));
     const children = index('sitemap > loc').toArray().map((n) => index(n).text().trim());
