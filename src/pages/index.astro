@@ -1,16 +1,5 @@
 ---
-/* Temporary page: renders the shared frame until task 1.1 replaces it with the landing. */
-import Base from '../layouts/Base.astro';
+/* drafta.org — the English landing. */
+import Landing from '../components/landing/Landing.astro';
 ---
-<Base
-  lang="en"
-  title="Drafta — Markdown notes for programmers on macOS"
-  description="A native macOS Markdown editor for programmers. CodeMirror 6, 50+ languages, Mermaid and KaTeX preview, notebooks, tags and revision history. Your notes stay plain .md files. macOS 26 or later, Apple Silicon & Intel."
-  canonicalPath="/"
->
-  <section class="hero">
-    <div class="wrap wrap--hero">
-      <h1 class="display-1">Drafta</h1>
-    </div>
-  </section>
-</Base>
+<Landing lang="en" />

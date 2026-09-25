@@ -1,0 +1,34 @@
+---
+/* Three short claims on --surface cards, right under the hero shot. */
+import type { Fact } from './copy/types';
+
+interface Props {
+  label: string;
+  facts: Fact[];
+}
+const { label, facts } = Astro.props;
+---
+<section class="band band--soft facts-band" aria-label={label}>
+  <div class="wrap">
+    <ul class="grid grid--3 facts">
+      {facts.map((fact) => (
+        <li class="card">
+          <h2 class="h3">{fact.title}</h2>
+          <p class="feature__body" set:html={fact.html} />
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  /* three short cards need less air than a full section */
+  .facts-band {
+    padding-block: var(--space-8);
+  }
+  .facts {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+</style>

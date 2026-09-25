@@ -1,0 +1,36 @@
+---
+/* Pricing: trial callout, the cards rendered by scripts/plans.ts into
+   [data-plans] (link mode), and the note on what the plan covers. */
+import SectionHead from './SectionHead.astro';
+import type { LandingCopy } from './copy/types';
+
+interface Props {
+  copy: LandingCopy['pricing'];
+}
+const { copy } = Astro.props;
+---
+<section class="band" id="pricing" aria-labelledby="pricing-title">
+  <div class="wrap">
+    <SectionHead head={copy} id="pricing-title" />
+    <div class="callout callout--accent">
+      <p set:html={copy.trialHtml} />
+    </div>
+    <div class="plans" data-plans></div>
+    <p class="muted" set:html={copy.noteHtml} />
+  </div>
+</section>
+
+<script>
+  import { renderPlans } from '../../scripts/plans';
+
+  const el = document.querySelector<HTMLElement>('[data-plans]');
+  if (el) {
+    // renderPlans already falls back to the built-in plan list when the API is
+    // unreachable; a failure here means the render itself broke, and an empty
+    // block would read as "no plans", so the block is hidden instead.
+    renderPlans(el, { lang: document.documentElement.lang, mode: 'link' }).catch((error: unknown) => {
+      el.hidden = true;
+      console.error('Drafta: pricing cards failed to render', error);
+    });
+  }
+</script>

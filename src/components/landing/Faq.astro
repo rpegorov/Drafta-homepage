@@ -1,0 +1,42 @@
+---
+/* FAQ: heading on the left, native <details> disclosures on the right. */
+import SectionHead from './SectionHead.astro';
+import type { LandingCopy } from './copy/types';
+
+interface Props {
+  copy: LandingCopy['faq'];
+}
+const { copy } = Astro.props;
+---
+<section class="band band--soft" id="faq" aria-labelledby="faq-title">
+  <div class="wrap">
+    <div class="faq-layout">
+      <div>
+        <SectionHead head={copy} id="faq-title" />
+      </div>
+      <div class="faq">
+        {copy.items.map((item) => (
+          <details class="faq__item">
+            <summary class="faq__q">{item.q}</summary>
+            <p class="faq__a" set:html={item.html} />
+          </details>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: var(--space-7);
+    align-items: start;
+  }
+  @media (max-width: 820px) {
+    .faq-layout {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-5);
+    }
+  }
+</style>

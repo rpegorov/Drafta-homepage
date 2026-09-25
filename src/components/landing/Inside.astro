@@ -1,0 +1,47 @@
+---
+/* "What's inside": feature rows, text and screenshot alternating sides. */
+import SectionHead from './SectionHead.astro';
+import Shot from './Shot.astro';
+import type { LandingCopy } from './copy/types';
+
+interface Props {
+  copy: LandingCopy['inside'];
+}
+const { copy } = Astro.props;
+---
+<section class="band" id="inside" aria-labelledby="inside-title">
+  <div class="wrap">
+    <SectionHead head={copy} id="inside-title" />
+    {copy.rows.map((row, index) => (
+      <div class:list={['feature-row', 'inside-row', { 'feature-row--reverse': index % 2 === 0 }]}>
+        <div class="feature-row__text">
+          <h3 class="h3">{row.title}</h3>
+          <p class="feature__body" set:html={row.html} />
+          <ul class="feature-row__list">
+            {row.points.map((point) => <li>{point}</li>)}
+          </ul>
+        </div>
+        <div class="feature-row__media">
+          <Shot shot={row.shot} layout="row" />
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  /* The captures are dense app windows: the screenshot takes the wider column
+     (7 of 12) so its text stays legible; site.css's rows favour the text. */
+  .inside-row {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  }
+  .inside-row.feature-row--reverse {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  }
+  @media (max-width: 820px) {
+    .inside-row,
+    .inside-row.feature-row--reverse {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

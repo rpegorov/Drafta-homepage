@@ -1,0 +1,13 @@
+---
+/* Eyebrow + display-2 title + optional lead. The title's id labels its section. */
+import type { SectionHead } from './copy/types';
+
+interface Props {
+  head: SectionHead;
+  id: string;
+}
+const { head, id } = Astro.props;
+---
+<p class="eyebrow">{head.eyebrow}</p>
+<h2 class="display-2" id={id}>{head.title}</h2>
+{head.lead && <p class="lead">{head.lead}</p>}
