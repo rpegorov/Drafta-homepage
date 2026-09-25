@@ -1,7 +1,7 @@
 // Loads a module that a wave-2 task promised in PLAN v2 §11.2/§11.3. A missing
 // file or export fails with the owning task in the message, so a red test says
 // "not built yet" instead of a resolver stack trace.
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { parseFrontmatter } from '@astrojs/internal-helpers/frontmatter';
 import { ROOT } from './dist.mjs';
@@ -33,8 +33,4 @@ export function parseMarkdown(text) {
   const src = text.startsWith('---') ? text : `---\n${text.trimEnd()}\n---\n`;
   const { frontmatter, content } = parseFrontmatter(src);
   return { data: frontmatter, body: content };
-}
-
-export function readMarkdown(file) {
-  return parseMarkdown(readFileSync(file, 'utf8'));
 }
