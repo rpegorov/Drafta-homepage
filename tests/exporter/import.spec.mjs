@@ -1,7 +1,7 @@
 // ЗАДАЧА-2.2 — the Drafta → site exporter, driven through its CLI contract
 // (`--library --site [--commit] --json`, PLAN v2 §11.3) on the fixture library.
 // Selection rule under test (§11.4, §11.0): completed, not trashed, not a
-// template, tag site/blog|site/docs by full path (body or extraTags), site block
+// template, tag drafta/blog|drafta/docs by full path (body or extraTags), site block
 // with slug + description, no publish: false; sealed files are skipped.
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -34,7 +34,7 @@ describe('ЗАДАЧА-2.2 exporter', () => {
     expect(json.created[0].url).toMatch(/\/blog\/hello-world\/$/);
   });
 
-  it('selects by #site/blog in the body and by extraTags, pairing EN and RU under one slug', () => {
+  it('selects by #drafta/blog in the body and by extraTags, pairing EN and RU under one slug', () => {
     const w = world({ notes: [ID.helloEn, ID.helloRu] });
     const { json } = runExporter(w, ['--commit']);
     expect(slugs(json.created).sort()).toEqual(['en/hello-world', 'ru/hello-world']);

@@ -79,6 +79,7 @@ export function makeWorld({ notes, site = {} }) {
     mkdirSync(dirname(join(siteDir, rel)), { recursive: true });
     writeFileSync(join(siteDir, rel), content);
   }
+  writeFileSync(join(siteDir, 'publish.config.json'), JSON.stringify({ tagNamespace: 'drafta' }));
   git(siteDir, 'init', '-q', '-b', 'main');
   git(siteDir, 'add', '-A');
   git(siteDir, 'commit', '-q', '-m', 'site before import');

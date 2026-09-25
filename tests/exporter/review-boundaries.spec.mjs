@@ -4,7 +4,7 @@
 // - `publish: false` wins even when the rest of the site block is broken;
 // - a note that loses Completed is unpublished with its attachment folder;
 // - `tags:` on the site are the tags written in the note's text, minus
-//   `site/*`; front-matter `extraTags` never leak onto the page.
+//   `drafta/*`; front-matter `extraTags` never leak onto the page.
 // Each test publishes a fixture note first, then edits the note in the fake
 // library the way the app would, and reruns the real CLI.
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -90,9 +90,9 @@ describe('ЗАДАЧА-2.2 review — unpublishing', () => {
 });
 
 describe('ЗАДАЧА-2.2 review — tags', () => {
-  it('front-matter extraTags stay off the page; text tags go on it, site/* never', () => {
+  it('front-matter extraTags stay off the page; text tags go on it, drafta/* never', () => {
     const w = world({ notes: [ID.helloEn] });
-    editNote(w, ID.helloEn, (md) => md.replace(/^status: completed$/m, 'status: completed\nextraTags:\n- private-idea\n- site/blog'));
+    editNote(w, ID.helloEn, (md) => md.replace(/^status: completed$/m, 'status: completed\nextraTags:\n- private-idea\n- drafta/blog'));
     const { json } = runExporter(w, ['--commit']);
     expect(slugs(json.created)).toEqual(['en/hello-world']);
 
