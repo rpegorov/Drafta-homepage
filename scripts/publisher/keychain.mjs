@@ -30,24 +30,25 @@ export async function readDraftaDefault(exec, key) {
   }
 }
 
-async function readItem(exec, service, account) {
+async function readItem(exec, service, account, timeoutMs) {
   try {
-    const { stdout } = await exec(SECURITY, ['find-generic-password', '-s', service, '-a', account, '-w'], { timeout: KEY_READ_TIMEOUT_MS });
+    const { stdout } = await exec(SECURITY, ['find-generic-password', '-s', service, '-a', account, '-w'], { timeout: timeoutMs });
     return String(stdout).trim() || null;
   } catch (error) {
     if (error?.code === ITEM_NOT_FOUND) return null;
-    const why = error?.killed ? `no answer within ${KEY_READ_TIMEOUT_MS / 1000} s (the Keychain dialog was not answered)` : `security exited ${error?.code ?? 'abnormally'}`;
+    const why = error?.killed ? `no answer within ${timeoutMs / 1000} s (the Keychain dialog was not answered)` : `security exited ${error?.code ?? 'abnormally'}`;
     throw new KeychainError(`keychain: ${service} → ${why}`);
   }
 }
 
 /**
  * The provider's API key: the publisher's own item first, then Drafta's.
+ * @param {{timeoutMs?: number}} [options] the installer waits longer: the owner reads the dialog
  * @returns {Promise<string|null>} null when neither item exists
  * @throws {KeychainError} the read was denied or timed out (message has no key)
  */
-export async function readProviderKey(exec, provider) {
-  return (await readItem(exec, OWN_KEY_SERVICE, provider)) ?? (await readItem(exec, DRAFTA_KEY_SERVICE, provider));
+export async function readProviderKey(exec, provider, { timeoutMs = KEY_READ_TIMEOUT_MS } = {}) {
+  return (await readItem(exec, OWN_KEY_SERVICE, provider, timeoutMs)) ?? (await readItem(exec, DRAFTA_KEY_SERVICE, provider, timeoutMs));
 }
 
 export const AI_SKIP = Object.freeze({ mock: 'mock', noProvider: 'no-provider', noKey: 'no-key', keychain: 'keychain' });
