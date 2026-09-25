@@ -74,6 +74,7 @@ const CONTENT_ROOT = 'src/content';
  */
 export async function syncToOrigin(dir, branch, { exec = defaultExec } = {}) {
   await git(exec, dir, ['fetch', '--quiet', 'origin', branch]);
+  await abortRebase(exec, dir);
   await git(exec, dir, ['reset', '--hard', '--quiet', `origin/${branch}`]);
   await git(exec, dir, ['checkout', '--quiet', '-B', branch, `origin/${branch}`]);
   await git(exec, dir, ['clean', '-fd', '--quiet', '--', CONTENT_ROOT]);
@@ -91,7 +92,30 @@ export async function rebaseOntoOrigin(dir, branch, { exec = defaultExec } = {})
     await git(exec, dir, ['rebase', '--quiet', `origin/${branch}`]);
     return true;
   } catch {
-    await git(exec, dir, ['rebase', '--abort']);
+    await abortRebase(exec, dir);
     return false;
+  }
+}
+
+/**
+ * Ends a rebase in progress — a conflicted one, or one a killed run left
+ * behind, which makes every later rebase and checkout refuse. With no rebase
+ * in progress git exits non-zero, and that is not an error here.
+ */
+async function abortRebase(exec, dir) {
+  try {
+    await git(exec, dir, ['rebase', '--abort']);
+  } catch {
+    // nothing to abort
+  }
+}
+
+/** The checked-out branch, or null when HEAD is detached. */
+export async function currentBranch(dir, { exec = defaultExec } = {}) {
+  try {
+    const { stdout } = await git(exec, dir, ['symbolic-ref', '--quiet', '--short', 'HEAD']);
+    return stdout.trim() || null;
+  } catch {
+    return null;
   }
 }
