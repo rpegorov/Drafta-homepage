@@ -38,6 +38,15 @@ function rememberChoice(event: Event): void {
   if (value) store(value);
 }
 
+/* A page that lists its language versions (a blog post without a Russian
+   original) has no /ru/ twin unless it names one. Pages that list none, like
+   Starlight docs, always have one. */
+function hasRuTwin(doc: Document): boolean {
+  const alternates = doc.querySelectorAll('link[rel="alternate"][hreflang]');
+  if (alternates.length === 0) return true;
+  return doc.querySelector('link[rel="alternate"][hreflang="ru"]') !== null;
+}
+
 /* Where initLang is about to send this page, or null when it stays. Exported so
    a page script that spends a single-use token (verify) can skip the request on
    a load that is going to be replaced by its /ru/ twin — otherwise both loads
@@ -49,6 +58,7 @@ export function pendingLanguageRedirect(
 ): string | null {
   const ru = isRuPage(doc, loc);
   if (ru || stored() || preferredLanguage(nav).indexOf('ru') !== 0) return null;
+  if (!hasRuTwin(doc)) return null;
   return twinPath(loc.pathname, ru) + ruSearch(loc.search) + loc.hash;
 }
 
