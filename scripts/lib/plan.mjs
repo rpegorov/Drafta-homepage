@@ -157,7 +157,9 @@ export function buildPlan({ pages, existing, skipped, protectedIds, adopt = fals
     }
   }
 
-  const twins = translationTwins(pages.filter((page) => !collisions.has(page)));
+  // No translation without an accepted original: a collision or an ownership
+  // conflict (both in failedIds) keeps its twin out of the plan.
+  const twins = translationTwins(pages.filter((page) => !failedIds.has(page.noteId)));
   const deleting = new Set();
 
   for (const file of existing) {
