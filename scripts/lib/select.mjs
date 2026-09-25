@@ -46,10 +46,12 @@ export function selectNote(note) {
 
   const block = extractSiteBlock(note.body);
   if (!block.found) return skip(SKIP.noSiteBlock);
+  // The take-down switch is judged before the block's other problems: a page
+  // the owner switched off must come down even if the rest of the block is broken.
+  if (!block.fields.publish) return skip(SKIP.publishFalse);
   if (block.problems.length > 0) {
     return { verdict: 'error', message: `site block: ${block.problems.join('; ')}` };
   }
-  if (!block.fields.publish) return skip(SKIP.publishFalse);
   if (!block.fields.slug) return skip(SKIP.noSlug);
   if (!block.fields.description) return skip(SKIP.noDescription);
 

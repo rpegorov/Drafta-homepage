@@ -119,7 +119,7 @@ function readLibrary(library) {
       result.skipped.push({ title: note.title, reason: verdict.reason });
     } else if (verdict.verdict === 'error') {
       result.protectedIds.add(note.id);
-      result.errors.push({ title: note.title, message: verdict.message });
+      result.errors.push({ title: note.title, message: verdict.message, noteId: note.id });
     } else {
       result.candidates.push({ note, ...verdict, target: pageTarget(verdict.section, verdict.site.lang, verdict.site.slug) });
     }
@@ -423,6 +423,8 @@ async function translateAll(options, run, env) {
 // ── Output ─────────────────────────────────────────────────────────────────
 
 const publicEntry = ({ title, slug, lang, url, section, path }) => ({ title, slug, lang, url, section, path });
+/** `published` — the broken note's page is still on the site (§11.1: never taken down by an error). */
+const publicError = ({ title, message, published }) => ({ title, message, ...(published ? { published: true } : {}) });
 
 function report(plan, library, extra) {
   return {
@@ -431,7 +433,7 @@ function report(plan, library, extra) {
     deleted: plan.delete.map((entry) => ({ ...publicEntry(entry), reason: entry.reason })),
     unchanged: plan.unchanged.map(publicEntry),
     skipped: library.skipped,
-    errors: [...library.errors, ...plan.errors, ...extra.errors],
+    errors: [...library.errors, ...plan.errors, ...extra.errors].map(publicError),
     warnings: extra.warnings,
     committed: extra.committed,
     ...(extra.sha ? { sha: extra.sha } : {}),
@@ -495,14 +497,24 @@ function planRun(options) {
       library.errors.push({ title: candidate.note.title, message: built.error });
     }
   }
+  const existing = readSiteFiles(options.site);
+  markStillPublished(library.errors, existing);
   const plan = buildPlan({
     pages,
-    existing: readSiteFiles(options.site),
+    existing,
     skipped: library.skippedIds,
     protectedIds: library.protectedIds,
     adopt: options.adopt,
   });
   return { library, plan, warnings, context };
+}
+
+/** A note whose site block broke keeps its page on the site (protected) — the owner must hear that. */
+function markStillPublished(errors, existing) {
+  const onSite = new Set(existing.map((file) => file.draftaId).filter(Boolean));
+  for (const error of errors) {
+    if (error.noteId && onSite.has(error.noteId)) error.published = true;
+  }
 }
 
 // Builds `content: publish <slug>` for a single change, or

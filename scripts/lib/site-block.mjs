@@ -22,6 +22,7 @@ const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
 const COMMENT = /\s#(?:\s.*)?$/;
 const KNOWN_KEYS = ['slug', 'lang', 'description', 'date', 'order', 'cover', 'publish'];
+const PUBLISH_TRUE = 'true';
 
 function unquote(value) {
   const quoted = /^"(.*)"$/.exec(value) ?? /^'(.*)'$/.exec(value);
@@ -78,10 +79,10 @@ function validate(raw, problems) {
     else problems.push(`order "${raw.order}" is not an integer`);
   }
   if (raw.cover) fields.cover = raw.cover;
-  if (raw.publish !== undefined) {
-    if (raw.publish === 'true' || raw.publish === 'false') fields.publish = raw.publish === 'true';
-    else problems.push(`publish "${raw.publish}" is not true or false`);
-  }
+  // A `publish` key that does not say exactly `true` (False, no, a typo) takes
+  // the page down: the owner reached for the switch, and a page that stays up
+  // because of a typo is the worse mistake.
+  if (raw.publish !== undefined) fields.publish = raw.publish === PUBLISH_TRUE;
   return { fields };
 }
 

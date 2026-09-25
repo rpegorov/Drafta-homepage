@@ -22,14 +22,19 @@ export function changeNotifications(result) {
 
 /** Notes that wanted to go out and did not: exporter errors and intent-revealing skips. */
 export function currentProblems(result) {
-  const errors = (result.errors ?? []).map((e) => ({ title: titled(e), reason: e.message ?? 'ошибка' }));
+  const errors = (result.errors ?? []).map((e) => ({ title: titled(e), reason: e.message ?? 'ошибка', published: e.published === true }));
   const skips = (result.skipped ?? [])
     .filter((e) => INTENT_SKIPS[e.reason])
-    .map((e) => ({ title: titled(e), reason: INTENT_SKIPS[e.reason] }));
+    .map((e) => ({ title: titled(e), reason: INTENT_SKIPS[e.reason], published: false }));
   return [...errors, ...skips];
 }
 
 const problemKey = ({ title, reason }) => `${title}\n${reason}`;
+
+/** A broken note whose page is still up is not "not published" — the owner must know it stays visible. */
+function problemTitle(problem) {
+  return problem.published ? `Осталась опубликованной — ошибка в site-блоке: ${problem.title}` : `Не опубликовано: ${problem.title}`;
+}
 
 /**
  * @param {{title: string, reason: string}[]} problems
@@ -40,7 +45,7 @@ export function problemNotifications(problems, announced) {
   const before = new Set(announced);
   const fresh = problems.filter((p) => !before.has(problemKey(p)));
   return {
-    notifications: fresh.map((p) => ({ title: `Не опубликовано: ${p.title}`, body: p.reason })),
+    notifications: fresh.map((p) => ({ title: problemTitle(p), body: p.reason })),
     announced: problems.map(problemKey),
   };
 }
