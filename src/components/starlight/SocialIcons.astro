@@ -1,0 +1,26 @@
+---
+/* Docs header links back to the rest of the site. Starlight renders this slot in
+   the header on wide screens and in the mobile menu footer on narrow ones. */
+import { blogIndexPath } from '../blog/posts';
+import { normalizeLang, t } from '../../i18n';
+
+const lang = normalizeLang(Astro.locals.starlightRoute.locale ?? 'en');
+---
+<a class="docs-nav-link" href={blogIndexPath(lang)}>{t(lang, 'navBlog')}</a>
+
+<style>
+  .docs-nav-link {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .docs-nav-link:hover {
+    color: var(--accent);
+  }
+  .docs-nav-link:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+</style>
