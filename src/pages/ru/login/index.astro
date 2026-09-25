@@ -1,0 +1,53 @@
+---
+/* /ru/login/ — вход. Текст и DOM-хуки перенесены 1:1 из старой страницы
+   (коммит c497677); логика — в scripts/pages/login.ts. */
+import Base from '../../../layouts/Base.astro';
+---
+<Base
+  lang="ru"
+  title="Вход — Drafta"
+  description="Войдите в аккаунт Drafta, чтобы начать 30-дневную пробную версию и выбрать тариф."
+  canonicalPath="/ru/login/"
+  noindex
+>
+  <section class="band band--soft">
+    <div class="wrap wrap--narrow">
+      <p class="eyebrow">Аккаунт</p>
+      <h1 class="h1">Вход</h1>
+      <p class="lede">Создание аккаунта идёт в два шага: ссылка для подтверждения из письма, затем этот вход. Если вы только что зарегистрировались, сначала откройте ссылку из письма — до этого аккаунт не активирован и пароль здесь не сработает.</p>
+      <noscript>
+        <p class="muted">Для входа нужен JavaScript. Включите его и обновите страницу.</p>
+      </noscript>
+
+      <form class="form" method="post" action="" data-login-form novalidate>
+        <div class="form__field">
+          <label class="form__label" for="email">Почта</label>
+          <input class="form__input" id="email" name="email" type="email" autocomplete="email" spellcheck="false" autofocus required>
+        </div>
+
+        <div class="form__field">
+          <label class="form__label" for="password">Пароль</label>
+          <input class="form__input" id="password" name="password" type="password" autocomplete="current-password" required>
+        </div>
+
+        <div class="form__actions">
+          <button class="btn btn--primary btn--block" type="submit">Войти</button>
+        </div>
+
+        <p class="form__alt">Ещё нет аккаунта? <a class="btn btn--ghost" href="/ru/register/">Создать аккаунт</a></p>
+      </form>
+
+      <div class="form is-hidden" data-signed-in hidden role="status">
+        <p class="form__ok">Вы вошли.</p>
+        <p class="muted">Сессия хранится только на этом устройстве. Переходим к следующему шагу:</p>
+        <div class="form__actions">
+          <a class="btn btn--primary" href="/ru/checkout/" data-next-link>Перейти к оплате</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    import '../../../scripts/pages/login.ts';
+  </script>
+</Base>

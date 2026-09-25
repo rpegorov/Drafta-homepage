@@ -1,0 +1,54 @@
+---
+/* /login/ — sign-in. Text, DOM hooks (data-login-form, #email, #password,
+   data-signed-in, data-next-link) and behaviour ported 1:1 from the old page
+   at commit c497677; scripts/pages/login.ts owns the logic. */
+import Base from '../../layouts/Base.astro';
+---
+<Base
+  lang="en"
+  title="Sign in — Drafta"
+  description="Sign in to your Drafta account to start a 30-day trial and choose your plan."
+  canonicalPath="/login/"
+  noindex
+>
+  <section class="band band--soft">
+    <div class="wrap wrap--narrow">
+      <p class="eyebrow">Account</p>
+      <h1 class="h1">Sign in</h1>
+      <p class="lede">Creating an account comes in two steps: the confirmation link we mail you, then this sign-in. If you have just registered, open the link from the email first — until you do, the account is not activated and the password will not work here.</p>
+      <noscript>
+        <p class="muted">Signing in needs JavaScript. Turn it on and reload this page.</p>
+      </noscript>
+
+      <form class="form" method="post" action="" data-login-form novalidate>
+        <div class="form__field">
+          <label class="form__label" for="email">Email</label>
+          <input class="form__input" id="email" name="email" type="email" autocomplete="email" spellcheck="false" autofocus required>
+        </div>
+
+        <div class="form__field">
+          <label class="form__label" for="password">Password</label>
+          <input class="form__input" id="password" name="password" type="password" autocomplete="current-password" required>
+        </div>
+
+        <div class="form__actions">
+          <button class="btn btn--primary btn--block" type="submit">Sign in</button>
+        </div>
+
+        <p class="form__alt">No account yet? <a class="btn btn--ghost" href="/register/">Create an account</a></p>
+      </form>
+
+      <div class="form is-hidden" data-signed-in hidden role="status">
+        <p class="form__ok">Signed in.</p>
+        <p class="muted">Your session is kept on this device only. Continue to the next step:</p>
+        <div class="form__actions">
+          <a class="btn btn--primary" href="/checkout/" data-next-link>Continue to checkout</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    import '../../scripts/pages/login.ts';
+  </script>
+</Base>

@@ -1,0 +1,60 @@
+---
+/* /ru/register/ — создать аккаунт. Текст и DOM-хуки перенесены 1:1 из старой
+   страницы (коммит c497677); логика — в scripts/pages/register.ts. */
+import Base from '../../../layouts/Base.astro';
+---
+<Base
+  lang="ru"
+  title="Создать аккаунт — Drafta"
+  description="Аккаунт Drafta: 30 дней пробной версии на каждом новом аккаунте, без карты. Мы пришлём ссылку для подтверждения адреса — до этого аккаунт не активирован."
+  canonicalPath="/ru/register/"
+  noindex
+>
+  <section class="band band--soft">
+    <div class="wrap wrap--narrow">
+      <p class="eyebrow">Аккаунт</p>
+      <h1 class="h1">Создайте аккаунт</h1>
+      <p class="lede">Аккаунт хранит вашу пробную версию и тариф. Данные этой страницы остаются на устройстве, пока служба аккаунтов не подтвердит адрес.</p>
+      <noscript>
+        <p class="muted">Для создания аккаунта нужен JavaScript. Включите его и обновите страницу.</p>
+      </noscript>
+
+      <form class="form" method="post" action="" data-register-form novalidate>
+        <div class="form__field">
+          <label class="form__label" for="email">Почта</label>
+          <input class="form__input" id="email" name="email" type="email" autocomplete="email" spellcheck="false" autofocus required>
+        </div>
+
+        <div class="form__field">
+          <label class="form__label" for="password">Пароль</label>
+          <input class="form__input" id="password" name="password" type="password" autocomplete="new-password" minlength="8" maxlength="1024" required>
+          <p class="form__hint">Не меньше 8 символов.</p>
+        </div>
+
+        <div class="form__field">
+          <label class="form__label" for="password-confirm">Повторите пароль</label>
+          <input class="form__input" id="password-confirm" name="password-confirm" type="password" autocomplete="new-password" minlength="8" maxlength="1024" required>
+        </div>
+
+        <div class="form__actions">
+          <button class="btn btn--primary btn--block" type="submit">Создать аккаунт</button>
+        </div>
+
+        <p class="form__alt is-hidden" data-signin hidden>Уже есть аккаунт? <a href="/ru/login/">Войдите</a> с этим адресом.</p>
+      </form>
+
+      <div class="form is-hidden" data-register-sent hidden role="status">
+        <p class="form__ok">Проверьте почту.</p>
+        <p class="muted">Мы отправили ссылку для подтверждения на <span class="mono" data-sent-email></span>. Откройте её, чтобы подтвердить адрес — до этого аккаунт не активирован.</p>
+        <p class="muted">Когда адрес подтверждён, войдите с этой почтой, чтобы выбрать тариф.</p>
+        <div class="form__actions">
+          <a class="btn btn--primary" href="/ru/login/">Войти</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    import '../../../scripts/pages/register.ts';
+  </script>
+</Base>

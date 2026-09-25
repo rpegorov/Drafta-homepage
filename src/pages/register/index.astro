@@ -1,0 +1,62 @@
+---
+/* /register/ — create account. Text and DOM hooks (data-register-form,
+   #email, #password, #password-confirm, data-register-sent, data-signin)
+   ported 1:1 from the old page at commit c497677; scripts/pages/register.ts
+   owns the logic. */
+import Base from '../../layouts/Base.astro';
+---
+<Base
+  lang="en"
+  title="Create your account — Drafta"
+  description="Create a Drafta account: a 30-day trial on every new account, no card. We send a confirmation link to your address before the account is activated."
+  canonicalPath="/register/"
+  noindex
+>
+  <section class="band band--soft">
+    <div class="wrap wrap--narrow">
+      <p class="eyebrow">Account</p>
+      <h1 class="h1">Create your account</h1>
+      <p class="lede">An account carries your trial and your plan. Everything on this page stays on this device until the accounts service confirms your address.</p>
+      <noscript>
+        <p class="muted">Creating an account needs JavaScript. Turn it on and reload this page.</p>
+      </noscript>
+
+      <form class="form" method="post" action="" data-register-form novalidate>
+        <div class="form__field">
+          <label class="form__label" for="email">Email</label>
+          <input class="form__input" id="email" name="email" type="email" autocomplete="email" spellcheck="false" autofocus required>
+        </div>
+
+        <div class="form__field">
+          <label class="form__label" for="password">Password</label>
+          <input class="form__input" id="password" name="password" type="password" autocomplete="new-password" minlength="8" maxlength="1024" required>
+          <p class="form__hint">At least 8 characters.</p>
+        </div>
+
+        <div class="form__field">
+          <label class="form__label" for="password-confirm">Confirm password</label>
+          <input class="form__input" id="password-confirm" name="password-confirm" type="password" autocomplete="new-password" minlength="8" maxlength="1024" required>
+        </div>
+
+        <div class="form__actions">
+          <button class="btn btn--primary btn--block" type="submit">Create account</button>
+        </div>
+
+        <p class="form__alt is-hidden" data-signin hidden>Already have an account? <a href="/login/">Sign in</a> with this address.</p>
+      </form>
+
+      <div class="form is-hidden" data-register-sent hidden role="status">
+        <p class="form__ok">Check your email.</p>
+        <p class="muted">We sent a confirmation link to <span class="mono" data-sent-email></span>. Open that link to confirm the address — the account is not activated until you do.</p>
+        <p class="muted">Once you have confirmed your address, sign in with this email to choose a plan.</p>
+        <div class="form__actions">
+          <a class="btn btn--primary" href="/login/">Sign in</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    import '../../scripts/pages/register.ts';
+  </script>
+</Base>
