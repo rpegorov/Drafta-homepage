@@ -8,6 +8,8 @@
    tests (.nav, .nav__toggle, .nav__links, .skip-link, .form__error, .form__ok,
    .plan, .plan--selected, .is-hidden, .is-busy): restyle freely, never rename. */
 
+@import './callouts.css';
+
 /* ---------- reset + base ---------- */
 
 *,*::before,*::after{box-sizing:border-box}

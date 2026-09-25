@@ -1,9 +1,26 @@
 // drafta.org — a fully prerendered Astro site served as Workers static assets.
 // No Cloudflare adapter: dist/ is uploaded as-is (see wrangler.jsonc).
 import { defineConfig } from 'astro/config';
+import { unified } from '@astrojs/markdown-remark';
 import starlight from '@astrojs/starlight';
 import sitemap from '@astrojs/sitemap';
 import { readdirSync, readFileSync } from 'node:fs';
+import { visit } from 'unist-util-visit';
+import { remarkCallouts } from './src/lib/remark-callouts.mjs';
+
+// Flags a page as containing a ```mermaid fence so its render route can load
+// the Mermaid.astro island only there — pages without one ship zero mermaid
+// bytes. Astro exposes the result as `remarkPluginFrontmatter.hasMermaid`
+// from `render(entry)` (see src/pages/blog/[slug].astro).
+function remarkFlagMermaid() {
+  return function transformer(tree, file) {
+    let found = false;
+    visit(tree, 'code', (node) => {
+      if (node.lang === 'mermaid') found = true;
+    });
+    file.data.astro.frontmatter.hasMermaid = found;
+  };
+}
 
 // Pages that stay out of the sitemap: auth/checkout flows and the bilingual
 // 404, in either language twin. Keep in sync with the noindex pages themselves.
@@ -51,6 +68,14 @@ export default defineConfig({
       assetsInlineLimit: 0,
     },
   },
+  markdown: {
+    // Switches from Astro 7's default Sätteri processor to unified/remark so
+    // our own remark plugins can run. Applies to both the blog collection and
+    // Starlight's docs — they share this one Astro markdown pipeline.
+    processor: unified({
+      remarkPlugins: [remarkCallouts, remarkFlagMermaid],
+    }),
+  },
   integrations: [
     // One sitemap for the whole site, docs included. Starlight only registers its
     // own @astrojs/sitemap when none is configured, so this instance (with the
@@ -75,7 +100,12 @@ export default defineConfig({
         tag: 'link',
         attrs: { rel: 'preload', href, as: 'font', type: 'font/woff2', crossorigin: true },
       })),
-      customCss: ['./src/styles/tokens.css', './src/styles/product.css', './src/styles/starlight.css'],
+      customCss: [
+        './src/styles/tokens.css',
+        './src/styles/product.css',
+        './src/styles/starlight.css',
+        './src/styles/callouts.css',
+      ],
       components: {
         SiteTitle: './src/components/starlight/SiteTitle.astro',
         ThemeProvider: './src/components/starlight/ThemeProvider.astro',

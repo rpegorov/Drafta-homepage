@@ -1,0 +1,43 @@
+---
+// Renders ```mermaid fences client-side. The caller decides whether to
+// include this component at all — pages without a mermaid block must not
+// render it, so the mermaid bundle never ships there (see
+// src/pages/blog/[slug].astro, which checks `remarkPluginFrontmatter.hasMermaid`).
+//
+// Starlight's Expressive Code integration syntax-highlights every code fence
+// site-wide (blog included, not just docs), so a ```mermaid fence does not
+// survive as plain text inside <code> — it becomes a tree of highlighting
+// <span>s. Expressive Code keeps the original source for its own copy-button
+// feature in the frame's `button[data-code]` attribute, with line breaks
+// encoded as \x7F (its own convention, undone here the same way its copy
+// script does). That attribute, not the <code> element, is this script's
+// source of truth for the diagram text.
+---
+
+<script>
+  import mermaid from 'mermaid';
+
+  const frames = document.querySelectorAll<HTMLElement>('pre[data-language="mermaid"]');
+  if (frames.length > 0) {
+    mermaid.initialize({ startOnLoad: false, theme: 'neutral' });
+
+    for (const pre of frames) {
+      const figure = pre.closest('figure') ?? pre;
+      const copyButton = figure.querySelector<HTMLElement>('button[data-code]');
+      const source = (copyButton?.dataset.code ?? pre.textContent ?? '').replace(/\x7f/g, '\n');
+      const id = `mermaid-${Math.random().toString(36).slice(2)}`;
+
+      mermaid
+        .render(id, source)
+        .then(({ svg }) => {
+          const container = document.createElement('div');
+          container.className = 'mermaid-diagram';
+          container.innerHTML = svg;
+          (figure.parentElement ?? figure).replaceChild(container, figure);
+        })
+        .catch((error) => {
+          console.error('Mermaid render failed:', error);
+        });
+    }
+  }
+</script>

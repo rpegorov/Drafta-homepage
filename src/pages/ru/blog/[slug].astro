@@ -1,0 +1,27 @@
+---
+// Temporary stub for ЗАДАЧА-2.0 — see src/pages/blog/[slug].astro (RU twin).
+// Wave 2.1 replaces this with the real post layout.
+import { getCollection, render } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import Mermaid from '../../../components/Mermaid.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', (entry) => entry.data.lang === 'ru');
+  return posts.map((entry) => ({ params: { slug: entry.data.slug }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content, remarkPluginFrontmatter } = await render(entry);
+---
+
+<Base
+  lang="ru"
+  title={entry.data.title}
+  description={entry.data.description}
+  canonicalPath={`/ru/blog/${entry.data.slug}/`}
+>
+  <main class="section" style="max-width: var(--measure-reading); margin-inline: auto;">
+    <Content />
+  </main>
+  {remarkPluginFrontmatter.hasMermaid && <Mermaid />}
+</Base>
