@@ -17,6 +17,9 @@ const legal = defineCollection({
     title: z.string(),
     description: z.string(),
     updated: z.string(),
+    // Editorial notes for the seller about placeholder text on the page. They
+    // live in frontmatter so they never reach the published HTML.
+    owner: z.array(z.string()).default([]),
   }),
 });
 

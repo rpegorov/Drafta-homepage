@@ -2,9 +2,12 @@
 title: 'Refund Policy'
 description: 'How refunds work for Drafta subscriptions billed per period in cryptocurrency.'
 updated: '2026-09-25'
+owner:
+  - 'seller identity, contact and the refund window below are placeholders.'
+  - 'refund window and condition are a placeholder rule pending the seller''s decision.'
+  - 'payment provider is not connected yet, so no refund can be processed through this site today.'
+  - 'contact address placeholder.'
 ---
-
-<!-- OWNER: seller identity, contact and the refund window below are placeholders. -->
 
 ## How billing works
 
@@ -15,18 +18,15 @@ to read-only mode at the end of the paid period instead of renewing.
 
 ## Refunds
 
-<!-- OWNER: refund window and condition are a placeholder rule pending the seller's decision. -->
 A payment can be refunded within 14 days of the payment date, provided the
 app was not used during the paid period.
 
-<!-- OWNER: payment provider is not connected yet, so no refund can be processed through this site today. -->
 The payment provider that will process invoices and refunds is not yet
 connected. Until it is, no payment or refund can be requested through this
 site.
 
 ## How to request a refund
 
-<!-- OWNER: contact address placeholder. -->
 Write to [support@drafta.org](mailto:support@drafta.org) with your account
 email and the payment date.
 

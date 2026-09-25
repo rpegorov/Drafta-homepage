@@ -2,9 +2,12 @@
 title: 'Terms of Service'
 description: 'The terms for using Drafta: the trial, billing, read-only mode after a lapsed period, and account deletion.'
 updated: '2026-09-25'
+owner:
+  - 'seller identity, jurisdiction and contact are placeholders — see the entries below.'
+  - 'payment provider is not connected yet; this section names the accepted currencies only, not a processor.'
+  - 'jurisdiction placeholder — replace with the seller''s actual jurisdiction.'
+  - 'contact address placeholder.'
 ---
-
-<!-- OWNER: seller identity, jurisdiction and contact are placeholders — see the OWNER-tagged lines below. -->
 
 ## The service
 
@@ -24,7 +27,6 @@ dollars. Payment is accepted in cryptocurrency (USDT or USDC). There are no
 automatic charges: each billing period is a separate invoice that you pay
 yourself, and the subscription does not renew on its own.
 
-<!-- OWNER: payment provider is not connected yet; this section names the accepted currencies only, not a processor. -->
 The payment provider that will process these invoices is not yet connected.
 Until it is, subscriptions and payment are not available from this site.
 
@@ -50,12 +52,10 @@ and remain in place.
 
 ## Governing law
 
-<!-- OWNER: jurisdiction placeholder — replace with the seller's actual jurisdiction. -->
 These terms are governed by the law of the Russian Federation.
 
 ## Contact
 
-<!-- OWNER: contact address placeholder. -->
 Questions about these terms: [support@drafta.org](mailto:support@drafta.org).
 
 ---

@@ -2,9 +2,11 @@
 title: 'Privacy Policy'
 description: 'What Drafta stores about your account and your synced notes, and how note content is encrypted.'
 updated: '2026-09-25'
+owner:
+  - 'seller identity and contact are placeholders — see the entries below.'
+  - 'jurisdiction placeholder — replace with the seller''s actual jurisdiction.'
+  - 'contact address placeholder.'
 ---
-
-<!-- OWNER: seller identity and contact are placeholders — see the OWNER-tagged lines below. -->
 
 ## What we store
 
@@ -44,12 +46,10 @@ affected and remain there.
 
 ## Governing law
 
-<!-- OWNER: jurisdiction placeholder — replace with the seller's actual jurisdiction. -->
 This policy is governed by the law of the Russian Federation.
 
 ## Contact
 
-<!-- OWNER: contact address placeholder. -->
 Questions about your data: [support@drafta.org](mailto:support@drafta.org).
 
 ---
