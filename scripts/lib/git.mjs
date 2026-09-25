@@ -45,6 +45,12 @@ export async function commitPaths(dir, paths, message, { exec = defaultExec } = 
   return { committed: true, sha: stdout.trim(), files };
 }
 
+/** Whether HEAD holds commits `origin/<branch>` (as last fetched) does not — e.g. after a rebase retry. */
+export async function aheadOfOrigin(dir, branch, { exec = defaultExec } = {}) {
+  const { stdout } = await git(exec, dir, ['rev-list', '--count', `origin/${branch}..HEAD`]);
+  return Number.parseInt(stdout, 10) > 0;
+}
+
 /**
  * Pushes HEAD to `origin/<branch>`. Without `--force` git itself refuses
  * anything but a fast-forward, and the rejection propagates to the caller.

@@ -4,8 +4,11 @@
 // publisher:run` starts the same run by hand.
 //
 //   wait for quiet → reset the clone to origin/<branch> → exporter --commit
-//   [--translate] → git push (fast-forward only; one retry after a fresh fetch)
-//   → notify
+//   --push [--translate] (the originals are pushed before any translation is
+//   paid for, §11.9 п. 5; fast-forward only) → notify. A rejected push is
+//   retried once: the clone's unpushed commits are rebased onto a fresh
+//   origin/<branch> — a translation already committed is not translated again —
+//   and only a rebase conflict falls back to a full reset.
 //
 // The exporter is reached only through its CLI JSON contract (§11.3). All IO
 // goes through the injected {exec, now, sleep, notify, env, readMtimes,
@@ -14,10 +17,11 @@
 // PUBLISHER_PROBE=1 only checks that origin answers (the installer's auth probe).
 import { execFile } from 'node:child_process';
 import { realpathSync } from 'node:fs';
+import { constants } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { promisify } from 'node:util';
-import { syncToOrigin } from '../lib/git.mjs';
+import { rebaseOntoOrigin, syncToOrigin } from '../lib/git.mjs';
 import { changeNotifications, currentProblems, pendingChanges, problemNotifications, summaryLine } from './announce.mjs';
 import { layout } from './layout.mjs';
 import { acquireLock, releaseLock } from './lock.mjs';
@@ -27,6 +31,8 @@ import { notesMtimes, waitForQuiet } from './quiet.mjs';
 import { PROVIDER_IDS } from '../translate/providers.mjs';
 import { AI_SKIP, readDraftaDefault, readProviderKey, resolveAi } from './keychain.mjs';
 import {
+  HOUR_MS,
+  MINUTE_MS,
   addTranslationChars,
   markNotified,
   mayNotify,
@@ -39,10 +45,16 @@ import {
 
 const EXIT_OK = 0;
 const EXIT_FAILED = 1;
+// A run killed by launchd or the owner exits like a shell does: 128 + signal number.
+const EXIT_SIGNAL_BASE = 128;
 const PUSH_ATTEMPTS = 2;
-const THROTTLE_MS = 60 * 60_000;
+const THROTTLE_MS = HOUR_MS;
 const EXPORTER_MAX_BUFFER = 64 * 1024 * 1024;
 const OFFLINE_REASON = 'offline';
+// A hung ssh or a stalled provider must not hold the lock until the next reboot.
+const GIT_TIMEOUT_MS = 5 * MINUTE_MS;
+const EXPORTER_TIMEOUT_MS = 20 * MINUTE_MS;
+const RELEASE_ON_SIGNALS = ['SIGTERM', 'SIGINT'];
 
 const OFFLINE = /Could not resolve host|nodename nor servname|Network is unreachable|No route to host|Operation timed out|Connection timed out|Connection refused|Temporary failure in name resolution/i;
 const REJECTED = /\[rejected\]|\[remote rejected\]|non-fast-forward|fetch first|stale info/i;
@@ -77,14 +89,15 @@ export function exporterEnv(env, translation) {
   };
 }
 
-export function exporterArgs(paths, { commit, translate = false }) {
+/** A committing run also pushes: the exporter pushes the originals before it translates (§11.9 п. 5). */
+export function exporterArgs(paths, { commit, branch, translate = false }) {
   return [
     join(paths.clone, 'scripts/import-from-drafta.mjs'),
     '--library',
     paths.library,
     '--site',
     paths.clone,
-    ...(commit ? ['--commit'] : []),
+    ...(commit ? ['--commit', '--push', '--branch', branch] : []),
     ...(commit && translate ? ['--translate'] : []),
     '--json',
   ];
@@ -100,10 +113,10 @@ function parseExporterJson(stdout) {
 }
 
 /** Exit 1 still carries the JSON (per-note errors); no JSON at all is a failed run. */
-async function runExporter(ctx, { commit, translation }) {
-  const options = { cwd: ctx.paths.clone, env: exporterEnv(ctx.env, translation), maxBuffer: EXPORTER_MAX_BUFFER };
+async function runExporter(ctx, { commit, branch, translation }) {
+  const options = { cwd: ctx.paths.clone, env: exporterEnv(ctx.env, translation), maxBuffer: EXPORTER_MAX_BUFFER, timeout: EXPORTER_TIMEOUT_MS };
   try {
-    const { stdout } = await ctx.exec(ctx.node, exporterArgs(ctx.paths, { commit, translate: Boolean(translation) }), options);
+    const { stdout } = await ctx.exec(ctx.node, exporterArgs(ctx.paths, { commit, branch, translate: Boolean(translation) }), options);
     const result = parseExporterJson(stdout);
     if (!result) throw new RunError(`exporter printed no JSON: ${firstLine(stdout || '(empty)')}`);
     return result;
@@ -116,7 +129,7 @@ async function runExporter(ctx, { commit, translation }) {
 }
 
 function git(ctx, args) {
-  return ctx.exec('git', args, { cwd: ctx.paths.clone, env: ctx.env });
+  return ctx.gitExec('git', args, { cwd: ctx.paths.clone });
 }
 
 async function publishBranch(ctx) {
@@ -257,6 +270,12 @@ function translationNotifications(events, result, { pushed }) {
   ];
 }
 
+/**
+ * Books the run into state.json and tells the owner. Every run that got an
+ * exporter result ends here — also one whose push failed, so the characters a
+ * translation cost still count against the day's budget.
+ * @returns {Promise<{code: number, state: object}>}
+ */
 async function finish(ctx, state, result, { pushed }) {
   ctx.log(summaryLine(result, { pushed }));
   logTranslations(ctx, result);
@@ -269,35 +288,68 @@ async function finish(ctx, state, result, { pushed }) {
     ...problems.notifications,
     ...translationNotifications(booked.events, result, { pushed }),
   ]);
-  writeState(ctx.paths.state, { ...booked.state, announcedProblems: problems.announced });
-  return (result.errors ?? []).length > 0 ? EXIT_FAILED : EXIT_OK;
+  const next = { ...booked.state, announcedProblems: problems.announced };
+  writeState(ctx.paths.state, next);
+  return { code: (result.errors ?? []).length > 0 ? EXIT_FAILED : EXIT_OK, state: next };
+}
+
+const isGitError = (error) => /^git\b/.test(error.title ?? '');
+
+/** The exporter's own git failure (its commit or push), in the shape isOffline/isRejected read. */
+function gitFailure(result) {
+  const failure = (result.errors ?? []).find(isGitError);
+  return failure ? { message: failure.message ?? '' } : null;
+}
+
+/** A push the publisher handles itself (offline, rejected) is not a per-note problem to announce. */
+function withoutGitFailure(result) {
+  return { ...result, errors: (result.errors ?? []).filter((error) => !isGitError(error)) };
+}
+
+/**
+ * A retry after a rejected push sees the pages of the first attempt as
+ * unchanged (they are still committed in the clone), so the two results are
+ * merged: the owner is told about every page the run put on origin.
+ */
+function mergeAttempts(previous, latest) {
+  if (!previous) return latest;
+  const union = (key) => [...new Map([...(previous[key] ?? []), ...(latest[key] ?? [])].map((entry) => [entry.path ?? entry.slug, entry])).values()];
+  return { ...latest, created: union('created'), updated: union('updated'), deleted: union('deleted') };
+}
+
+/** First attempt: the clone becomes origin/<branch>. Retry: its unpushed commits are replayed on top instead. */
+async function prepareClone(ctx, branch, attempt) {
+  const options = { exec: ctx.gitExec };
+  if (attempt > 1 && (await rebaseOntoOrigin(ctx.paths.clone, branch, options))) return;
+  await syncToOrigin(ctx.paths.clone, branch, options);
 }
 
 async function publish(ctx, initialState) {
   const branch = await publishBranch(ctx);
   const { translation, state } = await prepareTranslation(ctx, initialState);
+  let merged = null;
   for (let attempt = 1; ; attempt += 1) {
     try {
-      await syncToOrigin(ctx.paths.clone, branch, { exec: ctx.exec });
+      await prepareClone(ctx, branch, attempt);
     } catch (error) {
       if (isOffline(error)) return deferOffline(ctx, state, error);
       throw new RunError(`git fetch failed: ${errorLine(error)}`);
     }
-    const result = await runExporter(ctx, { commit: true, translation });
-    if (!result.committed) return finish(ctx, state, result, { pushed: false });
-    try {
-      await git(ctx, ['push', 'origin', `HEAD:refs/heads/${branch}`]);
-      return finish(ctx, state, result, { pushed: true });
-    } catch (error) {
-      if (isOffline(error)) return deferOffline(ctx, state, error, result);
-      if (!isRejected(error)) throw new RunError(`git push failed: ${errorLine(error)}`);
-      if (attempt >= PUSH_ATTEMPTS) {
-        ctx.log(`push rejected twice: origin/${branch} moved ahead — ${errorLine(error)}`);
-        await sendAll(ctx, [{ title: 'Не опубликовано: origin ушёл вперёд', body: `origin/${branch} изменился во время публикации; повторю на следующем прогоне.` }]);
-        return EXIT_FAILED;
-      }
-      ctx.log(`push rejected, fetching origin/${branch} and retrying`);
+    merged = mergeAttempts(merged, await runExporter(ctx, { commit: true, branch, translation }));
+    const failure = gitFailure(merged);
+    if (!failure) return (await finish(ctx, state, merged, { pushed: merged.pushed === true })).code;
+    if (isOffline(failure)) {
+      const done = await finish(ctx, state, withoutGitFailure(merged), { pushed: false });
+      return deferOffline(ctx, done.state, failure, merged);
     }
+    if (!isRejected(failure)) throw new RunError(`git push failed: ${firstLine(failure.message)}`);
+    if (attempt >= PUSH_ATTEMPTS) {
+      await finish(ctx, state, withoutGitFailure(merged), { pushed: false });
+      ctx.log(`push rejected twice: origin/${branch} moved ahead — ${firstLine(failure.message)}`);
+      await sendAll(ctx, [{ title: 'Не опубликовано: origin ушёл вперёд', body: `origin/${branch} изменился во время публикации; повторю на следующем прогоне.` }]);
+      return EXIT_FAILED;
+    }
+    ctx.log(`push rejected, fetching origin/${branch} and retrying`);
   }
 }
 
@@ -325,6 +377,8 @@ function context(io) {
     env,
     paths,
     exec,
+    // Every git call of the run: the publisher's env (GIT_SSH_COMMAND) and a bounded wait.
+    gitExec: (file, args, options) => exec(file, args, { ...options, env, timeout: GIT_TIMEOUT_MS }),
     now,
     node: io.node ?? process.execPath,
     sleep: io.sleep ?? ((ms) => new Promise((resolve) => setTimeout(resolve, ms))),
@@ -346,9 +400,16 @@ export async function run(io = {}) {
     ctx.log(`skipped: run ${lock.pid} is still in progress`);
     return EXIT_OK;
   }
+  const onSignal = (signal) => {
+    releaseLock(ctx.paths.lock);
+    ctx.log(`stopped by ${signal}`);
+    process.exit(EXIT_SIGNAL_BASE + constants.signals[signal]);
+  };
+  for (const signal of RELEASE_ON_SIGNALS) process.once(signal, onSignal);
   try {
     return await publishRun(ctx);
   } finally {
+    for (const signal of RELEASE_ON_SIGNALS) process.off(signal, onSignal);
     releaseLock(ctx.paths.lock);
   }
 }

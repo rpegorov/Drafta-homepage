@@ -34,7 +34,7 @@ import {
   rewriteAttachmentRefs,
 } from './lib/attachments.mjs';
 import { parseFrontmatter } from './lib/frontmatter.mjs';
-import { commitPaths, pushFastForward } from './lib/git.mjs';
+import { aheadOfOrigin, commitPaths, defaultExec, pushFastForward } from './lib/git.mjs';
 import { decodeNote } from './lib/notes.mjs';
 import { buildPlan, contentDirs, pageTarget, renderPage, withoutTitleLine } from './lib/plan.mjs';
 import { SECTION_TAGS, SKIP, selectNote } from './lib/select.mjs';
@@ -56,6 +56,18 @@ const HELD = 'held';
 const UNEXPECTED = 'error';
 // After one of these, every later request of the run would fail the same way.
 const RUN_WIDE_DEFERRALS = new Set([DEFER.noKey, DEFER.offline, DEFER.auth, DEFER.timeout]);
+
+// The AI key is for the provider only: git and ssh (hooks, credential helpers)
+// never see it.
+const AI_ENV_KEYS = ['DRAFTA_AI_KEY', 'DRAFTA_AI_PROVIDER'];
+
+function withoutAiEnv(env) {
+  const rest = { ...env };
+  for (const key of AI_ENV_KEYS) delete rest[key];
+  return rest;
+}
+
+const gitExec = (file, args, options) => defaultExec(file, args, { ...options, env: withoutAiEnv(process.env) });
 
 const USAGE = `Usage: npm run import:drafta -- [--library <dir>] [--site <dir>] [--commit] [--push --branch <b>] [--adopt] [--translate] [--json]
   (no flags)   dry run: print the plan, change nothing
@@ -337,8 +349,8 @@ function usageDelta(before, after) {
 /** Writes, commits and (with --push) pushes one translation; returns the commit sha. */
 async function publishTranslation(options, job, page) {
   writePage(options.site, { page });
-  const commit = await commitPaths(options.site, [page.path, page.assetDir], `content: translate ${job.slug} (${job.from}→${job.to})`);
-  if (options.push) await pushFastForward(options.site, options.branch);
+  const commit = await commitPaths(options.site, [page.path, page.assetDir], `content: translate ${job.slug} (${job.from}→${job.to})`, { exec: gitExec });
+  if (options.push) await pushFastForward(options.site, options.branch, { exec: gitExec });
   return commit.committed ? commit.sha : undefined;
 }
 
@@ -539,9 +551,12 @@ async function publish(options, plan) {
   const outcome = { committed: false, pushed: false, errors: [] };
   try {
     const touched = applyPlan(options.site, plan);
-    const commit = await commitPaths(options.site, touched, importCommitMessage(plan));
+    const commit = await commitPaths(options.site, touched, importCommitMessage(plan), { exec: gitExec });
     Object.assign(outcome, commit.committed ? { committed: true, sha: commit.sha } : {});
-    if (options.push) outcome.pushed = (await pushFastForward(options.site, options.branch)).pushed;
+    // Also after a retry: the originals were committed by the previous attempt and are still unpushed.
+    if (options.push && (commit.committed || (await aheadOfOrigin(options.site, options.branch, { exec: gitExec })))) {
+      outcome.pushed = (await pushFastForward(options.site, options.branch, { exec: gitExec })).pushed;
+    }
   } catch (error) {
     outcome.errors.push({ title: 'git', message: (error.stderr || error.message || String(error)).trim() });
   }
