@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 -40.5 485 485" fill="none" stroke-width="24" stroke-linecap="round">
+  <style>.a{stroke:#1c1a17}.b{stroke:#1c1a17;opacity:.55}@media (prefers-color-scheme:dark){.a,.b{stroke:#f3ede3}}</style>
+  <path class="a" d="M0 6H356M0 50H130M242 50H406M0 94H130M285 94H439M0 138H130M308 138H459M0 182H130M319 182H469M0 314H130M285 314H439"/>
+  <path class="b" d="M0 226H130M319 226H469M0 270H130M308 270H459M0 358H130M242 358H406M0 402H356"/>
+</svg>

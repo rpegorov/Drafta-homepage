@@ -1,0 +1,71 @@
+---
+/* Site footer: product, account, downloads and legal columns, the licence line
+   with language links, and the product signature `by craftzman` with the 16px seal. */
+import DraftaMark from './DraftaMark.astro';
+import { t } from '../i18n';
+import { DRAFTA } from '../lib/config';
+import { localePath } from '../lib/lang';
+import type { Lang } from '../lib/types';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const home = localePath('/', lang);
+const p = (enPath: string) => localePath(enPath, lang);
+
+const columns = [
+  {
+    title: t(lang, 'footerProduct'),
+    links: [
+      { href: `${home}#features`, label: t(lang, 'footerFeatures') },
+      { href: `${home}#pricing`, label: t(lang, 'footerPricing') },
+      { href: p('/checkout/'), label: t(lang, 'footerPlans') },
+    ],
+  },
+  {
+    title: t(lang, 'footerAccount'),
+    links: [
+      { href: p('/register/'), label: t(lang, 'footerRegister') },
+      { href: p('/login/'), label: t(lang, 'footerSignIn') },
+      { href: `${home}#faq`, label: t(lang, 'footerFaq') },
+    ],
+  },
+  {
+    title: t(lang, 'footerDownloads'),
+    links: [{ href: DRAFTA.releases, label: t(lang, 'footerLatestRelease') }],
+  },
+  {
+    title: t(lang, 'footerLegal'),
+    links: [
+      { href: p('/terms/'), label: t(lang, 'footerTerms') },
+      { href: p('/privacy/'), label: t(lang, 'footerPrivacy') },
+      { href: p('/refund/'), label: t(lang, 'footerRefund') },
+      { href: p('/contact/'), label: t(lang, 'footerContact') },
+    ],
+  },
+];
+/* The licence line names the other language first, as the old pages did. */
+const languages = lang === 'ru'
+  ? [{ code: 'en', href: '/', label: 'English' }, { code: 'ru', href: '/ru/', label: 'Русский' }]
+  : [{ code: 'ru', href: '/ru/', label: 'Русский' }, { code: 'en', href: '/', label: 'English' }];
+---
+<footer class="footer">
+  <div class="footer__inner wrap">
+    <div class="footer__brand" translate="no"><DraftaMark class="nav__mark" />Drafta</div>
+    <div class="footer__cols">
+      {columns.map((column) => (
+        <div class="footer__col">
+          <div class="footer__col-title">{column.title}</div>
+          {column.links.map(({ href, label }) => <a href={href}>{label}</a>)}
+        </div>
+      ))}
+    </div>
+    <div class="footer__legal">
+      <span>{t(lang, 'footerCopyright')}{languages.map(({ code, href, label }) => (
+        <Fragment>{' · '}<a href={href} lang={code} data-lang={code}>{label}</a></Fragment>
+      ))}</span>
+      <a class="footer__maker" href="https://craftzman.ru" translate="no"><img class="footer__seal" src="/brand/cz-seal.svg" width="16" height="16" alt="" />{t(lang, 'footerMadeBy')}</a>
+    </div>
+  </div>
+</footer>

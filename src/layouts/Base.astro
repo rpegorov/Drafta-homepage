@@ -1,0 +1,87 @@
+---
+/* Base — the one <head> and page frame of drafta.org.
+   Props:
+     lang           'en' | 'ru' — must match canonicalPath (Russian pages live under /ru/).
+     title          full <title>, also og:title.
+     description    meta description, also og:description.
+     canonicalPath  this page's own path with a trailing slash, e.g. "/login/" or "/ru/login/".
+                    hreflang en/ru/x-default and the language switcher are derived from it.
+     noindex        adds robots noindex, follow (service pages).
+     ogImage        site path or absolute URL of the social card; defaults to /og.png.
+   Slots: "head" — extra <head> content such as JSON-LD; default — the page's <main> content. */
+import '../styles/tokens.css';
+import '../styles/product.css';
+import '../styles/site.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import SkipLink from '../components/SkipLink.astro';
+import { fontPreloads } from '../lib/fonts';
+import { langOfPath, localePaths } from '../lib/lang';
+import type { Lang } from '../lib/types';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+  canonicalPath: string;
+  noindex?: boolean;
+  ogImage?: string;
+}
+
+const { lang, title, description, canonicalPath, noindex = false, ogImage = '/og.png' } = Astro.props;
+
+if (!canonicalPath.startsWith('/') || !canonicalPath.endsWith('/')) {
+  throw new Error(`Base: canonicalPath must start and end with "/", got "${canonicalPath}"`);
+}
+if (langOfPath(canonicalPath) !== lang) {
+  throw new Error(`Base: lang "${lang}" does not match canonicalPath "${canonicalPath}"`);
+}
+
+const site = Astro.site ?? new URL('https://drafta.org');
+const absolute = (path: string) => new URL(path, site).href;
+const paths = localePaths(canonicalPath);
+const OG_LOCALE: Record<Lang, string> = { en: 'en_US', ru: 'ru_RU' };
+---
+<!DOCTYPE html>
+<html lang={lang} data-theme="paper">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{title}</title>
+  <meta name="description" content={description}>
+  {noindex && <meta name="robots" content="noindex, follow">}
+  <link rel="canonical" href={absolute(canonicalPath)}>
+  <link rel="alternate" hreflang="en" href={absolute(paths.en)}>
+  <link rel="alternate" hreflang="ru" href={absolute(paths.ru)}>
+  <link rel="alternate" hreflang="x-default" href={absolute(paths.en)}>
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Drafta">
+  <meta property="og:locale" content={OG_LOCALE[lang]}>
+  <meta property="og:title" content={title}>
+  <meta property="og:description" content={description}>
+  <meta property="og:url" content={absolute(canonicalPath)}>
+  <meta property="og:image" content={absolute(ogImage)}>
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#fbf7f0" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1b1916" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon-180.png">
+  <link rel="manifest" href="/site.webmanifest">
+  {fontPreloads(lang).map((href) => <link rel="preload" href={href} as="font" type="font/woff2" crossorigin>)}
+  <script is:inline src="/theme-init.js"></script>
+  <slot name="head" />
+</head>
+<body>
+  <SkipLink lang={lang} />
+  <Header lang={lang} paths={paths} />
+  <main id="main" tabindex="-1">
+    <slot />
+  </main>
+  <Footer lang={lang} />
+  <script>
+    import '../scripts/lang.ts';
+    import '../scripts/nav.ts';
+  </script>
+</body>
+</html>

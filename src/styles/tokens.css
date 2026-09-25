@@ -1,0 +1,132 @@
+/* craftzman — design tokens. Source of truth: https://claude.ai/artifact/8m9AZL8iPX81t7yDYp4M5H (tokens.json). Do not edit values here by hand. */
+:root, [data-theme="paper"] {
+  --bg: #fbf7f0;
+  --bg-soft: #f4ede2;
+  --bg-deep: #eadfcf;
+  --surface: #ffffff;
+  --surface-2: #fffdf9;
+  --band: #17140f;
+  --band-text: #f6f1e8;
+  --band-muted: #a9a093;
+  --border: #1c181419;
+  --border-strong: #1c18142e;
+  --ink: #1c1a17;
+  --ink-soft: #4a443b;
+  --muted: #6e6559;
+  --muted-2: #a79e92;
+  --accent: #1b6d6a;
+  --accent-hover: #145654;
+  --accent-soft: #1b6d6a1a;
+  --accent-glow: #88ccca;
+  --on-accent: #ffffff;
+  --seal: #b8402e;
+  --seal-soft: #b8402e14;
+  --on-seal: #fbf7f0;
+  --ok: #2f7d53;
+  --ok-soft: #2f7d5318;
+  --warn: #8f5f12;
+  --warn-soft: #b4791f1f;
+  --danger: var(--seal);
+  --danger-soft: var(--seal-soft);
+  --focus: var(--accent);
+  --selection: var(--accent-soft);
+  --product-drafta: #2f5fe0;
+  --syn-keyword: #a3489b;
+  --syn-string: #2f7d53;
+  --syn-number: #1f6f8b;
+  --syn-fn: #1b6d6a;
+  --syn-type: #8a5a1f;
+  --syn-comment: #9a9186;
+  --shadow-sm: 0 1px 2px rgba(28,24,20,0.05);
+  --shadow-md: 0 2px 6px rgba(28,24,20,0.05), 0 18px 40px rgba(28,24,20,0.09);
+  --shadow-lg: 0 4px 12px rgba(28,24,20,0.06), 0 32px 70px rgba(28,24,20,0.14);
+  --shadow-glass: 0 1px 0 rgba(255,255,255,0.6) inset;
+  color-scheme: light;
+}
+[data-theme="sumi"] {
+  --bg: #1b1916;
+  --bg-soft: #221f1a;
+  --bg-deep: #2b2722;
+  --surface: #26231e;
+  --surface-2: #2d2924;
+  --band: #f4ede2;
+  --band-text: #1c1a17;
+  --band-muted: #6e6559;
+  --border: #f6f1e81f;
+  --border-strong: #f6f1e838;
+  --ink: #f3ede3;
+  --ink-soft: #cfc6b8;
+  --muted: #a79e92;
+  --muted-2: #7a7267;
+  --accent: #7fcbc8;
+  --accent-hover: #9bdad7;
+  --accent-soft: #7fcbc824;
+  --accent-glow: #88ccca;
+  --on-accent: #1b1916;
+  --seal: #e06a55;
+  --seal-soft: #e06a5524;
+  --on-seal: #1b1916;
+  --ok: #6fbf8c;
+  --ok-soft: #6fbf8c24;
+  --warn: #e0a94a;
+  --warn-soft: #e0a94a24;
+  --danger: var(--seal);
+  --danger-soft: var(--seal-soft);
+  --focus: var(--accent);
+  --selection: var(--accent-soft);
+  --product-drafta: #8fb3ff;
+  --syn-keyword: #d69ad0;
+  --syn-string: #8fd0a6;
+  --syn-number: #7fc0d9;
+  --syn-fn: #7fcbc8;
+  --syn-type: #d9a866;
+  --syn-comment: #7a7267;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.30);
+  --shadow-md: 0 2px 6px rgba(0,0,0,0.30), 0 18px 40px rgba(0,0,0,0.35);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,0.35), 0 32px 70px rgba(0,0,0,0.45);
+  --shadow-glass: 0 1px 0 rgba(255,255,255,0.06) inset;
+  color-scheme: dark;
+}
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --space-10: 128px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+  --radius-seal: 14%;
+  --measure-page: 1140px;
+  --measure-reading: 680px;
+  --measure-hero: 820px;
+  --nav-height: 56px;
+  --glass-blur: 10px;
+  --font-display: "Lora", Georgia, "Times New Roman", serif;
+  --font-sans: "Golos Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+@font-face { font-family: "Lora"; src: url("/fonts/Lora.woff2") format("woff2"); font-weight: 400 700; font-style: normal; font-display: swap; }
+@font-face { font-family: "Lora"; src: url("/fonts/Lora-Italic.woff2") format("woff2"); font-weight: 400 700; font-style: italic; font-display: swap; }
+@font-face { font-family: "Golos Text"; src: url("/fonts/GolosText.woff2") format("woff2"); font-weight: 400 900; font-style: normal; font-display: swap; }
+@font-face { font-family: "JetBrains Mono"; src: url("/fonts/JetBrainsMono.woff2") format("woff2"); font-weight: 100 800; font-style: normal; font-display: swap; }
+.display-1 { font-family: var(--font-display); font-size: 56px; line-height: 1.05; font-weight: 600; letter-spacing: -0.02em; }
+.display-2 { font-family: var(--font-display); font-size: 40px; line-height: 1.08; font-weight: 600; letter-spacing: -0.02em; }
+.h1 { font-family: var(--font-display); font-size: 32px; line-height: 1.15; font-weight: 600; letter-spacing: -0.015em; }
+.h2 { font-family: var(--font-display); font-size: 24px; line-height: 1.2; font-weight: 600; letter-spacing: -0.01em; }
+.quote { font-family: var(--font-display); font-size: 22px; line-height: 1.4; font-weight: 500; font-style: italic; }
+.h3 { font-family: var(--font-sans); font-size: 20px; line-height: 1.3; font-weight: 600; }
+.lead { font-family: var(--font-sans); font-size: 19px; line-height: 1.55; font-weight: 400; }
+.body { font-family: var(--font-sans); font-size: 17px; line-height: 1.65; font-weight: 400; }
+.body-sm { font-family: var(--font-sans); font-size: 15px; line-height: 1.55; font-weight: 400; }
+.caption { font-family: var(--font-sans); font-size: 13px; line-height: 1.4; font-weight: 500; letter-spacing: 0.02em; }
+.button { font-family: var(--font-sans); font-size: 15px; line-height: 1; font-weight: 600; }
+.code { font-family: var(--font-mono); font-size: 14px; line-height: 1.6; font-weight: 400; }
+.handle { font-family: var(--font-mono); font-size: 15px; line-height: 1.4; font-weight: 600; }
+.label { font-family: var(--font-mono); font-size: 12px; line-height: 1.3; font-weight: 500; letter-spacing: 0.08em; }

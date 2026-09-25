@@ -1,0 +1,28 @@
+---
+/* EN/RU switcher: two plain links to this page's twins. Works without JavaScript;
+   scripts/lang.ts only remembers the choice through [data-lang]. */
+import { t } from '../i18n';
+import type { Lang } from '../lib/types';
+
+interface Props {
+  lang: Lang;
+  paths: Record<Lang, string>;
+}
+const { lang, paths } = Astro.props;
+const options: Array<{ code: Lang; label: string }> = [
+  { code: 'en', label: 'EN' },
+  { code: 'ru', label: 'RU' },
+];
+---
+<div class="lang" role="group" aria-label={t(lang, 'langSwitchLabel')}>
+  {options.map(({ code, label }) => (
+    <a
+      class:list={['lang__btn', { 'lang__btn--active': code === lang }]}
+      href={paths[code]}
+      hreflang={code}
+      lang={code}
+      data-lang={code}
+      aria-current={code === lang ? 'true' : undefined}
+    >{label}</a>
+  ))}
+</div>
