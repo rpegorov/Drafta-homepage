@@ -1,0 +1,39 @@
+---
+/* "Everything in the box" — the page's one --band section (brand rule 5). The
+   first item is the widest claim and spans the row; the rest form a 2x2 grid. */
+import SectionHead from './SectionHead.astro';
+import type { LandingCopy } from './copy/types';
+
+interface Props {
+  copy: LandingCopy['box'];
+}
+const { copy } = Astro.props;
+---
+<section class="band band--ink" id="features" aria-labelledby="features-title">
+  <div class="wrap">
+    <SectionHead head={copy} id="features-title" />
+    <ul class="features box">
+      {copy.items.map((item) => (
+        <li class="feature">
+          <h3 class="feature__title">{item.title}</h3>
+          <p class="feature__body" set:html={item.html} />
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .box {
+    margin: var(--space-7) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .box > :first-child {
+    grid-column: 1 / -1;
+  }
+  .box > :first-child .feature__body {
+    max-width: var(--measure-reading);
+    font-size: var(--text-lead);
+  }
+</style>

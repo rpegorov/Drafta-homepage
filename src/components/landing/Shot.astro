@@ -1,0 +1,38 @@
+---
+/* A product screenshot: framed image + caption. The hero shot loads eagerly with
+   high priority (it is the LCP element); every other shot is lazy. */
+import { Image } from 'astro:assets';
+import { SHOTS, SHOT_SIZES, SHOT_WIDTHS, type ShotLayout } from './shots';
+import type { Shot } from './copy/types';
+
+interface Props {
+  shot: Shot;
+  layout: ShotLayout;
+}
+const { shot, layout } = Astro.props;
+const eager = layout === 'hero';
+---
+<figure class="shot">
+  <div class="shot__frame">
+    <Image
+      class="shot__img"
+      src={SHOTS[shot.slot]}
+      alt={shot.alt}
+      widths={SHOT_WIDTHS}
+      sizes={SHOT_SIZES[layout]}
+      format="webp"
+      loading={eager ? 'eager' : 'lazy'}
+      fetchpriority={eager ? 'high' : 'auto'}
+      decoding="async"
+    />
+  </div>
+  <figcaption class="shot__caption">{shot.caption}</figcaption>
+</figure>
+
+<style>
+  /* The captures are dark app windows; in sumi the frame's large shadow is
+     near-invisible, so a stronger hairline carries the edge (brandbook §8). */
+  :global([data-theme="sumi"]) .shot__frame {
+    border-color: var(--border-strong);
+  }
+</style>

@@ -1,0 +1,25 @@
+---
+/* Roadmap: one line per item; the status is a word, the dot only repeats it
+   (colour is never the only carrier of meaning). */
+import SectionHead from './SectionHead.astro';
+import type { LandingCopy } from './copy/types';
+
+interface Props {
+  copy: LandingCopy['roadmap'];
+}
+const { copy } = Astro.props;
+---
+<section class="band" id="roadmap" aria-labelledby="roadmap-title">
+  <div class="wrap">
+    <SectionHead head={copy} id="roadmap-title" />
+    <ul class="roadmap">
+      {copy.items.map((item) => (
+        <li class="roadmap__item">
+          <span class={`dot dot--${item.status}`} aria-hidden="true"></span>
+          <span><strong>{item.name}</strong> — <Fragment set:html={item.html} /></span>
+          <span class="roadmap__status">{item.statusLabel}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>

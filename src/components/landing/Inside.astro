@@ -1,0 +1,30 @@
+---
+/* "What's inside": feature rows, text and screenshot alternating sides. */
+import SectionHead from './SectionHead.astro';
+import Shot from './Shot.astro';
+import type { LandingCopy } from './copy/types';
+
+interface Props {
+  copy: LandingCopy['inside'];
+}
+const { copy } = Astro.props;
+---
+<section class="band" id="inside" aria-labelledby="inside-title">
+  <div class="wrap">
+    <SectionHead head={copy} id="inside-title" />
+    {copy.rows.map((row, index) => (
+      <div class={index % 2 === 0 ? 'feature-row feature-row--reverse' : 'feature-row'}>
+        <div class="feature-row__text">
+          <h3 class="h3">{row.title}</h3>
+          <p class="feature__body" set:html={row.html} />
+          <ul class="feature-row__list">
+            {row.points.map((point) => <li>{point}</li>)}
+          </ul>
+        </div>
+        <div class="feature-row__media">
+          <Shot shot={row.shot} layout="row" />
+        </div>
+      </div>
+    ))}
+  </div>
+</section>

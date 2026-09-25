@@ -1,0 +1,33 @@
+---
+/* Hero: eyebrow, the page's one <h1>, lead, the screen's one primary button,
+   platform line and the editor screenshot. */
+import Shot from './Shot.astro';
+import { releases } from '../../lib/config';
+import type { LandingCopy } from './copy/types';
+
+interface Props {
+  copy: LandingCopy['hero'];
+}
+const { copy } = Astro.props;
+---
+<section class="hero" aria-labelledby="hero-title">
+  <div class="wrap">
+    <div class="hero__text">
+      <p class="eyebrow">{copy.eyebrow}</p>
+      <h1 class="display-1" id="hero-title">{copy.title}</h1>
+      <p class="lead">{copy.lead}</p>
+      <div class="hero__actions">
+        <a class="btn btn--primary btn--lg" href={releases}>{copy.download}</a>
+        <a class="btn btn--ghost btn--lg" href="#pricing">{copy.pricing}</a>
+      </div>
+      <p class="hero__meta">{copy.platform}</p>
+    </div>
+    <Shot shot={copy.shot} layout="hero" />
+  </div>
+</section>
+
+<style>
+  .hero__text {
+    max-width: var(--measure-hero);
+  }
+</style>

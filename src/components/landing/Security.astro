@@ -1,0 +1,47 @@
+---
+/* Security: the two-sided promise, its two numbers, then six precise claims. */
+import SectionHead from './SectionHead.astro';
+import Stats from './Stats.astro';
+import type { LandingCopy } from './copy/types';
+
+interface Props {
+  copy: LandingCopy['security'];
+}
+const { copy } = Astro.props;
+---
+<section class="band" id="security" aria-labelledby="security-title">
+  <div class="wrap">
+    <div class="split">
+      <div class="split__text">
+        <SectionHead head={copy} id="security-title" />
+        <p class="lead" set:html={copy.introHtml} />
+        <blockquote class="pullquote">
+          <p>{copy.quote}</p>
+          <span class="pullquote__source">{copy.quoteSource}</span>
+        </blockquote>
+      </div>
+      <div class="split__media">
+        <Stats stats={copy.stats} />
+      </div>
+    </div>
+    <ul class="features security">
+      {copy.items.map((item) => (
+        <li class="feature">
+          <h3 class="feature__title">{item.title}</h3>
+          <p class="feature__body" set:html={item.html} />
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .security {
+    margin: var(--space-8) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pullquote p {
+    margin: 0;
+  }
+</style>

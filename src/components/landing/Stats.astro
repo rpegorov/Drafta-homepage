@@ -1,0 +1,36 @@
+---
+/* A 2-column grid of big numbers, each read as "value label". */
+import type { Stat } from './copy/types';
+
+interface Props {
+  stats: Stat[];
+}
+const { stats } = Astro.props;
+---
+<ul class="grid grid--2 stats">
+  {stats.map((stat) => (
+    <li class="stat">
+      <span class:list={['stat__value', { highlight: stat.highlight }]} translate="no">{stat.value}</span>
+      <span class="stat__label">{stat.label}</span>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .stats {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .stat {
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border);
+  }
+  .stat__value {
+    overflow-wrap: anywhere;
+  }
+  /* the page's one vermilion highlight wins over the value's ink colour */
+  .stat__value.highlight {
+    color: var(--seal);
+  }
+</style>

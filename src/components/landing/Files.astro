@@ -1,0 +1,33 @@
+---
+/* Local first: why the library is files, what keeps working, four numbers. */
+import SectionHead from './SectionHead.astro';
+import Stats from './Stats.astro';
+import type { LandingCopy } from './copy/types';
+
+interface Props {
+  copy: LandingCopy['files'];
+}
+const { copy } = Astro.props;
+---
+<section class="band band--soft" id="files" aria-labelledby="files-title">
+  <div class="wrap">
+    <div class="split">
+      <div class="split__text">
+        <SectionHead head={copy} id="files-title" />
+        {copy.paragraphsHtml.map((html) => <p class="feature__body files__p" set:html={html} />)}
+        <ul class="feature-row__list">
+          {copy.points.map((point) => <li>{point}</li>)}
+        </ul>
+      </div>
+      <div class="split__media">
+        <Stats stats={copy.stats} />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .files__p + .files__p {
+    margin-top: var(--space-4);
+  }
+</style>

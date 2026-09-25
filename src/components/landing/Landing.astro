@@ -1,0 +1,39 @@
+---
+/* The drafta.org landing, one language: Base frame + JSON-LD + sections.
+   Brandbook page structure: hero → sections on --bg/--bg-soft → one --band →
+   the rest → footer (Base). */
+import Base from '../../layouts/Base.astro';
+import Hero from './Hero.astro';
+import Facts from './Facts.astro';
+import Inside from './Inside.astro';
+import Box from './Box.astro';
+import Security from './Security.astro';
+import Files from './Files.astro';
+import Pricing from './Pricing.astro';
+import Faq from './Faq.astro';
+import Roadmap from './Roadmap.astro';
+import { landingCopy } from './copy';
+import { softwareApplication } from './jsonLd';
+import { localePath } from '../../lib/lang';
+import type { Lang } from '../../lib/types';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const copy = landingCopy(lang);
+const site = Astro.site ?? new URL('https://drafta.org');
+const jsonLd = JSON.stringify(softwareApplication(lang, site));
+---
+<Base lang={lang} title={copy.meta.title} description={copy.meta.description} canonicalPath={localePath('/', lang)}>
+  <script slot="head" type="application/ld+json" set:html={jsonLd} />
+  <Hero copy={copy.hero} />
+  <Facts label={copy.factsLabel} facts={copy.facts} />
+  <Inside copy={copy.inside} />
+  <Box copy={copy.box} />
+  <Security copy={copy.security} />
+  <Files copy={copy.files} />
+  <Pricing copy={copy.pricing} />
+  <Faq copy={copy.faq} />
+  <Roadmap copy={copy.roadmap} />
+</Base>
