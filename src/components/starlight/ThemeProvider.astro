@@ -1,0 +1,8 @@
+---
+/* Replaces Starlight's theme provider. The docs use the site's own themes —
+   data-theme="paper" / "sumi" from tokens.css — chosen by the same blocking file
+   as every other page (public/theme-init.js: follows prefers-color-scheme).
+   Starlight's version is an inline script writing "light" / "dark", which the
+   brand tokens do not know and a script-src 'self' CSP would block. */
+---
+<script is:inline src="/theme-init.js"></script>

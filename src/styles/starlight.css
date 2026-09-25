@@ -1,0 +1,114 @@
+/* Starlight on the craftzman brand. Loaded after tokens.css and product.css
+   (astro.config.mjs → starlight.customCss), so every --sl-* value below is a brand
+   token and follows data-theme="paper" / "sumi" by itself — no colour is written
+   twice. Starlight's own palette keys off data-theme="light", which the docs never
+   set (see components/starlight/ThemeProvider.astro), so its dark defaults would
+   show through anything not mapped here; the few light-only rules Starlight ships
+   are restated for paper at the end.
+
+   Starlight's grey ramp runs from the strongest text (white) to the page (black). */
+
+:root {
+  /* Surfaces and text */
+  --sl-color-white: var(--ink);
+  --sl-color-gray-1: var(--ink);
+  --sl-color-gray-2: var(--ink-soft);
+  --sl-color-gray-3: var(--muted);
+  --sl-color-gray-4: var(--muted-2);
+  --sl-color-gray-5: var(--bg-deep);
+  --sl-color-gray-6: var(--bg-soft);
+  --sl-color-gray-7: var(--bg-soft);
+  --sl-color-black: var(--bg);
+
+  --sl-color-text: var(--ink-soft);
+  --sl-color-text-accent: var(--accent);
+  --sl-color-text-invert: var(--on-accent);
+  --sl-color-bg: var(--bg);
+  --sl-color-bg-nav: color-mix(in srgb, var(--bg) 60%, transparent);
+  --sl-color-bg-sidebar: var(--bg);
+  --sl-color-bg-inline-code: var(--bg-soft);
+  --sl-color-bg-accent: var(--accent);
+  --sl-color-hairline-light: var(--border);
+  --sl-color-hairline: var(--border);
+  --sl-color-hairline-shade: var(--border-strong);
+  --sl-color-backdrop-overlay: color-mix(in srgb, var(--band) 55%, transparent);
+
+  /* Accent: Drafta's product colour (product.css points --accent at it) */
+  --sl-color-accent-low: var(--accent-soft);
+  --sl-color-accent: var(--accent);
+  --sl-color-accent-high: var(--accent);
+
+  /* Asides and badges: note → accent, tip → accent, caution → warn,
+     danger → seal, success → ok. -low is the fill, -high the text. */
+  --sl-color-blue-low: var(--accent-soft);
+  --sl-color-blue: var(--accent);
+  --sl-color-blue-high: var(--accent);
+  --sl-color-purple-low: var(--accent-soft);
+  --sl-color-purple: var(--accent);
+  --sl-color-purple-high: var(--accent);
+  --sl-color-orange-low: var(--warn-soft);
+  --sl-color-orange: var(--warn);
+  --sl-color-orange-high: var(--warn);
+  --sl-color-red-low: var(--seal-soft);
+  --sl-color-red: var(--seal);
+  --sl-color-red-high: var(--seal);
+  --sl-color-green-low: var(--ok-soft);
+  --sl-color-green: var(--ok);
+  --sl-color-green-high: var(--ok);
+
+  --sl-shadow-sm: var(--shadow-sm);
+  --sl-shadow-md: var(--shadow-md);
+  --sl-shadow-lg: var(--shadow-lg);
+
+  /* Type: the brand's families and rem scale */
+  --sl-font: var(--font-sans);
+  --sl-font-mono: var(--font-mono);
+  --sl-text-body: var(--text-body);
+  --sl-text-body-sm: var(--text-sm);
+  --sl-text-h1: var(--text-display-2);
+  --sl-text-h2: var(--text-h2);
+  --sl-text-h3: var(--text-h3);
+  --sl-text-h4: var(--text-body);
+  --sl-text-h5: var(--text-body);
+  --sl-line-height: var(--leading-body);
+
+  /* Layout: the brand's 56px nav and reading measure */
+  --sl-nav-height: var(--nav-height);
+  --sl-content-width: var(--measure-reading);
+}
+
+/* Headings in the brand's display face */
+h1#_top,
+.sl-markdown-content :is(h1, h2, h3) {
+  font-family: var(--font-display);
+  letter-spacing: var(--tracking-display);
+  color: var(--ink);
+}
+
+/* The nav is glass, as on the rest of the site */
+header.header {
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+}
+
+/* Focus and selection as on the rest of the site (site.css), not the system accent */
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+::selection {
+  background: var(--selection);
+  color: var(--ink);
+}
+
+/* Starlight's light-only rules, restated for paper */
+:root[data-theme="paper"] #starlight__search {
+  --pagefind-ui-tag: var(--sl-color-gray-6);
+}
+:root[data-theme="paper"] .sl-menu-button {
+  background-color: var(--sl-color-black);
+  color: var(--sl-color-white);
+}
+:root[data-theme="paper"] .sl-menu-button:has(~ :popover-open) {
+  background-color: var(--sl-color-gray-5);
+}
