@@ -12,6 +12,18 @@ const HEADING = /^ {0,3}(#{1,6})\s/;
 const LIST_ITEM = /^\s*(?:[-*+]|\d+[.)])\s/;
 const PREAMBLE = /^\s*(?:here is|here's|here are|sure[,!])/i;
 const RAW_FENCE = /```/;
+const HTML_TAG = /<\/?([a-zA-Z][\w-]*)[^<>]*>/g;
+
+/** Lowercased names of the HTML tags in a text — what a model tends to add (<br>, <p>) around Markdown. */
+function htmlTagNames(text) {
+  return new Set([...text.matchAll(HTML_TAG)].map((match) => match[1].toLowerCase()));
+}
+
+/** Tags in the output that the source never used: markup invented by the model. */
+function addedHtmlTags(source, output) {
+  const known = htmlTagNames(source);
+  return [...htmlTagNames(output)].filter((name) => !known.has(name));
+}
 
 function headingLevels(text) {
   const counts = {};
@@ -44,6 +56,8 @@ export function validateChunk(source, output) {
   if (headingLevels(source) !== headingLevels(output)) violations.push('the number and levels of headings must stay the same');
   if (listItems(source) !== listItems(output)) violations.push('the number of list items must stay the same');
   if (RAW_FENCE.test(output)) violations.push('do not add ``` code fences');
+  const added = addedHtmlTags(source, output);
+  if (added.length > 0) violations.push(`do not add HTML tags (${added.map((name) => `<${name}>`).join(', ')}) — keep the Markdown as it is`);
   if (source.length >= MIN_LENGTH_FOR_RATIO) {
     const ratio = output.length / source.length;
     if (ratio < MIN_LENGTH_RATIO || ratio > MAX_LENGTH_RATIO) violations.push('the translation must be a full translation, no longer or shorter than needed');

@@ -24,6 +24,11 @@ const COMMENT = /\s#(?:\s.*)?$/;
 const KNOWN_KEYS = ['slug', 'lang', 'description', 'date', 'order', 'cover', 'publish'];
 const PUBLISH_TRUE = 'true';
 
+/** Lowercase latin with dashes — the only shape of a page's slug, file name and attachment folder. */
+export function isValidSlug(value) {
+  return typeof value === 'string' && SLUG.test(value);
+}
+
 function unquote(value) {
   const quoted = /^"(.*)"$/.exec(value) ?? /^'(.*)'$/.exec(value);
   return quoted ? quoted[1] : null;
@@ -64,7 +69,7 @@ export function parseSiteFields(lines) {
 function validate(raw, problems) {
   const fields = { lang: raw.lang || DEFAULT_LANG, publish: true };
   if (raw.slug) {
-    if (SLUG.test(raw.slug)) fields.slug = raw.slug;
+    if (isValidSlug(raw.slug)) fields.slug = raw.slug;
     else problems.push(`slug "${raw.slug}" is not lowercase-latin-with-dashes`);
   }
   if (!LANGS.includes(fields.lang)) problems.push(`lang "${fields.lang}" is not en or ru`);

@@ -164,6 +164,9 @@ async function install() {
   console.log(`key:    ${key}`);
   console.log(`node:   ${node}`);
 
+  // A loaded agent may be publishing from the clone right now; it is unloaded
+  // before the clone is reset under it, and loaded again at the end.
+  await bootoutIfLoaded(LABEL);
   const how = await prepareClone(paths, branch, { ...env, GIT_SSH_COMMAND: gitSsh, GIT_TERMINAL_PROMPT: '0' });
   console.log(`clone:  ${paths.clone} (${how}, branch ${branch})`);
 

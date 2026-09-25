@@ -38,6 +38,7 @@ import { aheadOfOrigin, commitPaths, defaultExec, pushFastForward } from './lib/
 import { decodeNote } from './lib/notes.mjs';
 import { buildPlan, contentDirs, pageTarget, renderPage, withoutTitleLine } from './lib/plan.mjs';
 import { SECTION_TAGS, SKIP, selectNote } from './lib/select.mjs';
+import { isValidSlug } from './lib/site-block.mjs';
 import { removeTags } from './lib/tags.mjs';
 import { MINUTE_MS } from './lib/time.mjs';
 import { rewriteWikilinks, titleKey } from './lib/wikilinks.mjs';
@@ -254,6 +255,9 @@ function readSiteFiles(site) {
       const text = readFileSync(join(site, path), 'utf8');
       const { data } = parseFrontmatter(text);
       const slug = name.replace(NOTE_FILE, '');
+      // A file the exporter would never have written (`..md`, `Draft Copy.md`)
+      // is not its to judge or delete — and its "asset folder" could be anything.
+      if (!isValidSlug(slug)) continue;
       const target = pageTarget(section, lang, slug);
       files.push({
         ...target,
@@ -280,7 +284,11 @@ function writePage(site, { page }) {
   writeFileSync(join(site, page.path), page.text);
 }
 
+/** Removes a page and its attachments — only ever `<section dir>/<slug>` of a valid slug. */
 function removePage(site, entry) {
+  if (!isValidSlug(entry.slug) || entry.assetDir !== pageTarget(entry.section, entry.lang, entry.slug).assetDir) {
+    throw new Error(`refusing to remove ${entry.assetDir}: not a page folder of slug "${entry.slug}"`);
+  }
   rmSync(join(site, entry.path), { force: true });
   rmSync(join(site, entry.assetDir), { recursive: true, force: true });
 }
@@ -441,22 +449,35 @@ function printTable(result, { commit }, planned) {
 
 // ── Run ────────────────────────────────────────────────────────────────────
 
+/** Builds every candidate's page; a candidate whose page cannot be built is reported in `failed`. */
+function buildPages(candidates, context) {
+  const out = { pages: [], failed: [], warnings: [] };
+  for (const candidate of candidates) {
+    const built = buildPage(candidate, context);
+    out.warnings.push(...built.warnings.map((message) => ({ title: candidate.note.title, message })));
+    if (built.page) out.pages.push(built.page);
+    else out.failed.push({ candidate, error: built.error });
+  }
+  return out;
+}
+
 function planRun(options) {
   const library = readLibrary(options.library);
-  const links = titleIndex(library.candidates);
   const roots = attachmentRoots(options.library);
-  const context = { links, roots, site: options.site };
-  const pages = [];
-  const warnings = [];
-  for (const candidate of library.candidates) {
-    const built = buildPage(candidate, context);
-    warnings.push(...built.warnings.map((message) => ({ title: candidate.note.title, message })));
-    if (built.page) {
-      pages.push(built.page);
-    } else {
-      library.protectedIds.add(candidate.note.id);
-      library.errors.push({ title: candidate.note.title, message: built.error });
-    }
+  let context = { links: titleIndex(library.candidates), roots, site: options.site };
+  let built = buildPages(library.candidates, context);
+  if (built.failed.length > 0) {
+    // A wiki-link must not point at a page that is not going out: rebuild
+    // without the failed notes in the index (a page fails on its attachments,
+    // not on its links, so the second pass fails the same notes).
+    const failedIds = new Set(built.failed.map(({ candidate }) => candidate.note.id));
+    context = { ...context, links: titleIndex(library.candidates.filter((candidate) => !failedIds.has(candidate.note.id))) };
+    built = buildPages(library.candidates, context);
+  }
+  const { pages, warnings } = built;
+  for (const { candidate, error } of built.failed) {
+    library.protectedIds.add(candidate.note.id);
+    library.errors.push({ title: candidate.note.title, message: error });
   }
   const existing = readSiteFiles(options.site);
   markStillPublished(library.errors, existing);
@@ -525,6 +546,11 @@ async function main(argv) {
   }
 
   const run = planRun(options);
+  const emptiness = libraryLooksEmpty(run);
+  if (emptiness) {
+    reportFailure(options.json, 'library looks empty', emptiness);
+    return EXIT_FAILED;
+  }
   const outcome = options.commit ? await publish(options, run.plan) : { committed: false, pushed: false, errors: [] };
   // Rule 5: translation starts only once the originals are committed.
   const translating = options.translate && options.commit && outcome.errors.length === 0;
@@ -547,6 +573,17 @@ async function main(argv) {
 }
 
 const NO_TRANSLATION = Object.freeze({ translated: [], deferred: [], chars: 0, sha: undefined, errors: [] });
+
+// A library that publishes nothing yet asks to take down more pages than this
+// is far more likely wrong (moved, half-synced, wrong --library) than emptied
+// on purpose: the run stops before it unpublishes anything.
+const MAX_UNPUBLISH_WITHOUT_CANDIDATES = 3;
+
+/** @returns {string|null} why the run refuses to apply the plan */
+function libraryLooksEmpty({ library, plan }) {
+  if (library.candidates.length > 0 || plan.delete.length <= MAX_UNPUBLISH_WITHOUT_CANDIDATES) return null;
+  return `no note is selected for the site, yet ${plan.delete.length} published pages would be removed — refusing (check --library)`;
+}
 
 /** A run that failed before it had a plan still owes `--json` callers one JSON object. */
 function reportFailure(json, title, message) {
