@@ -4,13 +4,11 @@
 // promisified `execFile`. Never `--force`, never `stash`, never a push the
 // caller did not ask for.
 import { execFile } from 'node:child_process';
-import { existsSync, rmSync } from 'node:fs';
+import { rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
 
 export const defaultExec = promisify(execFile);
-// lsof exits 1 when no process has the named file open.
-const LSOF_NOTHING_OPEN = 1;
 
 function git(exec, dir, args) {
   return exec('git', args, { cwd: dir });
@@ -78,7 +76,7 @@ const CONTENT_ROOT = 'src/content';
  */
 export async function syncToOrigin(dir, branch, { exec = defaultExec } = {}) {
   await git(exec, dir, ['fetch', '--quiet', 'origin', branch]);
-  await removeStaleIndexLock(exec, dir);
+  removeStaleIndexLock(dir);
   await abortRebase(exec, dir);
   await git(exec, dir, ['reset', '--hard', '--quiet', `origin/${branch}`]);
   await git(exec, dir, ['checkout', '--quiet', '-B', branch, `origin/${branch}`]);
@@ -104,20 +102,14 @@ export async function rebaseOntoOrigin(dir, branch, { exec = defaultExec } = {})
 
 /**
  * `.git/index.lock` left by a git that was killed mid-way blocks every later
- * command. It is removed only when no process holds it open (`lsof`): git
- * keeps the lock file open while it works, so an open handle means a live
- * git in this clone — the owner's, since the publisher's own lock is held.
+ * command, and it is removed unconditionally: git does not keep the lock file
+ * open while it works, so nothing (lsof included) can tell a live lock from a
+ * stale one. That is safe only because this is the publisher's disposable
+ * clone under the publisher's own run lock — no other git runs in it. Never
+ * call this on a working copy.
  */
-async function removeStaleIndexLock(exec, dir) {
-  const lock = join(dir, '.git', 'index.lock');
-  if (!existsSync(lock)) return;
-  try {
-    await exec('lsof', ['-t', lock], {});
-    return; // exit 0: some process has it open
-  } catch (error) {
-    if (error.code !== LSOF_NOTHING_OPEN) throw error;
-  }
-  rmSync(lock, { force: true });
+function removeStaleIndexLock(dir) {
+  rmSync(join(dir, '.git', 'index.lock'), { force: true });
 }
 
 /**

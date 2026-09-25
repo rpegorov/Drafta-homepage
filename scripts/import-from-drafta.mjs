@@ -12,7 +12,8 @@
 //
 // `--translate` (with `--commit`; PLAN v2 §11.9): after the originals are
 // committed and pushed, each Russian page without a hand-written English twin
-// gets a machine translation in its own commit. Provider and key come only
+// gets a machine translation; all translations of the run go into one commit
+// and one push, so no page reaches origin ahead of a twin it links to. Provider and key come only
 // from env: DRAFTA_AI_PROVIDER, DRAFTA_AI_KEY. DRAFTA_TRANSLATE_MAX_CHARS caps
 // the characters sent this run; DRAFTA_TRANSLATE_HOLD (`slug:sourceHash,…`)
 // names translations the publisher is backing off from. A failed translation
@@ -405,8 +406,10 @@ function translationCommitMessage(pages) {
   return `content: translate ${pages.length} pages from Drafta`;
 }
 
+/** @returns {Promise<boolean>} whether a push happened */
 async function pushTranslations(options) {
-  if (options.push) await pushFastForward(options.site, options.branch, { exec: gitExec });
+  if (!options.push) return false;
+  return (await pushFastForward(options.site, options.branch, { exec: gitExec })).pushed;
 }
 
 /**
@@ -614,12 +617,6 @@ function importCommitMessage(plan) {
   return `content: ${clauses.join(', ')} from Drafta`;
 }
 
-/**
- * Nothing new to commit, yet HEAD is ahead of origin/<branch>: the publisher's
- * retry after a rejected push, whose originals the previous attempt committed.
- * Only on <branch> itself — an owner's working copy on a feature branch must
- * not have its commits pushed to main by a stray --push.
- */
 /** `--push --branch <b>` is honoured only from <b> itself: a working copy on another branch never has its commits pushed there. */
 async function assertOnPushBranch({ site, branch }) {
   const checkedOut = await currentBranch(site, { exec: gitExec });
@@ -680,7 +677,7 @@ async function main(argv) {
     ...outcome,
     committed: outcome.committed || Boolean(translation.sha),
     sha: translation.sha ?? outcome.sha,
-    pushed: outcome.pushed || Boolean(options.push && translation.sha),
+    pushed: outcome.pushed || translation.pushed,
     errors: [...outcome.errors, ...translation.errors],
     warnings: run.warnings,
     translated: translation.translated,
@@ -693,7 +690,7 @@ async function main(argv) {
   return result.errors.length > 0 ? EXIT_FAILED : EXIT_OK;
 }
 
-const NO_TRANSLATION = Object.freeze({ translated: [], deferred: [], chars: 0, sha: undefined, errors: [] });
+const NO_TRANSLATION = Object.freeze({ translated: [], deferred: [], chars: 0, sha: undefined, pushed: false, errors: [] });
 
 // A library that publishes nothing yet asks to take down more pages than this
 // is far more likely wrong (moved, half-synced, wrong --library) than emptied

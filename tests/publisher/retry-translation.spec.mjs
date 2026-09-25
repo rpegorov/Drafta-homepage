@@ -22,7 +22,11 @@ const readDefaults = vi.fn(async (...args) => (args.includes('aiUseMockProvider'
 const readKey = vi.fn(async () => 'sk-ant-fake');
 const env = { PUBLISHER_TRANSLATE_MAX_CHARS_PER_DAY: String(PER_DAY) };
 
-/** Attempt 1 translates and commits, its push is rejected; attempt 2 finds the translation already committed. */
+/**
+ * Attempt 1 translates and commits, its push is rejected — the exporter's
+ * contract: the translation is deferred as `git` and carries its paid record;
+ * attempt 2 finds the translation already committed and reports it cached.
+ */
 function rejectedThenPushed() {
   let publishes = 0;
   return (call) => {
@@ -31,6 +35,7 @@ function rejectedThenPushed() {
     if (!isPublish(call)) return cliJson();
     publishes += 1;
     if (publishes === 1) {
+      const { cached: _cached, ...paid } = TRANSLATION;
       throw execError('push rejected', {
         code: 1,
         stdout: cliJson({
@@ -38,14 +43,15 @@ function rejectedThenPushed() {
           committed: true,
           sha: 'abc1234',
           pushed: false,
-          translated: [TRANSLATION],
-          translationDeferred: [],
+          translated: [],
+          translationDeferred: [{ ...paid, reason: 'git', sourceHash: 'hash-1' }],
           translationChars: CHARS,
           errors: [{ title: 'git', message: REJECTED }],
         }),
       });
     }
-    return cliJson({ unchanged: [POST], committed: true, sha: 'def5678', pushed: true, translated: [], translationDeferred: [], translationChars: 0 });
+    const cached = { slug: TRANSLATION.slug, from: TRANSLATION.from, to: TRANSLATION.to, cached: true };
+    return cliJson({ unchanged: [POST], committed: false, sha: 'abc1234', pushed: true, translated: [cached], translationDeferred: [], translationChars: 0 });
   };
 }
 

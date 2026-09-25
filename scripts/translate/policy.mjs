@@ -38,7 +38,7 @@ async function translatePhase(jobs, { budget, hold }, translate, out) {
   let stopper = null;
   for (const { job, hash, chars } of jobs) {
     const base = { slug: job.slug, title: job.title, from: job.from, to: job.to };
-    const defer = (reason, detail) => out.deferred.push({ ...base, reason, ...(detail ? { detail } : {}), sourceHash: hash });
+    const defer = (reason, detail, paid = {}) => out.deferred.push({ ...base, ...paid, reason, ...(detail ? { detail } : {}), sourceHash: hash });
     if (job.existing?.translation?.sourceHash === hash) {
       out.translated.push({ ...base, cached: true });
       continue;
@@ -77,15 +77,15 @@ async function translatePhase(jobs, { budget, hold }, translate, out) {
  * @param {{translate: (job: object) => Promise<{done: object, usage: object, model: string}>,
  *   build: (items: {job: object, done: object}[]) => ({page: object} | {error: string})[],
  *   commit: (pages: {job: object, page: object}[]) => Promise<string|undefined>,
- *   push: () => Promise<void>}} io
+ *   push: () => Promise<boolean>}} io
  *   translate — the model call (throws TranslationDeferred on a text or provider problem);
  *   build — the pages of every translation made, aligned with `items`; an error is a text problem;
  *   commit — writes every page and commits them together, resolving the commit sha;
- *   push — takes the commit to origin (a no-op when the run does not push)
- * @returns {Promise<{translated: object[], deferred: object[], chars: number, sha?: string, errors: object[]}>}
+ *   push — takes the commit to origin, resolving true when it did (false when the run does not push)
+ * @returns {Promise<{translated: object[], deferred: object[], chars: number, sha?: string, pushed: boolean, errors: object[]}>}
  */
 export async function runTranslations(jobs, { budget, hold, provider }, { translate, build, commit, push }) {
-  const out = { translated: [], deferred: [], chars: 0, sha: undefined, errors: [] };
+  const out = { translated: [], deferred: [], chars: 0, sha: undefined, pushed: false, errors: [] };
   const made = await translatePhase(jobs, { budget, hold }, translate, out);
   const built = await buildPhase(made, build);
   const pages = [];
@@ -97,19 +97,19 @@ export async function runTranslations(jobs, { budget, hold, provider }, { transl
 
   // One commit and one push for every translation of the run: a page never
   // reaches origin ahead of the twin it links. When git refuses, every job is
-  // deferred as `git`; the pages stay in the local commit and the retry's
-  // rebase serves them from the cache instead of paying for them again.
+  // deferred as `git` — carrying its paid record (provider, model, usage,
+  // chars), the only account of what the translation cost, because the
+  // retry's rebase serves the pages from the cache and never sees it again.
+  const paid = ({ item, page }) => ({ url: page.url, path: page.path, provider, model: item.model, usage: item.usage, chars: item.chars });
   try {
     out.sha = (await commit(pages.map(({ item, page }) => ({ job: item.job, page })))) ?? out.sha;
-    await push();
+    out.pushed = (await push()) === true;
   } catch (error) {
     out.errors.push({ title: 'git', message: (error.stderr || error.message || String(error)).trim() });
-    for (const { item } of pages) item.defer(GIT_REFUSED);
+    for (const entry of pages) entry.item.defer(GIT_REFUSED, undefined, paid(entry));
     return out;
   }
-  for (const { item, page } of pages) {
-    out.translated.push({ ...item.base, cached: false, url: page.url, path: page.path, provider, model: item.model, usage: item.usage, chars: item.chars });
-  }
+  for (const entry of pages) out.translated.push({ ...entry.item.base, cached: false, ...paid(entry) });
   return out;
 }
 

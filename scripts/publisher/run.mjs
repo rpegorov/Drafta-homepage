@@ -31,7 +31,7 @@ import { notesMtimes, waitForQuiet } from './quiet.mjs';
 import { PROVIDER_IDS } from '../translate/providers.mjs';
 import { AI_SKIP, readDraftaDefault, readProviderKey, resolveAi } from './keychain.mjs';
 import { HOUR_MS, MINUTE_MS } from '../lib/time.mjs';
-import { DEFAULT_MAX_CHARS_PER_RUN } from '../translate/policy.mjs';
+import { DEFAULT_MAX_CHARS_PER_RUN, GIT_REFUSED } from '../translate/policy.mjs';
 import {
   addTranslationChars,
   markNotified,
@@ -322,32 +322,44 @@ function unionBy(previous, latest, key, prefer = (_earlier, later) => later) {
   return [...byKey.values()];
 }
 
+const isGitDeferred = (entry) => entry.reason === GIT_REFUSED;
+
 /**
  * A retry after a rejected push sees the work of the first attempt as already
- * done (its pages are unchanged, its translations cached), so the two results
- * are merged: every page the run put on origin is announced, a translation
- * paid for on attempt 1 keeps its provider record over the retry's `cached`,
- * and the characters of both attempts count against the budget.
+ * done: its pages come back as unchanged and its translations — committed in
+ * attempt 1, carried over by the rebase — as `cached`. The two results are
+ * merged so the owner hears about everything the run put on origin: pages of
+ * both attempts are announced once; a translation attempt 1 paid for and
+ * deferred as `git` is promoted into `translated` with its paid record
+ * (provider, model, usage, chars) once the retry pushed it — whether the retry
+ * reported it `cached` or did not mention it — so «Переведено» goes out and the
+ * log shows what it cost; and the characters of both attempts count against the budget.
  */
 function mergeAttempts(previous, latest) {
   if (!previous) return latest;
-  const paidFirst = (earlier, later) => (later.cached && !earlier.cached ? earlier : later);
+  const translated = mergeTranslated(previous, latest);
+  const done = new Set(translated.map(translationKey));
   return {
     ...latest,
     pushed: previous.pushed === true || latest.pushed === true,
     created: unionBy(previous.created ?? [], latest.created ?? [], pageKey),
     updated: unionBy(previous.updated ?? [], latest.updated ?? [], pageKey),
     deleted: unionBy(previous.deleted ?? [], latest.deleted ?? [], pageKey),
-    translated: unionBy(previous.translated ?? [], latest.translated ?? [], translationKey, paidFirst),
-    translationDeferred: stillDeferred(previous, latest),
+    translated,
+    translationDeferred: unionBy(previous.translationDeferred ?? [], latest.translationDeferred ?? [], translationKey).filter((entry) => !done.has(translationKey(entry))),
     translationChars: (previous.translationChars ?? 0) + (latest.translationChars ?? 0),
   };
 }
 
-/** Deferred on either attempt and translated on neither: a translation the retry made is no longer deferred. */
-function stillDeferred(previous, latest) {
-  const done = new Set([...(previous.translated ?? []), ...(latest.translated ?? [])].map(translationKey));
-  return unionBy(previous.translationDeferred ?? [], latest.translationDeferred ?? [], translationKey).filter((entry) => !done.has(translationKey(entry)));
+/** The paid record wins over a `cached` stand-in for the same translation. */
+function mergeTranslated(previous, latest) {
+  const paidFirst = (earlier, later) => (later.cached && !earlier.cached ? earlier : later);
+  const union = unionBy(previous.translated ?? [], latest.translated ?? [], translationKey, paidFirst);
+  const refusedAgain = new Set((latest.translationDeferred ?? []).filter(isGitDeferred).map(translationKey));
+  const promoted = (previous.translationDeferred ?? [])
+    .filter((entry) => isGitDeferred(entry) && entry.provider && latest.pushed === true && !refusedAgain.has(translationKey(entry)))
+    .map(({ reason: _reason, detail: _detail, sourceHash: _hash, ...paid }) => ({ ...paid, cached: false }));
+  return unionBy(union, promoted, translationKey, paidFirst);
 }
 
 /** The retry may spend only what the first attempt left of the run's budget. */
