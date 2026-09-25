@@ -8,7 +8,8 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && vitest run",
+    "astro:build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
     "test": "vitest run"
