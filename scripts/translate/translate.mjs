@@ -17,13 +17,14 @@ export const DEFER = Object.freeze({
   provider: 'provider',
   invalid: 'invalid-output',
   quota: 'quota',
+  timeout: 'timeout',
 });
 
 const ATTEMPTS_PER_CHUNK = 2;
 const RATE_LIMIT_RETRIES = 2;
 const RETRY_AFTER_CAP_MS = 60_000;
 const RETRY_AFTER_DEFAULT_MS = 10_000;
-const REQUEST_TIMEOUT_MS = 120_000;
+const REQUEST_TIMEOUT_MS = 60_000;
 const HTTP_TOO_MANY_REQUESTS = 429;
 const HTTP_UNAUTHORIZED = 401;
 const HTTP_FORBIDDEN = 403;
@@ -62,14 +63,18 @@ function httpFailure(status) {
 
 /**
  * @param {{fetch: Function, now: () => Date, sleep?: (ms: number) => Promise<void>,
- *   provider: string, model?: string, key?: string}} io
+ *   provider: string, model?: string, key?: string, deadline?: Date}} io
+ *   deadline — no new request starts after it (the originals wait for this step)
  */
-export function createTranslator({ fetch, now, sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms)), provider, model, key }) {
+export function createTranslator({ fetch, now, sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms)), provider, model, key, deadline }) {
   const api = providerFor(provider);
   const usedModel = model || api?.defaultModel;
   const usage = { inputTokens: 0, outputTokens: 0, requests: 0 };
 
   async function post(request) {
+    if (deadline && now().getTime() >= deadline.getTime()) {
+      throw new TranslationDeferred(DEFER.timeout, 'the translation time of this run is used up');
+    }
     try {
       return await fetch(request.url, {
         method: 'POST',

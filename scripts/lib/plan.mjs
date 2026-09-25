@@ -1,5 +1,6 @@
 // What the site should hold for the selected notes, and the difference from
-// what it holds now: create | update | delete | unchanged, plus errors.
+// what it holds now: create | update | delete | unchanged, plus errors, plus
+// the machine translations the site lacks (translate) — PLAN v2 §11.9.
 // Pure: every file read happens in scripts/import-from-drafta.mjs, which hands
 // the results in.
 import { renderBlogFrontmatter, renderDocsFrontmatter } from './frontmatter.mjs';
@@ -9,6 +10,10 @@ const DOCS_INDEX_SLUG = 'index';
 // Drafta note ids are UUIDs. A file whose draftaId is anything else (the wave-2.0
 // fixtures use `fixture-*`) was not written by the exporter and is not its to delete.
 const DRAFTA_ID = /^[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}$/i;
+
+// Owner's decision 2026-09-25: Russian originals get an English twin; English
+// originals are never translated into Russian.
+export const TRANSLATION_DIRECTIONS = Object.freeze({ ru: 'en' });
 
 const SECTION_DIRS = {
   blog: { en: 'src/content/blog/en', ru: 'src/content/blog/ru' },
@@ -56,16 +61,19 @@ export function withoutTitleLine(body) {
 }
 
 /**
- * The full Markdown file for one selected note.
- * @param {{note: object, section: 'blog'|'docs', site: object, tags: string[], body: string, cover?: string}} page
- *   body — final Markdown (links rewritten); cover — `./<slug>/<file>` if the post has one.
+ * The full Markdown file for one selected note, or for its machine translation.
+ * @param {{note: object, section: 'blog'|'docs', site: object, tags: string[], body: string, cover?: string,
+ *   title?: string, machine?: {translation: object, banner?: string}}} page
+ *   body — final Markdown (links rewritten); cover — `./<slug>/<file>` if the post has one;
+ *   title — overrides the note's title (a translated one); machine — marks a machine translation.
  */
-export function renderPage({ note, section, site, tags, body, cover }) {
+export function renderPage({ note, section, site, tags, body, cover, title, machine }) {
   const common = {
-    title: note.title,
+    title: title ?? note.title,
     description: site.description,
     updated: isoDay(note.updatedAt),
     draftaId: note.id,
+    ...(machine ? { machineTranslated: true, translation: machine.translation } : {}),
   };
   // Docs get no `lang`/`slug`: Starlight reads `slug` as a URL override, and
   // the language comes from the folder.
@@ -79,7 +87,7 @@ export function renderPage({ note, section, site, tags, body, cover }) {
           tags,
           cover,
         })
-      : renderDocsFrontmatter({ ...common, order: site.order });
+      : renderDocsFrontmatter({ ...common, order: site.order, ...(machine?.banner ? { banner: { content: machine.banner } } : {}) });
   return `${frontmatter}\n${body}`;
 }
 
@@ -95,6 +103,8 @@ function findCollisions(pages) {
 
 function ownershipError(page, file, adopt) {
   if (file.draftaId === page.noteId) return null;
+  // Rule 1: a hand-written note always wins over a machine translation.
+  if (file.machineTranslated) return null;
   const adoptable = !isDraftaId(file.draftaId);
   if (adopt && adoptable) return null;
   if (adoptable) return `${file.path} exists without a Drafta draftaId — rerun with --adopt to take it over`;
@@ -105,12 +115,14 @@ function ownershipError(page, file, adopt) {
  * @param {object} input
  * @param {object[]} input.pages desired pages: {noteId, title, section, lang, slug, path, assetDir, url,
  *   text, assets: {changed: string[], stale: string[]}} — assets as compared by the caller
- * @param {object[]} input.existing site files: {path, assetDir, draftaId?, title, slug, lang, section, url, text}
+ * @param {object[]} input.existing site files: {path, assetDir, draftaId?, title, slug, lang, section, url, text,
+ *   machineTranslated?, translation?}
  * @param {Map<string,string>} input.skipped noteId → why it is not published (drives delete reasons)
  * @param {Set<string>} input.protectedIds notes on disk this run could not judge (sealed, unreadable,
  *   failed): their files stay as they are
  * @param {boolean} [input.adopt] take over files that carry no Drafta draftaId
- * @returns {{create: object[], update: object[], delete: object[], unchanged: object[], errors: object[]}}
+ * @returns {{create: object[], update: object[], delete: object[], unchanged: object[], errors: object[],
+ *   translate: object[]}} translate — machine translations to make or check against their cache
  */
 export function buildPlan({ pages, existing, skipped, protectedIds, adopt = false }) {
   const result = { create: [], update: [], delete: [], unchanged: [], errors: [] };
@@ -140,13 +152,19 @@ export function buildPlan({ pages, existing, skipped, protectedIds, adopt = fals
     } else if (file.text === page.text && page.assets.changed.length === 0 && page.assets.stale.length === 0) {
       result.unchanged.push(entry(page));
     } else {
-      result.update.push(entry(page, { page, adopted: file.draftaId !== page.noteId }));
+      const replacedAuto = file.draftaId !== page.noteId && Boolean(file.machineTranslated);
+      result.update.push(entry(page, { page, adopted: file.draftaId !== page.noteId && !replacedAuto, replacedAuto }));
     }
   }
+
+  const twins = translationTwins(pages.filter((page) => !collisions.has(page)));
+  const deleting = new Set();
 
   for (const file of existing) {
     const owner = file.draftaId;
     if (keptPaths.has(file.path) || !isDraftaId(owner) || protectedIds.has(owner) || failedIds.has(owner)) continue;
+    if (file.machineTranslated && twins.get(owner)?.path === file.path) continue;
+    deleting.add(file.path);
     const movedTo = publishedPaths.get(owner);
     result.delete.push({
       title: file.title,
@@ -159,5 +177,46 @@ export function buildPlan({ pages, existing, skipped, protectedIds, adopt = fals
       reason: movedTo ? `moved to ${movedTo}` : (skipped.get(owner) ?? 'note removed from the library'),
     });
   }
+
+  result.translate = translationJobs(twins, { existingByPath, keptPaths, deleting });
   return result;
+}
+
+/** noteId → where the machine translation of that published page would live. */
+function translationTwins(pages) {
+  const twins = new Map();
+  for (const page of pages) {
+    const to = TRANSLATION_DIRECTIONS[page.lang];
+    if (!to) continue;
+    twins.set(page.noteId, { page, from: page.lang, to, ...pageTarget(page.section, to, page.slug) });
+  }
+  return twins;
+}
+
+/**
+ * A twin is translated only where nothing hand-written stands: the path is
+ * free, is being deleted in this plan, or holds this note's own machine translation.
+ */
+function translationJobs(twins, { existingByPath, keptPaths, deleting }) {
+  const jobs = [];
+  for (const [noteId, twin] of twins) {
+    if (keptPaths.has(twin.path)) continue;
+    const file = existingByPath.get(twin.path);
+    const free = !file || deleting.has(twin.path);
+    const ownAuto = file && file.machineTranslated && file.draftaId === noteId;
+    if (!free && !ownAuto) continue;
+    jobs.push({
+      noteId,
+      title: twin.page.title,
+      slug: twin.page.slug,
+      section: twin.page.section,
+      from: twin.from,
+      to: twin.to,
+      path: twin.path,
+      assetDir: twin.assetDir,
+      url: twin.url,
+      existing: ownAuto ? file : null,
+    });
+  }
+  return jobs;
 }
