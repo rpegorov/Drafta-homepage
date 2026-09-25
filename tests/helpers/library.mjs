@@ -35,7 +35,8 @@ export const ID = {
 };
 
 const SITE_DIRS = ['src/content/blog/en', 'src/content/blog/ru', 'src/content/docs/docs', 'src/content/docs/ru/docs'];
-const GIT_ENV = {
+/** A fixed git identity: CI builders (Cloudflare) have none configured. */
+export const GIT_ENV = {
   GIT_AUTHOR_NAME: 'Tester',
   GIT_AUTHOR_EMAIL: 'tester@example.invalid',
   GIT_COMMITTER_NAME: 'Tester',

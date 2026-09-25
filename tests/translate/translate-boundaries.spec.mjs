@@ -12,7 +12,7 @@ import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { contractFile } from '../helpers/contract.mjs';
 import { ROOT } from '../helpers/dist.mjs';
-import { EXPORTER, ID, makeWorld, runExporter, sitePost, slugs } from '../helpers/library.mjs';
+import { EXPORTER, GIT_ENV, ID, makeWorld, runExporter, sitePost, slugs } from '../helpers/library.mjs';
 import { execError, isCli, makeClock, makeExec, makeHome, makeNotify, runPublisher } from '../helpers/publisher.mjs';
 
 const FAKE_PROVIDER = join(ROOT, 'tests/helpers/fake-provider.mjs');
@@ -55,7 +55,7 @@ function realExporter(w, providerLog) {
     if (/\bsecurity\b.*find-generic-password/.test(call.line)) return 'sk-ant-fake\n';
     if (/rev-parse/.test(call.line)) return 'abc1234\n';
     if (!isCli(call)) return undefined;
-    const env = { ...process.env, ...(call.opts.env ?? {}), HOME: w.home, FAKE_PROVIDER_MODE: 'echo', FAKE_PROVIDER_LOG: providerLog };
+    const env = { ...process.env, ...(call.opts.env ?? {}), ...GIT_ENV, HOME: w.home, FAKE_PROVIDER_MODE: 'echo', FAKE_PROVIDER_LOG: providerLog };
     const r = spawnSync(process.execPath, ['--import', FAKE_PROVIDER, ...retarget(call.args, w)], { cwd: ROOT, encoding: 'utf8', env, timeout: 60000 });
     try {
       outputs.push(JSON.parse(r.stdout.trim()));
