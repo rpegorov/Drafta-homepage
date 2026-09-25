@@ -26,4 +26,4 @@ The server never had it, so it cannot be recovered. The notes on your Mac stay p
 
 Every new account gets a 30-day trial, no card required. When it ends without a plan, Drafta becomes read-only: you can open, search and read every note, while creating, editing and exporting wait for a plan — monthly or yearly.
 
-There is one plan; the two billing periods differ in how you pay, not in what you get. Card payment is not connected yet, so nothing is charged today.
+There is one plan; the two billing periods differ in how you pay, not in what you get. Payment is not connected yet, so nothing is charged today.

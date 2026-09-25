@@ -188,7 +188,7 @@ export const en: LandingCopy = {
     title: 'One plan, everything included.',
     lead: 'Monthly or annual billing for the same app. Every new account starts with a 30-day trial — no card needed.',
     trialHtml:
-      '<strong>30-day trial on every new account</strong> — no card required. When it ends, the app turns read-only until you pick a billing period, monthly or yearly: every note stays on your Mac and stays readable. There is no second tier and no lifetime licence. Card payment is not connected yet, so nothing is charged today.',
+      '<strong>30-day trial on every new account</strong> — no card required. When it ends, the app turns read-only until you pick a billing period, monthly or yearly: every note stays on your Mac and stays readable. There is no second tier and no lifetime licence. Payment is not connected yet, so nothing is charged today.',
     noteHtml:
       'The plan includes the full app: CodeMirror 6 editor, notebooks, tags, statuses, revision history, themes, import and export. The two billing periods differ in how you pay, not in what you get. Prices are in US dollars.',
   },
@@ -211,7 +211,7 @@ export const en: LandingCopy = {
       },
       {
         q: 'Is there a trial, and does it need a card?',
-        html: 'Every new account gets 30 days, and no card is needed to start. When the trial ends, Drafta turns read-only: you can open, search and read every note, while creating, editing and exporting wait for a plan — monthly or yearly. Card payment is not connected yet.',
+        html: 'Every new account gets 30 days, and no card is needed to start. When the trial ends, Drafta turns read-only: you can open, search and read every note, while creating, editing and exporting wait for a plan — monthly or yearly. Payment is not connected yet.',
       },
       {
         q: 'Where do my notes live?',
