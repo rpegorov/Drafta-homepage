@@ -8,9 +8,9 @@ updated: '2026-09-25'
 
 ## The service
 
-Drafta is a native macOS Markdown editor with an optional cloud sync service.
-The desktop app works fully offline; cloud sync, encrypted backup and
-multi-device access require a Drafta account and an active subscription.
+Drafta is a native macOS Markdown editor with a cloud sync service. The app
+requires a Drafta account; creating, editing and exporting notes require an
+active trial or a paid billing period.
 
 ## Trial
 
@@ -31,15 +31,16 @@ Until it is, subscriptions and payment are not available from this site.
 ## Read-only mode
 
 If the trial ends without a subscription, or a billing period ends without
-payment for the next one, the account and its synced notes switch to
-read-only mode: existing data remains accessible, but new changes cannot be
-synced until the account is paid again.
+payment for the next one, the whole app switches to read-only mode: you can
+still open, search and read every note, while creating, editing and exporting
+wait until the account is paid again.
 
 ## Self-hosting
 
-Drafta can instead be pointed at a CouchDB instance you run yourself. In that
-mode your notes and account data stay on your own server, and this section's
-billing terms do not apply to that data.
+Drafta can instead sync your notes to a CouchDB instance you run yourself. In
+that mode your notes are stored on your own server. Your account — email,
+plan and licence status — is still held by the Drafta service, and an account
+is still required.
 
 ## Account deletion
 

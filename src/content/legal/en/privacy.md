@@ -31,9 +31,10 @@ cannot read.
 
 ## Self-hosting
 
-If you connect Drafta to a CouchDB instance you run yourself, your account
-and note data stay on your own server instead of Drafta's, and this policy's
-server-side storage section does not apply to that data.
+If you connect Drafta to a CouchDB instance you run yourself, your notes are
+stored on your own server instead of Drafta's. Your account — email, plan and
+licence status — is still stored by the Drafta service, and an account is
+still required.
 
 ## Account deletion
 
