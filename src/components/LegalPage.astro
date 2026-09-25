@@ -1,0 +1,34 @@
+---
+/* One legal page (terms/privacy/refund/contact) in one language. Body copy and
+   the noindex flag live in src/content/legal/<lang>/<slug>.md; this component
+   only supplies the Base frame and the shared .legal typography. */
+import Base from '../layouts/Base.astro';
+import { getEntry, render } from 'astro:content';
+import { localePath } from '../lib/lang';
+import type { Lang } from '../lib/types';
+
+interface Props {
+  lang: Lang;
+  slug: 'terms' | 'privacy' | 'refund' | 'contact';
+}
+
+const { lang, slug } = Astro.props;
+const entry = await getEntry('legal', `${lang}/${slug}`);
+if (!entry) throw new Error(`content/legal/${lang}/${slug}.md is missing`);
+const { Content } = await render(entry);
+---
+<Base lang={lang} title={`${entry.data.title} — Drafta`} description={entry.data.description} canonicalPath={localePath(`/${slug}/`, lang)} noindex={entry.data.noindex}>
+  <article class="wrap wrap--narrow legal">
+    <h1 class="h1">{entry.data.title}</h1>
+    <Content />
+  </article>
+</Base>
+
+<style>
+  .legal{padding-block:var(--space-8)}
+  .legal :global(h2){font-family:var(--font-display);font-weight:600;font-size:var(--text-h2);line-height:1.2;letter-spacing:-0.01em;color:var(--ink);margin:var(--space-8) 0 var(--space-4)}
+  .legal :global(ul){margin:0 0 var(--space-4);padding-inline-start:var(--space-5)}
+  .legal :global(li){margin-bottom:var(--space-2)}
+  .legal :global(hr){margin:var(--space-8) 0}
+  .legal :global(em){color:var(--ink-soft)}
+</style>

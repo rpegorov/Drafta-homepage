@@ -3,11 +3,39 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import sitemap from '@astrojs/sitemap';
+import { readdirSync, readFileSync } from 'node:fs';
 
-// Pages that stay out of the sitemap: auth/checkout flows, the legal pages
-// (noindex for now, wave 3 revisits them) and the bilingual 404, in either
-// language twin. Keep in sync with the noindex pages themselves.
-const SITEMAP_EXCLUDED = /^\/(ru\/)?(login|register|verify|checkout|terms|privacy|refund|contact|404)(\/|$)/;
+// Pages that stay out of the sitemap: auth/checkout flows and the bilingual
+// 404, in either language twin. Keep in sync with the noindex pages themselves.
+const SITEMAP_EXCLUDED = /^\/(ru\/)?(login|register|verify|checkout|404)(\/|$)/;
+
+const LEGAL_DIR = new URL('./src/content/legal/', import.meta.url);
+const FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---/;
+const NOINDEX_KEY = /^noindex:\s*true\s*$/m;
+
+function isNoindexEntry(file) {
+  const frontmatter = FRONTMATTER.exec(readFileSync(new URL(file, LEGAL_DIR), 'utf8'))?.[1] ?? '';
+  return NOINDEX_KEY.test(frontmatter);
+}
+
+// "ru/terms.md" -> "/ru/terms/", "en/terms.md" -> "/terms/"
+function legalPath(file) {
+  const [lang, name] = file.replace(/\.md$/, '').split('/');
+  return lang === 'ru' ? `/ru/${name}/` : `/${name}/`;
+}
+
+// Legal pages whose frontmatter says `noindex: true` — the same key
+// LegalPage.astro turns into robots noindex, so the two cannot disagree.
+const LEGAL_NOINDEX = new Set(
+  readdirSync(LEGAL_DIR, { recursive: true })
+    .map((file) => String(file).replaceAll('\\', '/'))
+    .filter((file) => file.endsWith('.md') && isNoindexEntry(file))
+    .map(legalPath),
+);
+
+function inSitemap(pathname) {
+  return !SITEMAP_EXCLUDED.test(pathname) && !LEGAL_NOINDEX.has(pathname);
+}
 
 export default defineConfig({
   site: 'https://drafta.org',
@@ -28,7 +56,7 @@ export default defineConfig({
     // own @astrojs/sitemap when none is configured, so this instance (with the
     // noindex filter) is the only one in the build.
     sitemap({
-      filter: (page) => !SITEMAP_EXCLUDED.test(new URL(page).pathname),
+      filter: (page) => inSitemap(new URL(page).pathname),
       i18n: {
         defaultLocale: 'en',
         locales: { en: 'en', ru: 'ru' },

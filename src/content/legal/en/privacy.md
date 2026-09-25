@@ -2,6 +2,7 @@
 title: 'Privacy Policy'
 description: 'What Drafta stores about your account and your synced notes, and how note content is encrypted.'
 updated: '2026-09-25'
+noindex: true
 owner:
   - 'seller identity and contact are placeholders — see the entries below.'
   - 'jurisdiction placeholder — replace with the seller''s actual jurisdiction.'

@@ -20,6 +20,10 @@ const legal = defineCollection({
     // Editorial notes for the seller about placeholder text on the page. They
     // live in frontmatter so they never reach the published HTML.
     owner: z.array(z.string()).default([]),
+    // True while the page is not ready to be indexed: it adds robots noindex
+    // to the page and keeps it out of the sitemap (astro.config.mjs reads this
+    // same frontmatter key).
+    noindex: z.boolean().default(false),
   }),
 });
 

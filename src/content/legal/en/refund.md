@@ -2,6 +2,7 @@
 title: 'Refund Policy'
 description: 'How refunds work for Drafta subscriptions billed per period in cryptocurrency.'
 updated: '2026-09-25'
+noindex: true
 owner:
   - 'seller identity, contact and the refund window below are placeholders.'
   - 'refund window and condition are a placeholder rule pending the seller''s decision.'

@@ -2,6 +2,7 @@
 title: 'Terms of Service'
 description: 'The terms for using Drafta: the trial, billing, read-only mode after a lapsed period, and account deletion.'
 updated: '2026-09-25'
+noindex: true
 owner:
   - 'seller identity, jurisdiction and contact are placeholders — see the entries below.'
   - 'payment provider is not connected yet; this section names the accepted currencies only, not a processor.'

@@ -2,6 +2,7 @@
 title: 'Contact'
 description: 'How to reach Drafta and who sells the subscription.'
 updated: '2026-09-25'
+noindex: true
 owner:
   - 'everything below is a placeholder — seller identity, contact address and jurisdiction.'
   - 'seller identity placeholder — self-employed / NPD taxpayer status is real, the name and INN are not.'
