@@ -115,8 +115,11 @@ function parseExporterJson(stdout) {
 /** Exit 1 still carries the JSON (per-note errors); no JSON at all is a failed run. */
 async function runExporter(ctx, { commit, branch, translation }) {
   const options = { cwd: ctx.paths.clone, env: exporterEnv(ctx.env, translation), maxBuffer: EXPORTER_MAX_BUFFER, timeout: EXPORTER_TIMEOUT_MS };
+  const pending = ctx.exec(ctx.node, exporterArgs(ctx.paths, { commit, branch, translate: Boolean(translation) }), options);
+  // promisified execFile exposes the child: a signal to the publisher stops the exporter too.
+  if (pending.child) ctx.children.add(pending.child);
   try {
-    const { stdout } = await ctx.exec(ctx.node, exporterArgs(ctx.paths, { commit, branch, translate: Boolean(translation) }), options);
+    const { stdout } = await pending;
     const result = parseExporterJson(stdout);
     if (!result) throw new RunError(`exporter printed no JSON: ${firstLine(stdout || '(empty)')}`);
     return result;
@@ -125,6 +128,8 @@ async function runExporter(ctx, { commit, branch, translation }) {
     const result = parseExporterJson(error.stdout ?? '');
     if (result) return result;
     throw new RunError(`exporter failed: ${errorLine(error)}`);
+  } finally {
+    if (pending.child) ctx.children.delete(pending.child);
   }
 }
 
@@ -272,9 +277,11 @@ function translationNotifications(events, result, { pushed }) {
  * Books the run into state.json and tells the owner. Every run that got an
  * exporter result ends here — also one whose push failed, so the characters a
  * translation cost still count against the day's budget.
+ * @param {{pushed: boolean, translationsPushed: boolean}} what reached origin:
+ *   the originals (announced as published) and the translations (announced as translated)
  * @returns {Promise<{code: number, state: object}>}
  */
-async function finish(ctx, state, result, { pushed }) {
+async function finish(ctx, state, result, { pushed, translationsPushed }) {
   ctx.log(summaryLine(result, { pushed }));
   logTranslations(ctx, result);
   if (ctx.env.PUBLISHER_VERBOSE === '1') ctx.log(`exporter: ${JSON.stringify(result)}`);
@@ -284,7 +291,7 @@ async function finish(ctx, state, result, { pushed }) {
   await sendAll(ctx, [
     ...(pushed ? changeNotifications(result) : []),
     ...problems.notifications,
-    ...translationNotifications(booked.events, result, { pushed }),
+    ...translationNotifications(booked.events, result, { pushed: translationsPushed }),
   ]);
   const next = { ...booked.state, announcedProblems: problems.announced };
   writeState(ctx.paths.state, next);
@@ -304,15 +311,42 @@ function withoutGitFailure(result) {
   return { ...result, errors: (result.errors ?? []).filter((error) => !isGitError(error)) };
 }
 
+const pageKey = (entry) => entry.path ?? entry.slug;
+const translationKey = (entry) => `${entry.slug}\n${entry.to ?? ''}`;
+
+/** Entries of both attempts by key; `prefer` decides when the same key appears in both. */
+function unionBy(previous, latest, key, prefer = (_earlier, later) => later) {
+  const byKey = new Map(previous.map((entry) => [key(entry), entry]));
+  for (const entry of latest) byKey.set(key(entry), byKey.has(key(entry)) ? prefer(byKey.get(key(entry)), entry) : entry);
+  return [...byKey.values()];
+}
+
 /**
- * A retry after a rejected push sees the pages of the first attempt as
- * unchanged (they are still committed in the clone), so the two results are
- * merged: the owner is told about every page the run put on origin.
+ * A retry after a rejected push sees the work of the first attempt as already
+ * done (its pages are unchanged, its translations cached), so the two results
+ * are merged: every page the run put on origin is announced, a translation
+ * paid for on attempt 1 keeps its provider record over the retry's `cached`,
+ * and the characters of both attempts count against the budget.
  */
 function mergeAttempts(previous, latest) {
   if (!previous) return latest;
-  const union = (key) => [...new Map([...(previous[key] ?? []), ...(latest[key] ?? [])].map((entry) => [entry.path ?? entry.slug, entry])).values()];
-  return { ...latest, created: union('created'), updated: union('updated'), deleted: union('deleted') };
+  const paidFirst = (earlier, later) => (later.cached && !earlier.cached ? earlier : later);
+  return {
+    ...latest,
+    pushed: previous.pushed === true || latest.pushed === true,
+    created: unionBy(previous.created ?? [], latest.created ?? [], pageKey),
+    updated: unionBy(previous.updated ?? [], latest.updated ?? [], pageKey),
+    deleted: unionBy(previous.deleted ?? [], latest.deleted ?? [], pageKey),
+    translated: unionBy(previous.translated ?? [], latest.translated ?? [], translationKey, paidFirst),
+    translationDeferred: unionBy(previous.translationDeferred ?? [], latest.translationDeferred ?? [], translationKey),
+    translationChars: (previous.translationChars ?? 0) + (latest.translationChars ?? 0),
+  };
+}
+
+/** The retry may spend only what the first attempt left of the run's budget. */
+function remainingTranslation(translation, spent) {
+  if (!translation) return null;
+  return { ...translation, maxChars: Math.max(0, translation.maxChars - spent) };
 }
 
 /** First attempt: the clone becomes origin/<branch>. Retry: its unpushed commits are replayed on top instead. */
@@ -333,16 +367,19 @@ async function publish(ctx, initialState) {
       if (isOffline(error)) return deferOffline(ctx, state, error);
       throw new RunError(`git fetch failed: ${errorLine(error)}`);
     }
-    merged = mergeAttempts(merged, await runExporter(ctx, { commit: true, branch, translation }));
+    const budget = remainingTranslation(translation, merged?.translationChars ?? 0);
+    merged = mergeAttempts(merged, await runExporter(ctx, { commit: true, branch, translation: budget }));
     const failure = gitFailure(merged);
-    if (!failure) return (await finish(ctx, state, merged, { pushed: merged.pushed === true })).code;
+    // `pushed` is the originals' push: true also when only a later translation push failed.
+    const pushed = merged.pushed === true;
+    if (!failure) return (await finish(ctx, state, merged, { pushed, translationsPushed: pushed })).code;
     if (isOffline(failure)) {
-      const done = await finish(ctx, state, withoutGitFailure(merged), { pushed: false });
+      const done = await finish(ctx, state, withoutGitFailure(merged), { pushed, translationsPushed: false });
       return deferOffline(ctx, done.state, failure, merged);
     }
     if (!isRejected(failure)) throw new RunError(`git push failed: ${firstLine(failure.message)}`);
     if (attempt >= PUSH_ATTEMPTS) {
-      await finish(ctx, state, withoutGitFailure(merged), { pushed: false });
+      await finish(ctx, state, withoutGitFailure(merged), { pushed, translationsPushed: false });
       ctx.log(`push rejected twice: origin/${branch} moved ahead — ${firstLine(failure.message)}`);
       await sendAll(ctx, [{ title: 'Не опубликовано: origin ушёл вперёд', body: `origin/${branch} изменился во время публикации; повторю на следующем прогоне.` }]);
       return EXIT_FAILED;
@@ -377,6 +414,7 @@ function context(io) {
     exec,
     // Every git call of the run: the publisher's env (GIT_SSH_COMMAND) and a bounded wait.
     gitExec: (file, args, options) => exec(file, args, { ...options, env, timeout: GIT_TIMEOUT_MS }),
+    children: new Set(),
     now,
     node: io.node ?? process.execPath,
     sleep: io.sleep ?? ((ms) => new Promise((resolve) => setTimeout(resolve, ms))),
@@ -399,6 +437,9 @@ export async function run(io = {}) {
     return EXIT_OK;
   }
   const onSignal = (signal) => {
+    // The exporter goes first: a lock freed under a still-running child would
+    // let the next run's git meet this one's in the same clone.
+    for (const child of ctx.children) child.kill(signal);
     releaseLock(ctx.paths.lock);
     ctx.log(`stopped by ${signal}`);
     process.exit(EXIT_SIGNAL_BASE + constants.signals[signal]);
