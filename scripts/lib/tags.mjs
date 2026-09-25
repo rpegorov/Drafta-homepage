@@ -2,7 +2,7 @@
 // Tags are not stored in a note file — the app derives them from the body on
 // every load — so the exporter must run the same rules or every note looks
 // untagged. It must port `parse`, not `tags(in:)`: the latter keeps only the
-// leaf of a path tag, and `#site/blog` would become indistinguishable from
+// leaf of a path tag, and `#drafta/blog` would become indistinguishable from
 // `#blog` (brain: Drafta TagExtraction.tags returns only the leaf of a path tag).
 
 // ICU `\w` (NSRegularExpression) is Unicode-aware; JS `\w` is ASCII even with
@@ -127,7 +127,7 @@ export function mapProse(content, fn) {
     .join('\n');
 }
 
-// A run of tags that ends a line: `… text. #site/blog #drafta`.
+// A run of tags that ends a line: `… text. #drafta/blog #swift`.
 const TRAILING_TAGS = /(^|[ \t])((?:#[^\s#`]+[ \t]*)+)$/u;
 
 function withoutTrailingTags(line, wanted) {
@@ -141,7 +141,7 @@ function withoutTrailingTags(line, wanted) {
 }
 
 /**
- * Removes the given full-path tags (e.g. `site/blog`) where they trail a line
+ * Removes the given full-path tags (e.g. `drafta/blog`) where they trail a line
  * of prose — they are publishing switches, not text for readers. A tag in the
  * middle of a sentence stays: cutting it would break the sentence.
  */
@@ -180,7 +180,7 @@ export function parseTags(content) {
 }
 
 /**
- * Every tag of a note by its full path (`site/blog`, not `blog`): body tags
+ * Every tag of a note by its full path (`drafta/blog`, not `blog`): body tags
  * plus front matter `extraTags`, lowercased, unique, sorted.
  */
 export function fullTags(content, extraTags = []) {

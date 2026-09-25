@@ -37,7 +37,8 @@ import { parseFrontmatter } from './lib/frontmatter.mjs';
 import { aheadOfOrigin, commitPaths, defaultExec, pushFastForward } from './lib/git.mjs';
 import { decodeNote } from './lib/notes.mjs';
 import { buildPlan, contentDirs, pageTarget, renderPage, withoutTitleLine } from './lib/plan.mjs';
-import { SECTION_TAGS, SKIP, selectNote } from './lib/select.mjs';
+import { PublishConfigError, readPublishConfig } from './lib/publish-config.mjs';
+import { sectionTagsFor, selectNote, skipReasons } from './lib/select.mjs';
 import { isValidSlug } from './lib/site-block.mjs';
 import { removeTags } from './lib/tags.mjs';
 import { MINUTE_MS } from './lib/time.mjs';
@@ -107,11 +108,15 @@ function noteIdFromFile(file) {
 }
 
 /**
- * Reads and judges every note of the library.
+ * Reads and judges every note of the library. A candidate's body has the site's
+ * section tags already cut out: they are publishing switches, not text.
+ * @param {{blog: string, docs: string}} sectionTags the tags that publish to this site
  * @returns {{candidates: object[], skipped: object[], errors: object[], skippedIds: Map, protectedIds: Set}}
  */
-function readLibrary(library) {
+function readLibrary(library, sectionTags) {
   const notesDir = join(library, 'notes');
+  const SKIP = skipReasons(sectionTags);
+  const switches = Object.values(sectionTags);
   const result = { candidates: [], skipped: [], errors: [], skippedIds: new Map(), protectedIds: new Set() };
   for (const file of readdirSync(notesDir).filter((name) => NOTE_FILE.test(name)).sort()) {
     const decoded = decodeNote(readFileSync(join(notesDir, file), 'utf8'));
@@ -123,7 +128,7 @@ function readLibrary(library) {
       continue;
     }
     const { note } = decoded;
-    const verdict = selectNote(note);
+    const verdict = selectNote(note, sectionTags);
     if (verdict.verdict === 'skip') {
       result.skippedIds.set(note.id, verdict.reason);
       result.skipped.push({ title: note.title, reason: verdict.reason });
@@ -131,7 +136,8 @@ function readLibrary(library) {
       result.protectedIds.add(note.id);
       result.errors.push({ title: note.title, message: verdict.message, noteId: note.id });
     } else {
-      result.candidates.push({ note, ...verdict, target: pageTarget(verdict.section, verdict.site.lang, verdict.site.slug) });
+      const target = pageTarget(verdict.section, verdict.site.lang, verdict.site.slug);
+      result.candidates.push({ note, ...verdict, body: removeTags(verdict.body, switches), target });
     }
   }
   return result;
@@ -181,7 +187,7 @@ function titleIndex(candidates) {
 
 /** The note's Markdown as the site shows it, before links and attachments are rewritten. */
 function sourceBody(candidate) {
-  return removeTags(withoutTitleLine(candidate.body), Object.values(SECTION_TAGS));
+  return withoutTitleLine(candidate.body);
 }
 
 /** The note as written: its own language, title, description and body. */
@@ -461,8 +467,8 @@ function buildPages(candidates, context) {
   return out;
 }
 
-function planRun(options) {
-  const library = readLibrary(options.library);
+function planRun(options, { tagNamespace }) {
+  const library = readLibrary(options.library, sectionTagsFor(tagNamespace));
   const roots = attachmentRoots(options.library);
   let context = { links: titleIndex(library.candidates), roots, site: options.site };
   let built = buildPages(library.candidates, context);
@@ -545,7 +551,16 @@ async function main(argv) {
     return EXIT_FAILED;
   }
 
-  const run = planRun(options);
+  let config;
+  try {
+    config = readPublishConfig(options.site);
+  } catch (error) {
+    if (!(error instanceof PublishConfigError)) throw error;
+    reportFailure(options.json, 'config', error.message);
+    return EXIT_FAILED;
+  }
+
+  const run = planRun(options, config);
   const emptiness = libraryLooksEmpty(run);
   if (emptiness) {
     reportFailure(options.json, 'library looks empty', emptiness);
