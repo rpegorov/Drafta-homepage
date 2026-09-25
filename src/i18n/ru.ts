@@ -47,7 +47,7 @@ export const ru: Messages = {
   footerProduct: 'Продукт',
   footerFeatures: 'Возможности',
   footerPricing: 'Тарифы',
-  footerPlans: 'Тарифы',
+  footerPlans: 'Выбрать тариф',
   footerAccount: 'Аккаунт',
   footerRegister: 'Создать аккаунт',
   footerSignIn: 'Войти',

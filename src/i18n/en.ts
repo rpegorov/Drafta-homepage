@@ -38,7 +38,7 @@ export const en = {
   footerProduct: 'Product',
   footerFeatures: 'Features',
   footerPricing: 'Pricing',
-  footerPlans: 'Plans',
+  footerPlans: 'Choose a plan',
   footerAccount: 'Account',
   footerRegister: 'Create account',
   footerSignIn: 'Sign in',

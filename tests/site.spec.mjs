@@ -120,6 +120,17 @@ describe('ЗАДАЧА-1.4 legal pages in the footer', () => {
     }
     expect(bad).toEqual([]);
   });
+
+  it('[-] no two footer links share a label: two different destinations must read differently', () => {
+    const bad = [];
+    for (const p of PAGES) {
+      const $ = loadRoute(p.route);
+      const labels = $('footer').last().find('a[href]').toArray().map((a) => $(a).text().trim()).filter(Boolean);
+      const repeated = labels.filter((label, i) => labels.indexOf(label) !== i);
+      if (repeated.length) bad.push(`${p.route}: repeated footer labels ${JSON.stringify([...new Set(repeated)])}`);
+    }
+    expect(bad).toEqual([]);
+  });
 });
 
 describe('ЗАДАЧА-1.5 docs', () => {
