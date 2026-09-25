@@ -10,22 +10,17 @@ export type Post = CollectionEntry<'blog'>;
 
 const INTL_LOCALE: Record<Lang, string> = { en: 'en-GB', ru: 'ru-RU' };
 
-/**
- * Newest day first. Within one day the posts run in the order they were
- * written (`created` ascending — a series reads in order; a release
- * announcement written first comes first); posts without `created` follow
- * those with it, then the title keeps the order stable.
- */
-export function byNewest(a: Post, b: Post): number {
-  return b.data.date.localeCompare(a.data.date) || byCreated(a, b) || a.data.title.localeCompare(b.data.title);
+// A post without `published` counts as midnight of its day in the owner's zone.
+const OWNER_OFFSET = '+03:00';
+
+/** The instant a post was published: `published`, or its day at 00:00 in the owner's zone. */
+export function publishedAt(post: Post): Date {
+  return new Date(post.data.published ?? `${post.data.date}T00:00:00${OWNER_OFFSET}`);
 }
 
-function byCreated(a: Post, b: Post): number {
-  const ca = a.data.created;
-  const cb = b.data.created;
-  if (ca && cb) return ca.localeCompare(cb);
-  if (ca || cb) return ca ? -1 : 1;
-  return 0;
+/** Newest first by publication instant; the same instant keeps a stable order by title. */
+export function byNewest(a: Post, b: Post): number {
+  return publishedAt(b).getTime() - publishedAt(a).getTime() || a.data.title.localeCompare(b.data.title);
 }
 
 /** Every post of one language, newest first. */

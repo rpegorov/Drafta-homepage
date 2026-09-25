@@ -48,8 +48,8 @@ const blog = defineCollection({
       lang: z.enum(['en', 'ru']),
       slug: z.string(),
       date: z.string().regex(DATE_ONLY, 'date must be YYYY-MM-DD'),
-      // ISO-8601 instant the note was created; orders posts within one date.
-      created: z.string().optional(),
+      // ISO-8601 publication instant with offset; the blog orders posts by it.
+      published: z.string().optional(),
       updated: z.string().regex(DATE_ONLY, 'updated must be YYYY-MM-DD'),
       draftaId: z.string(),
       tags: z.array(z.string()).default([]),

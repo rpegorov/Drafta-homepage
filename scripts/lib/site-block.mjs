@@ -6,7 +6,8 @@
 //   lang: ru
 //   description: Что умеет встроенный MCP-сервер
 //   order: 40            # docs: sidebar.order
-//   date: 2026-10-01     # blog: publication date (default: createdAt)
+//   date: 2026-10-01     # blog: publication day, or `2026-10-01 18:00` with the
+//                        # owner's time (Europe/Moscow); default: the note's createdAt
 //   cover: cover.png     # blog: OG picture, from the note's attachments
 //   publish: false       # take the page down now, whatever the status
 //   ```
@@ -19,7 +20,8 @@ const BLOCK_INFO = 'site';
 const LANGS = ['en', 'ru'];
 const DEFAULT_LANG = 'en';
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
+// `2026-10-01` or `2026-10-01 18:00` — the owner's wall-clock time (Europe/Moscow).
+const DATE_WITH_TIME = /^(\d{4}-\d{2}-\d{2})(?: ((?:[01]\d|2[0-3]):[0-5]\d))?$/;
 const COMMENT = /\s#(?:\s.*)?$/;
 const KNOWN_KEYS = ['slug', 'lang', 'description', 'date', 'order', 'cover', 'publish'];
 const PUBLISH_TRUE = 'true';
@@ -75,8 +77,11 @@ function validate(raw, problems) {
   if (!LANGS.includes(fields.lang)) problems.push(`lang "${fields.lang}" is not en or ru`);
   if (raw.description) fields.description = raw.description;
   if (raw.date) {
-    if (DATE_ONLY.test(raw.date)) fields.date = raw.date;
-    else problems.push(`date "${raw.date}" is not YYYY-MM-DD`);
+    const match = DATE_WITH_TIME.exec(raw.date);
+    if (match) {
+      fields.date = match[1];
+      if (match[2]) fields.time = match[2];
+    } else problems.push(`date "${raw.date}" is not YYYY-MM-DD or YYYY-MM-DD HH:MM`);
   }
   if (raw.order) {
     const order = Number(raw.order);

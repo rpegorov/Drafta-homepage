@@ -2,7 +2,7 @@
 import rss from '@astrojs/rss';
 import { t } from '../../i18n';
 import type { Lang } from '../../lib/types';
-import { blogIndexPath, postPath, postsOf, toDate } from './posts';
+import { blogIndexPath, postPath, postsOf, publishedAt } from './posts';
 
 export async function feed(lang: Lang, site: URL | undefined): Promise<Response> {
   if (!site) throw new Error('rss: `site` is not set in astro.config.mjs');
@@ -15,7 +15,7 @@ export async function feed(lang: Lang, site: URL | undefined): Promise<Response>
     items: posts.map((post) => ({
       title: post.data.title,
       description: post.data.description,
-      pubDate: toDate(post.data.date),
+      pubDate: publishedAt(post),
       link: new URL(postPath(lang, post.data.slug), site).href,
       categories: post.data.tags,
     })),

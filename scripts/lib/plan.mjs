@@ -4,6 +4,7 @@
 // Pure: every file read happens in scripts/import-from-drafta.mjs, which hands
 // the results in.
 import { renderBlogFrontmatter, renderDocsFrontmatter } from './frontmatter.mjs';
+import { ownerDay, publishedAt } from './published-at.mjs';
 
 export const SITE_URL = 'https://drafta.org';
 const DOCS_INDEX_SLUG = 'index';
@@ -83,9 +84,9 @@ export function renderPage({ note, section, site, tags, body, cover, title, mach
           ...common,
           lang: site.lang,
           slug: site.slug,
-          date: site.date ?? isoDay(note.createdAt),
+          date: site.date ?? ownerDay(note.createdAt),
           // Also on a translation: the twin sorts next to its original.
-          created: new Date(note.createdAt).toISOString(),
+          published: publishedAt(site, note.createdAt),
           tags,
           cover,
         })
