@@ -4,6 +4,7 @@
 // TranslationDeferred: a partial translation never leaves this module.
 // All IO is injected: {fetch, now, sleep, provider, model, key}.
 import { createHash } from 'node:crypto';
+import { MINUTE_MS, SECOND_MS } from '../lib/time.mjs';
 import { chunkText, maxTokensFor, systemPrompt } from './prompt.mjs';
 import { providerFor } from './providers.mjs';
 import { restore, segment } from './segment.mjs';
@@ -22,9 +23,9 @@ export const DEFER = Object.freeze({
 
 const ATTEMPTS_PER_CHUNK = 2;
 const RATE_LIMIT_RETRIES = 2;
-const RETRY_AFTER_CAP_MS = 60_000;
-const RETRY_AFTER_DEFAULT_MS = 10_000;
-const REQUEST_TIMEOUT_MS = 60_000;
+const RETRY_AFTER_CAP_MS = MINUTE_MS;
+const RETRY_AFTER_DEFAULT_MS = 10 * SECOND_MS;
+const REQUEST_TIMEOUT_MS = MINUTE_MS;
 const HTTP_TOO_MANY_REQUESTS = 429;
 const HTTP_UNAUTHORIZED = 401;
 const HTTP_FORBIDDEN = 403;

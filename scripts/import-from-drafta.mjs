@@ -39,8 +39,10 @@ import { decodeNote } from './lib/notes.mjs';
 import { buildPlan, contentDirs, pageTarget, renderPage, withoutTitleLine } from './lib/plan.mjs';
 import { SECTION_TAGS, SKIP, selectNote } from './lib/select.mjs';
 import { removeTags } from './lib/tags.mjs';
+import { MINUTE_MS } from './lib/time.mjs';
 import { rewriteWikilinks, titleKey } from './lib/wikilinks.mjs';
 import { languageName } from './translate/prompt.mjs';
+import { DEFAULT_MAX_CHARS_PER_RUN, parseHold, runTranslations } from './translate/policy.mjs';
 import { DEFER, TranslationDeferred, createTranslator, documentChars, sourceHash } from './translate/translate.mjs';
 
 const REPO_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -48,14 +50,9 @@ const DEFAULT_LIBRARY = join(homedir(), 'Library/Application Support/Drafta/Libr
 const NOTE_FILE = /\.md$/;
 const EXIT_OK = 0;
 const EXIT_FAILED = 1;
-const DEFAULT_TRANSLATE_MAX_CHARS = 60_000;
-// Translation step limits: the originals wait for it before the publisher
-// pushes, so it stops taking new work after this long.
-const DEFAULT_TRANSLATE_MAX_MS = 5 * 60_000;
-const HELD = 'held';
-const UNEXPECTED = 'error';
-// After one of these, every later request of the run would fail the same way.
-const RUN_WIDE_DEFERRALS = new Set([DEFER.noKey, DEFER.offline, DEFER.auth, DEFER.timeout]);
+// The translation step stops taking new work after this long: a hung provider
+// must not hold the publisher's lock.
+const DEFAULT_TRANSLATE_MAX_MS = 5 * MINUTE_MS;
 
 // The AI key is for the provider only: git and ssh (hooks, credential helpers)
 // never see it.
@@ -313,15 +310,6 @@ function envNumber(value, fallback) {
   return value !== undefined && value !== '' && Number.isFinite(number) && number >= 0 ? number : fallback;
 }
 
-function heldTranslations(value = '') {
-  return new Set(
-    value
-      .split(',')
-      .map((item) => item.trim())
-      .filter(Boolean),
-  );
-}
-
 /** The translated text as a page of the target language, marked as a machine translation. */
 function translatedVersion(job, candidate, done) {
   const original = pageTarget(job.section, job.from, job.slug);
@@ -366,17 +354,10 @@ async function translateJob(job, candidate, source, { translator, context }) {
   return { page: built.page, usage: usageDelta(before, translator.usage), model: done.translation.model };
 }
 
-/**
- * The translation step of a committed run (§11.9 rules 1–6): cache check by
- * source hash, publisher hold, per-run character budget, then one document at
- * a time. Never throws — the originals are already committed.
- */
-async function translateAll(options, run, env) {
-  const out = { translated: [], deferred: [], chars: 0, sha: undefined, errors: [] };
+/** The translation step of a committed run: the IO around scripts/translate/policy.mjs. */
+function translateAll(options, run, env) {
   const candidates = new Map(run.library.candidates.map((candidate) => [candidate.note.id, candidate]));
-  const hold = heldTranslations(env.DRAFTA_TRANSLATE_HOLD);
-  let budget = envNumber(env.DRAFTA_TRANSLATE_MAX_CHARS, DEFAULT_TRANSLATE_MAX_CHARS);
-  let stopper = null;
+  const sources = new Map(run.plan.translate.map((job) => [job.noteId, originalVersion(candidates.get(job.noteId))]));
   const now = () => new Date();
   const translator = createTranslator({
     fetch: globalThis.fetch,
@@ -385,51 +366,19 @@ async function translateAll(options, run, env) {
     key: env.DRAFTA_AI_KEY,
     deadline: new Date(now().getTime() + envNumber(env.DRAFTA_TRANSLATE_MAX_MS, DEFAULT_TRANSLATE_MAX_MS)),
   });
-
-  for (const job of run.plan.translate) {
-    const candidate = candidates.get(job.noteId);
-    const source = originalVersion(candidate);
-    const hash = sourceHash(source);
-    const base = { slug: job.slug, title: job.title, from: job.from, to: job.to };
-    const defer = (reason, detail) => out.deferred.push({ ...base, reason, ...(detail ? { detail } : {}), sourceHash: hash });
-    if (job.existing?.translation?.sourceHash === hash) {
-      out.translated.push({ ...base, cached: true });
-      continue;
-    }
-    if (hold.has(`${job.slug}:${hash}`)) defer(HELD);
-    else if (stopper) defer(stopper.reason, stopper.detail);
-    else if (documentChars(source) > budget) defer(DEFER.quota, `needs ${documentChars(source)} characters, ${budget} left this run`);
-    else {
-      budget -= documentChars(source);
-      out.chars += documentChars(source);
-      let result;
-      try {
-        result = await translateJob(job, candidate, source, { translator, context: run.context });
-      } catch (error) {
-        const deferral = error instanceof TranslationDeferred ? error : new TranslationDeferred(UNEXPECTED, error?.message ?? String(error));
-        if (RUN_WIDE_DEFERRALS.has(deferral.reason)) stopper = deferral;
-        defer(deferral.reason, deferral.detail);
-        continue;
-      }
-      try {
-        out.sha = (await publishTranslation(options, job, result.page)) ?? out.sha;
-      } catch (error) {
-        out.errors.push({ title: 'git', message: (error.stderr || error.message || String(error)).trim() });
-        break;
-      }
-      out.translated.push({
-        ...base,
-        cached: false,
-        url: result.page.url,
-        path: result.page.path,
-        provider: env.DRAFTA_AI_PROVIDER,
-        model: result.model,
-        usage: result.usage,
-        chars: documentChars(source),
-      });
-    }
-  }
-  return out;
+  const jobs = run.plan.translate.map((job) => {
+    const source = sources.get(job.noteId);
+    return { job, hash: sourceHash(source), chars: documentChars(source) };
+  });
+  const limits = {
+    budget: envNumber(env.DRAFTA_TRANSLATE_MAX_CHARS, DEFAULT_MAX_CHARS_PER_RUN),
+    hold: parseHold(env.DRAFTA_TRANSLATE_HOLD),
+    provider: env.DRAFTA_AI_PROVIDER,
+  };
+  return runTranslations(jobs, limits, {
+    translate: (job) => translateJob(job, candidates.get(job.noteId), sources.get(job.noteId), { translator, context: run.context }),
+    publish: (job, page) => publishTranslation(options, job, page),
+  });
 }
 
 // ── Output ─────────────────────────────────────────────────────────────────

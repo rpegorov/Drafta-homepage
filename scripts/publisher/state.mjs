@@ -2,6 +2,7 @@
 // survives between launchd runs — every run is a fresh process.
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
+import { HOUR_MS } from '../lib/time.mjs';
 
 export const EMPTY_STATE = Object.freeze({ lastNotifiedReason: null, lastNotifiedAt: null, announcedProblems: [] });
 
@@ -41,8 +42,6 @@ export function markNotified(state, reason, at) {
 // state.translations = {pending: {slug: {reason, attempts, nextAfter, sourceHash,
 // title, disabled?}}, day: {date: 'YYYY-MM-DD', chars}}.
 
-export const MINUTE_MS = 60_000;
-export const HOUR_MS = 60 * MINUTE_MS;
 export const TRANSLATION_BACKOFF_MS = Object.freeze([1 * HOUR_MS, 4 * HOUR_MS, 24 * HOUR_MS]);
 export const TRANSLATION_DISABLE_AFTER = 3;
 // Not failures of a note: the run held it back, ran out of budget or time.

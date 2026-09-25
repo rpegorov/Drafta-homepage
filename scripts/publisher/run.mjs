@@ -30,9 +30,9 @@ import { notify as osNotify } from './notify.mjs';
 import { notesMtimes, waitForQuiet } from './quiet.mjs';
 import { PROVIDER_IDS } from '../translate/providers.mjs';
 import { AI_SKIP, readDraftaDefault, readProviderKey, resolveAi } from './keychain.mjs';
+import { HOUR_MS, MINUTE_MS } from '../lib/time.mjs';
+import { DEFAULT_MAX_CHARS_PER_RUN } from '../translate/policy.mjs';
 import {
-  HOUR_MS,
-  MINUTE_MS,
   addTranslationChars,
   markNotified,
   mayNotify,
@@ -193,9 +193,7 @@ async function deferOffline(ctx, state, error, pending) {
 
 // ── Translation (§11.9 rules 5–6) ──────────────────────────────────────────
 
-const DEFAULT_MAX_CHARS_PER_RUN = 60_000;
 const DEFAULT_MAX_CHARS_PER_DAY = 300_000;
-const HOUR_MS = 60 * 60_000;
 
 // Announced once until the reason changes. A mock or unset provider is the
 // owner's own choice: logged, not announced.
