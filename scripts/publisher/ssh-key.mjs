@@ -5,6 +5,10 @@ import { join } from 'node:path';
 
 export const GIT_HOST = 'github.com';
 const SSH_CONNECT_TIMEOUT_S = 20;
+// A connection that stops answering is dropped after interval × count seconds
+// instead of holding the run (and the lock) until the next reboot.
+const SSH_ALIVE_INTERVAL_S = 15;
+const SSH_ALIVE_COUNT_MAX = 3;
 
 /** ssh_config host pattern: `*` and `?` wildcards, `!` negation. */
 function hostMatches(patterns, host) {
@@ -49,5 +53,8 @@ function shellQuote(text) {
 
 /** Non-interactive ssh for git: no prompts, only this key, a bounded connect. */
 export function gitSshCommand(keyPath) {
-  return `ssh -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=${SSH_CONNECT_TIMEOUT_S} -i ${shellQuote(keyPath)}`;
+  return (
+    `ssh -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=${SSH_CONNECT_TIMEOUT_S} ` +
+    `-o ServerAliveInterval=${SSH_ALIVE_INTERVAL_S} -o ServerAliveCountMax=${SSH_ALIVE_COUNT_MAX} -i ${shellQuote(keyPath)}`
+  );
 }
