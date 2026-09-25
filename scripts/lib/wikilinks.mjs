@@ -12,7 +12,9 @@ export function titleKey(title) {
 
 /**
  * @param {string} body
- * @param {(title: string) => string | null} resolve URL of the exported note with that title, or null
+ * @param {(title: string) => string | {url: string, label: string} | null} resolve
+ *   the exported page for that title: its URL, or URL plus the text to show
+ *   (a translated page links under its own title), or null
  * @returns {{body: string, warnings: string[]}}
  */
 export function rewriteWikilinks(body, resolve) {
@@ -20,8 +22,10 @@ export function rewriteWikilinks(body, resolve) {
   const rewritten = mapProse(body, (text) =>
     text.replace(WIKILINK, (_match, target, alias) => {
       const title = target.trim();
-      const label = alias?.trim() || title;
-      const url = resolve(title);
+      const resolved = resolve(title);
+      const url = typeof resolved === 'string' ? resolved : resolved?.url;
+      // An alias the author wrote wins over any resolved label.
+      const label = alias?.trim() || (typeof resolved === 'object' && resolved?.label) || title;
       if (url) return `[${label}](${url})`;
       warnings.push(`[[${title}]] is not a published note in this language — left as text`);
       return label;

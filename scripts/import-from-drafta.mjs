@@ -36,7 +36,7 @@ import {
 import { parseFrontmatter } from './lib/frontmatter.mjs';
 import { aheadOfOrigin, commitPaths, currentBranch, defaultExec, pushFastForward } from './lib/git.mjs';
 import { decodeNote } from './lib/notes.mjs';
-import { buildPlan, contentDirs, pageTarget, renderPage, withoutTitleLine } from './lib/plan.mjs';
+import { TRANSLATION_DIRECTIONS, buildPlan, contentDirs, pageTarget, renderPage, withoutTitleLine } from './lib/plan.mjs';
 import { PublishConfigError, readPublishConfig } from './lib/publish-config.mjs';
 import { sectionTagsFor, selectNote, skipReasons } from './lib/select.mjs';
 import { isValidSlug } from './lib/site-block.mjs';
@@ -176,13 +176,52 @@ function compareAssets(site, assetDir, assets) {
 
 // ── Pages ──────────────────────────────────────────────────────────────────
 
+/** `<lang>\n<title key>` → the exported page a [[wiki link]] with that title means. */
 function titleIndex(candidates) {
   const index = new Map();
-  for (const { note, site, target } of candidates) {
+  for (const { note, site, section, target } of candidates) {
     const key = `${site.lang}\n${titleKey(note.title)}`;
-    if (!index.has(key)) index.set(key, target.sitePath);
+    if (!index.has(key)) index.set(key, { sitePath: target.sitePath, section, slug: site.slug });
   }
   return index;
+}
+
+const twinKey = (section, slug) => `${section}/${slug}`;
+
+/**
+ * `<section>/<slug>` → the page in the translation's target language that
+ * stands for the original with that slug: a hand-written note in that
+ * language, or a machine translation already on the site. Translations made
+ * later in this run are added as they are built (see translateJob).
+ */
+function twinIndex(candidates, existing) {
+  const twins = new Map();
+  const targetLangs = new Set(Object.values(TRANSLATION_DIRECTIONS));
+  for (const file of existing) {
+    if (targetLangs.has(file.lang) && file.machineTranslated) twins.set(twinKey(file.section, file.slug), { sitePath: file.sitePath, title: file.title });
+  }
+  for (const { note, site, section, target } of candidates) {
+    if (targetLangs.has(site.lang)) twins.set(twinKey(section, site.slug), { sitePath: target.sitePath, title: note.title });
+  }
+  return twins;
+}
+
+/**
+ * How a [[wiki link]] resolves on this version of the page. On the original,
+ * a title names a note of the page's own language. On a machine translation
+ * the title is still the original's (§11.9 п. 3 keeps [[…]] out of the
+ * model's hands): the link goes to that note's twin in the translation's
+ * language under the twin's title, or, without a twin, to the original.
+ */
+function linkResolver({ links, twins }, version) {
+  const own = (title) => links.get(`${version.lang}\n${titleKey(title)}`)?.sitePath ?? null;
+  if (!version.machine) return own;
+  return (title) => {
+    const source = links.get(`${version.from}\n${titleKey(title)}`);
+    if (!source) return own(title);
+    const twin = twins.get(twinKey(source.section, source.slug));
+    return twin ? { url: twin.sitePath, label: twin.title } : { url: source.sitePath, label: title };
+  };
 }
 
 /** The note's Markdown as the site shows it, before links and attachments are rewritten. */
@@ -207,11 +246,12 @@ function originalVersion(candidate) {
  *   translation {lang, title, description, body, target, machine}
  * @returns {{page?: object, error?: string, warnings: string[]}}
  */
-function buildPage(candidate, { links, roots, site }, version = originalVersion(candidate)) {
+function buildPage(candidate, context, version = originalVersion(candidate)) {
+  const { roots, site } = context;
   const { note, section } = candidate;
   const { target } = version;
   const fields = { ...candidate.site, lang: version.lang, description: version.description };
-  const linked = rewriteWikilinks(version.body, (title) => links.get(`${fields.lang}\n${titleKey(title)}`) ?? null);
+  const linked = rewriteWikilinks(version.body, linkResolver(context, version));
   const warnings = [...candidate.warnings, ...linked.warnings];
 
   const refs = findAttachmentRefs(linked.body);
@@ -329,6 +369,7 @@ function translatedVersion(job, candidate, done) {
   const original = pageTarget(job.section, job.from, job.slug);
   return {
     lang: job.to,
+    from: job.from,
     title: done.title,
     description: done.description,
     body: done.body,
@@ -365,6 +406,8 @@ async function translateJob(job, candidate, source, { translator, context }) {
   const done = await translator.translateDocument(source, { from: job.from, to: job.to });
   const built = buildPage(candidate, context, translatedVersion(job, candidate, done));
   if (!built.page) throw new TranslationDeferred(DEFER.invalid, built.error);
+  // Later translations of this run link to this one under its translated title.
+  context.twins.set(twinKey(job.section, job.slug), { sitePath: built.page.sitePath, title: built.page.title });
   return { page: built.page, usage: usageDelta(before, translator.usage), model: done.translation.model };
 }
 
@@ -487,6 +530,7 @@ function planRun(options, { tagNamespace }) {
   }
   const existing = readSiteFiles(options.site);
   markStillPublished(library.errors, existing);
+  context.twins = twinIndex(library.candidates, existing);
   const plan = buildPlan({
     pages,
     existing,
