@@ -1,21 +1,28 @@
 #!/usr/bin/env node
 // Installs the publishing LaunchAgent (PLAN v2 §11.1 п. 3, 7, 10).
 //
-//   npm run publisher:install [-- --branch <b>]      (default branch: main)
+//   npm run publisher:install [-- --branch <b>] [--own-ai-key]   (default branch: main)
 //
 // 1. clones the site from origin into ~/Library/Application Support/Drafta/
 //    site-publisher/repo (or resets an existing clone to origin/<branch>) —
 //    the agent runs run.mjs from that clone, never from a working copy;
-// 2. proves push auth from inside launchd with a short-lived probe job and
+// 2. reads Drafta's AI key once through /usr/bin/security, here in the owner's
+//    terminal, so the Keychain dialog appears now and "Always Allow" lets
+//    launchd runs read it silently (PLAN v2 §11.9). `--own-ai-key` instead
+//    asks for a key and stores it in the publisher's own Keychain item.
+//    Neither is fatal: without a key the site publishes untranslated;
+// 3. proves push auth from inside launchd with a short-lived probe job and
 //    prints `auth: ok`, and stops here if it is not ok;
-// 3. writes ~/Library/LaunchAgents/org.drafta.site-publisher.plist and loads
+// 4. writes ~/Library/LaunchAgents/org.drafta.site-publisher.plist and loads
 //    it (a reinstall replaces the loaded job).
-import { execFile } from 'node:child_process';
+import { execFile, spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs, promisify } from 'node:util';
 import { syncToOrigin } from '../lib/git.mjs';
+import { PROVIDER_IDS } from '../translate/providers.mjs';
+import { DRAFTA_KEY_SERVICE, OWN_KEY_SERVICE, SECURITY, readDraftaDefault, readProviderKey, resolveAi } from './keychain.mjs';
 import { bootoutIfLoaded, bootstrap } from './launchctl.mjs';
 import { LABEL, PROBE_LABEL, layout } from './layout.mjs';
 import { renderPlist } from './plist.mjs';
@@ -30,14 +37,45 @@ const FALLBACK_KEY = '.ssh/id_rsa';
 const PROBE_TIMEOUT_MS = 45_000;
 const PROBE_POLL_MS = 500;
 const PROBE_VERDICT = /probe: (ok|offline|auth failed)[^\n]*/;
+// The owner has to notice the dialog, read it and choose "Always Allow".
+const KEY_DIALOG_TIMEOUT_MS = 120_000;
 
 class InstallError extends Error {}
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function readOptions() {
-  const { values } = parseArgs({ options: { branch: { type: 'string', default: DEFAULT_BRANCH } } });
+  const { values } = parseArgs({
+    options: { branch: { type: 'string', default: DEFAULT_BRANCH }, 'own-ai-key': { type: 'boolean', default: false } },
+  });
   return values;
+}
+
+/**
+ * `-w` last makes security prompt for the key in this terminal: the key never
+ * passes through this process, argv or a file. `-T /usr/bin/security` puts the
+ * reader in the item's ACL, so launchd runs read it without a dialog.
+ */
+function storeOwnKey(provider) {
+  console.log(`ai:     paste the ${provider} API key (twice) — it goes straight into Keychain item ${OWN_KEY_SERVICE}`);
+  const result = spawnSync(SECURITY, ['add-generic-password', '-U', '-s', OWN_KEY_SERVICE, '-a', provider, '-T', SECURITY, '-w'], { stdio: 'inherit' });
+  if (result.status !== 0) throw new InstallError(`ai: security add-generic-password exited ${result.status ?? result.signal}`);
+}
+
+/** Step 2: make the AI key readable for launchd runs, or say why translation will be skipped. */
+async function prepareAiKey({ ownKey }) {
+  const readDefaults = (key) => readDraftaDefault(execFileP, key);
+  if (ownKey) {
+    const provider = await readDefaults('aiActiveProvider');
+    if (!PROVIDER_IDS.includes(provider)) throw new InstallError(`ai: choose a provider in Drafta → Settings → AI first (aiActiveProvider = ${provider ?? 'unset'})`);
+    storeOwnKey(provider);
+  } else {
+    console.log(`ai:     macOS may now ask to let "security" use "${DRAFTA_KEY_SERVICE}" — press "Always Allow"`);
+  }
+  const readKey = (provider) => readProviderKey(execFileP, provider, { timeoutMs: KEY_DIALOG_TIMEOUT_MS });
+  const ai = await resolveAi({ readDefaults, readKey, providers: PROVIDER_IDS });
+  if (ai.skip) console.log(`ai:     translation off — ${ai.detail} (the site still publishes; rerun publisher:install to fix)`);
+  else console.log(`ai:     ${ai.provider} key readable — Russian posts get an English translation`);
 }
 
 /** Homebrew's versioned Cellar path breaks on upgrade; its `opt` symlink does not. */
@@ -115,7 +153,7 @@ async function probeFromLaunchd(paths, values) {
 }
 
 async function install() {
-  const { branch } = readOptions();
+  const { branch, 'own-ai-key': ownKey } = readOptions();
   const env = process.env;
   const paths = layout(env);
   if (!existsSync(paths.notes)) throw new InstallError(`Drafta library not found: ${paths.notes} (set DRAFTA_LIBRARY)`);
@@ -128,6 +166,8 @@ async function install() {
 
   const how = await prepareClone(paths, branch, { ...env, GIT_SSH_COMMAND: gitSsh, GIT_TERMINAL_PROMPT: '0' });
   console.log(`clone:  ${paths.clone} (${how}, branch ${branch})`);
+
+  await prepareAiKey({ ownKey });
 
   const values = plistValues(paths, { node, branch, gitSsh, home: env.HOME });
   const verdict = await probeFromLaunchd(paths, values);

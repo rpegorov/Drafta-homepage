@@ -4,10 +4,13 @@
 // publisher:run` starts the same run by hand.
 //
 //   wait for quiet → reset the clone to origin/<branch> → exporter --commit
-//   → git push (fast-forward only; one retry after a fresh fetch) → notify
+//   [--translate] → git push (fast-forward only; one retry after a fresh fetch)
+//   → notify
 //
 // The exporter is reached only through its CLI JSON contract (§11.3). All IO
-// goes through the injected {exec, now, sleep, notify, env, readMtimes}.
+// goes through the injected {exec, now, sleep, notify, env, readMtimes,
+// readDefaults, readKey}. The AI key (§11.9) reaches the exporter only through
+// its child env; translation failures are backed off in state.json.
 // PUBLISHER_PROBE=1 only checks that origin answers (the installer's auth probe).
 import { execFile } from 'node:child_process';
 import { realpathSync } from 'node:fs';
@@ -21,7 +24,18 @@ import { acquireLock, releaseLock } from './lock.mjs';
 import { makeLogger, rotateLog } from './log.mjs';
 import { notify as osNotify } from './notify.mjs';
 import { notesMtimes, waitForQuiet } from './quiet.mjs';
-import { markNotified, mayNotify, readState, writeState } from './state.mjs';
+import { PROVIDER_IDS } from '../translate/providers.mjs';
+import { AI_SKIP, readDraftaDefault, readProviderKey, resolveAi } from './keychain.mjs';
+import {
+  addTranslationChars,
+  markNotified,
+  mayNotify,
+  readState,
+  recordTranslations,
+  translationCharsToday,
+  translationHold,
+  writeState,
+} from './state.mjs';
 
 const EXIT_OK = 0;
 const EXIT_FAILED = 1;
@@ -45,14 +59,25 @@ export const isOffline = (error) => OFFLINE.test(processOutput(error));
 export const isRejected = (error) => REJECTED.test(processOutput(error));
 
 /**
- * Environment of the exporter child process. ЗАДАЧА-2.5 extends it with the
- * translation provider and key — secrets travel through env, never argv.
+ * Environment of the exporter child process. The AI provider and key travel
+ * here and only here — never in argv, the plist or the log.
+ * @param {object} [translation] {provider, key, maxChars, hold} when this run translates
  */
-export function exporterEnv(env) {
-  return { ...env };
+export function exporterEnv(env, translation) {
+  const rest = { ...env };
+  delete rest.DRAFTA_AI_KEY;
+  delete rest.DRAFTA_AI_PROVIDER;
+  if (!translation) return rest;
+  return {
+    ...rest,
+    DRAFTA_AI_PROVIDER: translation.provider,
+    DRAFTA_AI_KEY: translation.key,
+    DRAFTA_TRANSLATE_MAX_CHARS: String(translation.maxChars),
+    DRAFTA_TRANSLATE_HOLD: translation.hold,
+  };
 }
 
-export function exporterArgs(paths, { commit }) {
+export function exporterArgs(paths, { commit, translate = false }) {
   return [
     join(paths.clone, 'scripts/import-from-drafta.mjs'),
     '--library',
@@ -60,6 +85,7 @@ export function exporterArgs(paths, { commit }) {
     '--site',
     paths.clone,
     ...(commit ? ['--commit'] : []),
+    ...(commit && translate ? ['--translate'] : []),
     '--json',
   ];
 }
@@ -74,10 +100,10 @@ function parseExporterJson(stdout) {
 }
 
 /** Exit 1 still carries the JSON (per-note errors); no JSON at all is a failed run. */
-async function runExporter(ctx, { commit }) {
-  const options = { cwd: ctx.paths.clone, env: exporterEnv(ctx.env), maxBuffer: EXPORTER_MAX_BUFFER };
+async function runExporter(ctx, { commit, translation }) {
+  const options = { cwd: ctx.paths.clone, env: exporterEnv(ctx.env, translation), maxBuffer: EXPORTER_MAX_BUFFER };
   try {
-    const { stdout } = await ctx.exec(ctx.node, exporterArgs(ctx.paths, { commit }), options);
+    const { stdout } = await ctx.exec(ctx.node, exporterArgs(ctx.paths, { commit, translate: Boolean(translation) }), options);
     const result = parseExporterJson(stdout);
     if (!result) throw new RunError(`exporter printed no JSON: ${firstLine(stdout || '(empty)')}`);
     return result;
@@ -152,17 +178,104 @@ async function deferOffline(ctx, state, error, pending) {
   return EXIT_OK;
 }
 
+// ── Translation (§11.9 rules 5–6) ──────────────────────────────────────────
+
+const DEFAULT_MAX_CHARS_PER_RUN = 60_000;
+const DEFAULT_MAX_CHARS_PER_DAY = 300_000;
+const HOUR_MS = 60 * 60_000;
+
+// Announced once until the reason changes. A mock or unset provider is the
+// owner's own choice: logged, not announced.
+const SKIP_NOTIFICATIONS = {
+  [AI_SKIP.keychain]: {
+    title: 'Перевод пропущен: нет доступа к ключу (keychain)',
+    body: 'Запустите npm run publisher:install ещё раз и нажмите «Always Allow».',
+  },
+  [AI_SKIP.noKey]: { title: 'Перевод пропущен: нет ключа AI', body: 'Добавьте ключ в Drafta → Settings → AI.' },
+};
+
+const DEFER_LABELS = {
+  offline: 'нет сети',
+  auth: 'провайдер отклонил ключ',
+  'rate-limit': 'лимит запросов провайдера',
+  provider: 'ошибка провайдера',
+  'invalid-output': 'модель нарушила разметку',
+  'no-key': 'нет ключа',
+  error: 'внутренняя ошибка',
+};
+
+function limitFromEnv(env, name, fallback) {
+  const value = Number(env[name]);
+  return env[name] && Number.isFinite(value) && value >= 0 ? value : fallback;
+}
+
+/**
+ * Provider, key and character budget for this run — or none, with the reason
+ * logged (and announced once).
+ * @returns {Promise<{translation: object|null, state: object}>}
+ */
+async function prepareTranslation(ctx, state) {
+  const ai = await resolveAi({ readDefaults: ctx.readDefaults, readKey: ctx.readKey, providers: PROVIDER_IDS });
+  if (ai.skip) {
+    ctx.log(`translate: skipped — ${ai.detail}`);
+    if (state.translationSkip !== ai.skip && SKIP_NOTIFICATIONS[ai.skip]) await sendAll(ctx, [SKIP_NOTIFICATIONS[ai.skip]]);
+    return { translation: null, state: { ...state, translationSkip: ai.skip } };
+  }
+  const at = ctx.now();
+  const perRun = limitFromEnv(ctx.env, 'PUBLISHER_TRANSLATE_MAX_CHARS_PER_RUN', DEFAULT_MAX_CHARS_PER_RUN);
+  const perDay = limitFromEnv(ctx.env, 'PUBLISHER_TRANSLATE_MAX_CHARS_PER_DAY', DEFAULT_MAX_CHARS_PER_DAY);
+  const maxChars = Math.max(0, Math.min(perRun, perDay - translationCharsToday(state, at)));
+  const translation = { provider: ai.provider, key: ai.key, maxChars, hold: translationHold(state, at) };
+  return { translation, state: { ...state, translationSkip: null } };
+}
+
+/** Provider usage per translation — the only record of what translating costs. */
+function logTranslations(ctx, result) {
+  for (const t of result.translated ?? []) {
+    const usage = t.usage ? ` in=${t.usage.inputTokens} out=${t.usage.outputTokens} requests=${t.usage.requests}` : '';
+    ctx.log(`translate: ${t.slug} ${t.from}→${t.to} ${t.cached ? 'cached' : `${t.provider}/${t.model}${usage} chars=${t.chars}`}`);
+  }
+  for (const d of result.translationDeferred ?? []) {
+    ctx.log(`translate: ${d.slug} deferred — ${d.reason}${d.detail ? `: ${d.detail}` : ''}`);
+  }
+}
+
+function translationNotifications(events, result, { pushed }) {
+  const pages = [...(result.created ?? []), ...(result.updated ?? []), ...(result.unchanged ?? [])];
+  const titleOf = (event) => event.title || pages.find((page) => page.slug === event.slug)?.title || event.slug;
+  const fresh = pushed ? (result.translated ?? []).filter((t) => !t.cached) : [];
+  return [
+    ...fresh.map((t) => ({ title: `Переведено: ${titleOf(t)}`, body: t.url ?? '' })),
+    ...events.map((event) =>
+      event.kind === 'disabled'
+        ? { title: `Перевод выключен до правки заметки: ${titleOf(event)}`, body: DEFER_LABELS[event.reason] ?? event.reason }
+        : {
+            title: `Опубликовано без перевода: ${titleOf(event)}`,
+            body: `${DEFER_LABELS[event.reason] ?? event.reason}; повтор через ${Math.round(event.retryInMs / HOUR_MS)} ч`,
+          },
+    ),
+  ];
+}
+
 async function finish(ctx, state, result, { pushed }) {
   ctx.log(summaryLine(result, { pushed }));
+  logTranslations(ctx, result);
   if (ctx.env.PUBLISHER_VERBOSE === '1') ctx.log(`exporter: ${JSON.stringify(result)}`);
+  const at = ctx.now();
+  const booked = recordTranslations(addTranslationChars(state, result.translationChars ?? 0, at), result, at);
   const problems = problemNotifications(currentProblems(result), state.announcedProblems);
-  await sendAll(ctx, [...(pushed ? changeNotifications(result) : []), ...problems.notifications]);
-  writeState(ctx.paths.state, { ...state, announcedProblems: problems.announced });
+  await sendAll(ctx, [
+    ...(pushed ? changeNotifications(result) : []),
+    ...problems.notifications,
+    ...translationNotifications(booked.events, result, { pushed }),
+  ]);
+  writeState(ctx.paths.state, { ...booked.state, announcedProblems: problems.announced });
   return (result.errors ?? []).length > 0 ? EXIT_FAILED : EXIT_OK;
 }
 
-async function publish(ctx, state) {
+async function publish(ctx, initialState) {
   const branch = await publishBranch(ctx);
+  const { translation, state } = await prepareTranslation(ctx, initialState);
   for (let attempt = 1; ; attempt += 1) {
     try {
       await syncToOrigin(ctx.paths.clone, branch, { exec: ctx.exec });
@@ -170,7 +283,7 @@ async function publish(ctx, state) {
       if (isOffline(error)) return deferOffline(ctx, state, error);
       throw new RunError(`git fetch failed: ${errorLine(error)}`);
     }
-    const result = await runExporter(ctx, { commit: true });
+    const result = await runExporter(ctx, { commit: true, translation });
     if (!result.committed) return finish(ctx, state, result, { pushed: false });
     try {
       await git(ctx, ['push', 'origin', `HEAD:refs/heads/${branch}`]);
@@ -217,6 +330,8 @@ function context(io) {
     sleep: io.sleep ?? ((ms) => new Promise((resolve) => setTimeout(resolve, ms))),
     readMtimes: io.readMtimes ?? (() => notesMtimes(paths.notes)),
     notify: io.notify ?? ((notification) => osNotify(notification, { exec })),
+    readDefaults: io.readDefaults ?? ((key) => readDraftaDefault(exec, key)),
+    readKey: io.readKey ?? ((provider) => readProviderKey(exec, provider)),
     log: makeLogger(now),
   };
 }
