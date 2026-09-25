@@ -1,7 +1,7 @@
 // ЗАДАЧА-1.0 — the composition root of the site: src/lib/config.ts is the one
 // place that knows the API, and every script that talks to the API reaches it
 // through an import, not through window (PLAN v2 §5 "Швы").
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { resetScripts, runScript } from './helpers/browser.mjs';
@@ -20,7 +20,7 @@ const ALL_SCRIPTS = ['src/scripts/lang.ts', 'src/scripts/nav.ts', ...API_SCRIPTS
 
 function resolveImport(fromFile, spec) {
   const base = resolve(dirname(fromFile), spec);
-  return [base, `${base}.ts`, `${base}.mjs`, `${base}.js`, join(base, 'index.ts')].find((f) => existsSync(f) && !f.endsWith('/'));
+  return [base, `${base}.ts`, `${base}.mjs`, `${base}.js`, join(base, 'index.ts')].find((f) => existsSync(f) && statSync(f).isFile());
 }
 
 /** Follows relative imports from `entry`; true when src/lib/config.ts is reached. */
