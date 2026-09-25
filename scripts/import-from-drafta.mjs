@@ -45,7 +45,7 @@ import { MINUTE_MS } from './lib/time.mjs';
 import { rewriteWikilinks, titleKey } from './lib/wikilinks.mjs';
 import { languageName } from './translate/prompt.mjs';
 import { DEFAULT_MAX_CHARS_PER_RUN, parseHold, runTranslations } from './translate/policy.mjs';
-import { DEFER, TranslationDeferred, createTranslator, documentChars, sourceHash } from './translate/translate.mjs';
+import { createTranslator, documentChars, sourceHash } from './translate/translate.mjs';
 
 const REPO_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const DEFAULT_LIBRARY = join(homedir(), 'Library/Application Support/Drafta/Library');
@@ -398,17 +398,43 @@ async function publishTranslation(options, job, page) {
 }
 
 /**
- * Translates one job. A problem with the text or the provider throws
- * TranslationDeferred; the caller turns everything else into a deferral too.
+ * Phase 1 of a job: the model call. A problem with the text or the provider
+ * throws TranslationDeferred; the caller turns everything else into a deferral too.
  */
-async function translateJob(job, candidate, source, { translator, context }) {
+async function translateJob(job, source, translator) {
   const before = { ...translator.usage };
   const done = await translator.translateDocument(source, { from: job.from, to: job.to });
-  const built = buildPage(candidate, context, translatedVersion(job, candidate, done));
-  if (!built.page) throw new TranslationDeferred(DEFER.invalid, built.error);
-  // Later translations of this run link to this one under its translated title.
-  context.twins.set(twinKey(job.section, job.slug), { sitePath: built.page.sitePath, title: built.page.title });
-  return { page: built.page, usage: usageDelta(before, translator.usage), model: done.translation.model };
+  return { done, usage: usageDelta(before, translator.usage), model: done.translation.model };
+}
+
+/**
+ * Phase 2, for every translation of the run at once: the pages are built only
+ * after every model call, with the run's own translations already in the twin
+ * index, so a translated page links a twin translated in the same run. A twin
+ * that fails to build is taken out of the index and the rest is built again.
+ * (A twin that only appears in a future run is not linked: the page is cached
+ * by its source hash and does not change until its original does.)
+ * @param {{job: object, done: object}[]} items
+ * @returns {({page: object} | {error: string})[]} aligned with `items`
+ */
+function buildTranslations(items, { candidates, context }) {
+  const versions = items.map(({ job, done }) => ({ job, version: translatedVersion(job, candidates.get(job.noteId), done) }));
+  const seedTwins = (skip) => {
+    for (const { job, version } of versions) {
+      const key = twinKey(job.section, job.slug);
+      if (skip.has(job)) context.twins.delete(key);
+      else context.twins.set(key, { sitePath: version.target.sitePath, title: version.title });
+    }
+  };
+  const buildAll = () => versions.map(({ job, version }) => buildPage(candidates.get(job.noteId), context, version));
+  seedTwins(new Set());
+  let built = buildAll();
+  const failed = new Set(versions.filter((_, i) => !built[i].page).map(({ job }) => job));
+  if (failed.size > 0) {
+    seedTwins(failed);
+    built = buildAll();
+  }
+  return built.map((result) => (result.page ? { page: result.page } : { error: result.error }));
 }
 
 /** The translation step of a committed run: the IO around scripts/translate/policy.mjs. */
@@ -433,7 +459,8 @@ function translateAll(options, run, env) {
     provider: env.DRAFTA_AI_PROVIDER,
   };
   return runTranslations(jobs, limits, {
-    translate: (job) => translateJob(job, candidates.get(job.noteId), sources.get(job.noteId), { translator, context: run.context }),
+    translate: (job) => translateJob(job, sources.get(job.noteId), translator),
+    build: (items) => buildTranslations(items, { candidates, context: run.context }),
     publish: (job, page) => publishTranslation(options, job, page),
   });
 }
