@@ -5,6 +5,14 @@
     <description>Обновления Drafta</description>
     <language>ru</language>
     <item>
+      <title>1.0.6</title>
+      <pubDate>Sat, 26 Sep 2026 01:18:36 +0300</pubDate>
+      <sparkle:version>1.0.6</sparkle:version>
+      <sparkle:shortVersionString>1.0.6</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+      <enclosure url="https://github.com/rpegorov/Drafta-releases/releases/download/v1.0.6/Drafta-1.0.6.dmg" type="application/octet-stream" length="22966547" sparkle:edSignature="C9ATF+oMOSMqVrtRltRl6RTZUa5L7Y68yJF9Re0Du403dOJWXIOYUg4bPvSGQ+7aV6lbrdMH/MCMsy1gi8TmCg==" />
+    </item>
+    <item>
       <title>1.0.5</title>
       <pubDate>Sat, 26 Sep 2026 00:33:02 +0300</pubDate>
       <sparkle:version>1.0.5</sparkle:version>
