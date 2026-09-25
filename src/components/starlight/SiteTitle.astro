@@ -1,0 +1,44 @@
+---
+/* Docs header title: the Drafta mark and name lead back to the site's home page in
+   the reader's language; the section name follows in the muted colour. */
+import DraftaMark from '../DraftaMark.astro';
+
+const { locale, siteTitle } = Astro.locals.starlightRoute;
+const home = locale === 'ru' ? '/ru/' : '/';
+---
+<span class="docs-title sl-flex">
+  <a class="docs-title__home sl-flex" href={home} translate="no">
+    <DraftaMark class="docs-title__mark" />
+    <span>Drafta</span>
+  </a>
+  <span class="docs-title__section">{siteTitle}</span>
+</span>
+
+<style>
+  .docs-title {
+    align-items: center;
+    gap: var(--space-3);
+    min-width: 0;
+    white-space: nowrap;
+  }
+  .docs-title__home {
+    align-items: center;
+    gap: var(--space-2);
+    font-family: var(--font-display);
+    font-size: var(--text-h3);
+    font-weight: 600;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .docs-title__mark {
+    inline-size: var(--space-5);
+    block-size: var(--space-5);
+    flex: none;
+  }
+  .docs-title__section {
+    overflow: hidden;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--muted);
+  }
+</style>
