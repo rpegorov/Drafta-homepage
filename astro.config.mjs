@@ -2,6 +2,12 @@
 // No Cloudflare adapter: dist/ is uploaded as-is (see wrangler.jsonc).
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import sitemap from '@astrojs/sitemap';
+
+// Pages that stay out of the sitemap: auth/checkout flows, the legal pages
+// (noindex for now, wave 3 revisits them) and the bilingual 404, in either
+// language twin. Keep in sync with the noindex pages themselves.
+const SITEMAP_EXCLUDED = /^\/(ru\/)?(login|register|verify|checkout|terms|privacy|refund|contact|404)(\/|$)/;
 
 export default defineConfig({
   site: 'https://drafta.org',
@@ -18,6 +24,16 @@ export default defineConfig({
     },
   },
   integrations: [
+    // One sitemap for the whole site, docs included. Starlight only registers its
+    // own @astrojs/sitemap when none is configured, so this instance (with the
+    // noindex filter) is the only one in the build.
+    sitemap({
+      filter: (page) => !SITEMAP_EXCLUDED.test(new URL(page).pathname),
+      i18n: {
+        defaultLocale: 'en',
+        locales: { en: 'en', ru: 'ru' },
+      },
+    }),
     // Docs at /docs/ and /ru/docs/. Starlight has no route prefix, so the pages
     // live under src/content/docs/docs/ (EN, root locale) and src/content/docs/ru/docs/.
     starlight({

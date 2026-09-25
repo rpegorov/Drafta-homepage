@@ -1,0 +1,29 @@
+---
+/* One 404 for both languages: a static host cannot know which twin the
+   visitor meant, so the English and Russian text sit side by side, each
+   under its own lang so the page is well-formed for either reader. */
+import Base from '../layouts/Base.astro';
+---
+<Base
+  lang="en"
+  title="Page not found — Drafta"
+  description="The page you are looking for does not exist. Go back to the Drafta home page."
+  canonicalPath="/404/"
+  noindex
+>
+  <section class="band">
+    <div class="wrap wrap--narrow">
+      <p class="eyebrow">404</p>
+      <h1 class="h1">This page is not here.</h1>
+      <p class="lede">The link may be old, or the address mistyped. Everything about Drafta starts from the home page.</p>
+      <div class="hero__actions">
+        <a class="btn btn--primary btn--lg" href="/">Go to drafta.org</a>
+      </div>
+      <div lang="ru">
+        <h2 class="h2">Такой страницы нет.</h2>
+        <p class="muted">Возможно, ссылка устарела или в адресе опечатка. Всё о Drafta — на главной.</p>
+        <p><a href="/ru/">Перейти на русскую версию сайта</a></p>
+      </div>
+    </div>
+  </section>
+</Base>
