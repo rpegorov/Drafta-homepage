@@ -2,6 +2,7 @@
 /* Site footer: product, account, downloads and legal columns, the licence line
    with language links, and the product signature `by craftzman` with the 16px seal. */
 import DraftaMark from './DraftaMark.astro';
+import { blogIndexPath, rssPath } from './blog/posts';
 import { t } from '../i18n';
 import { releases } from '../lib/config';
 import { localePath } from '../lib/lang';
@@ -21,6 +22,8 @@ const columns = [
       { href: `${home}#features`, label: t(lang, 'footerFeatures') },
       { href: `${home}#pricing`, label: t(lang, 'footerPricing') },
       { href: p('/checkout/'), label: t(lang, 'footerPlans') },
+      { href: blogIndexPath(lang), label: t(lang, 'footerBlog') },
+      { href: rssPath(lang), label: t(lang, 'footerRss') },
     ],
   },
   {

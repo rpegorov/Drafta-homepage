@@ -505,12 +505,29 @@ function planRun(options) {
   return { library, plan, warnings, context };
 }
 
+// Builds `content: publish <slug>` for a single change, or
+// `content: publish 2, update 1, unpublish 1 from Drafta` once several
+// notes moved — one clause per non-empty category, in publish/update/unpublish order.
+function importCommitMessage(plan) {
+  const categories = [
+    { action: 'publish', entries: plan.create },
+    { action: 'update', entries: plan.update },
+    { action: 'unpublish', entries: plan.delete },
+  ].filter(({ entries }) => entries.length > 0);
+  const total = categories.reduce((sum, { entries }) => sum + entries.length, 0);
+  if (total === 1) {
+    const { action, entries } = categories[0];
+    return `content: ${action} ${entries[0].slug}`;
+  }
+  const clauses = categories.map(({ action, entries }) => `${action} ${entries.length}`);
+  return `content: ${clauses.join(', ')} from Drafta`;
+}
+
 async function publish(options, plan) {
   const outcome = { committed: false, pushed: false, errors: [] };
-  const changes = plan.create.length + plan.update.length + plan.delete.length;
   try {
     const touched = applyPlan(options.site, plan);
-    const commit = await commitPaths(options.site, touched, `content: import ${changes} notes from Drafta`);
+    const commit = await commitPaths(options.site, touched, importCommitMessage(plan));
     Object.assign(outcome, commit.committed ? { committed: true, sha: commit.sha } : {});
     if (options.push) outcome.pushed = (await pushFastForward(options.site, options.branch)).pushed;
   } catch (error) {
