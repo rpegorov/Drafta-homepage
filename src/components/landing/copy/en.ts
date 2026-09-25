@@ -101,11 +101,11 @@ export const en: LandingCopy = {
     items: [
       {
         title: 'CodeMirror 6, 50+ languages',
-        html: `The editor that also powers <span translate="no">Inkdrop</span>, with highlighting for Python, Rust, TypeScript, Go, SQL, YAML, Bash and forty more. Three view modes — editor, preview, or split with synchronised scrolling. A grid picker for tables, live Mermaid and KaTeX, dashes and spacing tidied as you type. A table of contents, backlinks, a graph of linked notes and search with ${mono('⌘&nbsp;F')}. ${mono('$…$')} fences work as you would expect.`,
+        html: `The editor that also powers <span translate="no">Inkdrop</span>, with highlighting for Python, Rust, TypeScript, Go, SQL, YAML, Bash and forty more. Three view modes — editor, preview, or split with synchronised scrolling. A grid picker for tables, live Mermaid and KaTeX, dashes and spacing tidied as you type. A table of contents, backlinks, a graph of linked notes and search with ⌘&nbsp;F. ${mono('$…$')} fences work as you would expect.`,
       },
       {
         title: 'A library you can steer',
-        html: `Notebooks nest without limit, and notes drag between them. Tags come from the text automatically, by hand where you want, with a colour each. Statuses — Active, On Hold, Completed, Dropped — pinned notes and trash stay a keystroke away: ${mono('⌘&nbsp;P')} is fuzzy search across every note.`,
+        html: `Notebooks nest without limit, and notes drag between them. Tags come from the text automatically, by hand where you want, with a colour each. Statuses — Active, On Hold, Completed, Dropped — pinned notes and trash stay a keystroke away: ⌘&nbsp;P is fuzzy search across every note.`,
       },
       {
         title: 'Your history and your skins',
@@ -117,7 +117,7 @@ export const en: LandingCopy = {
       },
       {
         title: 'An assistant, and an MCP server',
-        html: `${mono('⌘&nbsp;J')} opens the assistant with your own API key: Anthropic (${mono('claude-haiku-4-5')}), OpenAI (${mono('gpt-4o-mini')}) or DeepSeek (${mono('deepseek-chat')}). The MCP server ships inside the app and gives Claude and other MCP clients 12 tools to search, read and write your whole library. Run it read-only and the write tools disappear.`,
+        html: `⌘&nbsp;J opens the assistant with your own API key: Anthropic (${mono('claude-haiku-4-5')}), OpenAI (${mono('gpt-4o-mini')}) or DeepSeek (${mono('deepseek-chat')}). The MCP server ships inside the app and gives Claude and other MCP clients 12 tools to search, read and write your whole library. Run it read-only and the write tools disappear.`,
       },
     ],
   },

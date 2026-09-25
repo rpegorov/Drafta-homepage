@@ -19,7 +19,7 @@ export const SHOT_WIDTHS = [480, 800, 1200, 1600, 2400];
    below the site's single 820px breakpoint (site.css). */
 export const SHOT_SIZES = {
   hero: '(max-width: 820px) calc(100vw - 2rem), min(calc(100vw - 3rem), 1092px)',
-  row: '(max-width: 820px) calc(100vw - 2rem), 520px',
+  row: '(max-width: 820px) calc(100vw - 2rem), 620px',
 } as const;
 
 export type ShotLayout = keyof typeof SHOT_SIZES;

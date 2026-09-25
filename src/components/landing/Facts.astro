@@ -8,7 +8,7 @@ interface Props {
 }
 const { label, facts } = Astro.props;
 ---
-<section class="band band--soft" aria-label={label}>
+<section class="band band--soft facts-band" aria-label={label}>
   <div class="wrap">
     <ul class="grid grid--3 facts">
       {facts.map((fact) => (
@@ -22,6 +22,10 @@ const { label, facts } = Astro.props;
 </section>
 
 <style>
+  /* three short cards need less air than a full section */
+  .facts-band {
+    padding-block: var(--space-8);
+  }
   .facts {
     margin: 0;
     padding: 0;
