@@ -7,13 +7,6 @@ date: "2026-09-25"
 updated: "2026-09-25"
 draftaId: "fixture-welcome-ru"
 tags: ["meta"]
-machineTranslated: true
-translation:
-  sourceHash: "fixture-sha256-0000000000000000000000000000000000000000000000000000000000000000"
-  sourceLang: "en"
-  provider: "anthropic"
-  model: "claude-haiku-4-5"
-  at: "2026-09-25T00:00:00Z"
 ---
 
 Это фикстурный пост для **ЗАДАЧА-2.0**: он доказывает, что коллекция `blog`

@@ -1,0 +1,17 @@
+---
+/* One post in the list: date, title (the link), description, tags. The whole
+   card is clickable through the title link's stretched hit area. */
+import PostMeta from './PostMeta.astro';
+import { postPath, type Post } from './posts';
+
+interface Props {
+  post: Post;
+}
+const { post } = Astro.props;
+const { lang, slug, title, description, date, updated, tags } = post.data;
+---
+<article class="post-card">
+  <h2 class="post-card__title"><a class="post-card__link" href={postPath(lang, slug)}>{title}</a></h2>
+  <p class="post-card__description">{description}</p>
+  <PostMeta lang={lang} date={date} updated={updated} tags={tags} />
+</article>

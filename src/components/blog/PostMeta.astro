@@ -1,0 +1,29 @@
+---
+/* Date line and tags of a post — used in the list card and the post header. */
+import { t } from '../../i18n';
+import type { Lang } from '../../lib/types';
+import { formatDay } from './posts';
+
+interface Props {
+  lang: Lang;
+  date: string;
+  updated?: string;
+  tags: string[];
+}
+const { lang, date, updated, tags } = Astro.props;
+const strings = t(lang, 'blog');
+const shownUpdate = updated && updated !== date ? updated : undefined;
+---
+<div class="post-meta">
+  <p class="post-meta__dates">
+    <time datetime={date}><span class="visually-hidden">{strings.published}: </span>{formatDay(date, lang)}</time>
+    {shownUpdate && (
+      <span class="post-meta__updated">{strings.updated}: <time datetime={shownUpdate}>{formatDay(shownUpdate, lang)}</time></span>
+    )}
+  </p>
+  {tags.length > 0 && (
+    <ul class="post-meta__tags" aria-label={strings.tagsLabel}>
+      {tags.map((tag) => <li class="tag">{tag}</li>)}
+    </ul>
+  )}
+</div>

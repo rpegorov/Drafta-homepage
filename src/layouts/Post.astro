@@ -1,0 +1,59 @@
+---
+/* One blog post on the Base frame: back link, title, translation notice,
+   description, meta, cover, then the Markdown body in the 680px reading column.
+   hreflang lists the twin only when it is published; og:image is the post's
+   own card from /og/<lang>/<slug>.png. */
+import '../styles/blog.css';
+import { Image } from 'astro:assets';
+import { render } from 'astro:content';
+import Base from './Base.astro';
+import Mermaid from '../components/Mermaid.astro';
+import PostMeta from '../components/blog/PostMeta.astro';
+import TranslationNotice from '../components/blog/TranslationNotice.astro';
+import { t } from '../i18n';
+import {
+  alternatesOf,
+  blogIndexPath,
+  ogImagePath,
+  postPath,
+  rssPath,
+  type Post,
+} from '../components/blog/posts';
+
+interface Props {
+  post: Post;
+  twin?: Post;
+}
+const { post, twin } = Astro.props;
+const { lang, slug, title, description, date, updated, tags, cover, machineTranslated, translation } = post.data;
+const strings = t(lang, 'blog');
+const { Content, remarkPluginFrontmatter } = await render(post);
+const sourceLang = translation?.sourceLang ?? twin?.data.lang;
+const originalHref = twin ? postPath(twin.data.lang, twin.data.slug) : undefined;
+---
+<Base
+  lang={lang}
+  title={`${title} — Drafta`}
+  description={description}
+  canonicalPath={postPath(lang, slug)}
+  ogImage={ogImagePath(lang, slug)}
+  alternates={alternatesOf(post, twin)}
+>
+  <link slot="head" rel="alternate" type="application/rss+xml" title={strings.rssTitle} href={rssPath(lang)}>
+  <article class="wrap wrap--narrow post">
+    <header class="post__header">
+      <a class="post__back" href={blogIndexPath(lang)}>{strings.allPosts}</a>
+      <h1 class="display-2 post__title">{title}</h1>
+      {machineTranslated && sourceLang && (
+        <TranslationNotice lang={lang} sourceLang={sourceLang} originalHref={originalHref} />
+      )}
+      <p class="lede post__lede">{description}</p>
+      <PostMeta lang={lang} date={date} updated={updated} tags={tags} />
+    </header>
+    {cover && <Image class="post__cover" src={cover} alt="" loading="eager" />}
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+  {remarkPluginFrontmatter.hasMermaid && <Mermaid />}
+</Base>

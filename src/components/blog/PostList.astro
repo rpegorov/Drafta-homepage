@@ -1,0 +1,25 @@
+---
+/* The list of posts, newest first as given, or the empty state when there are none. */
+import { t } from '../../i18n';
+import type { Lang } from '../../lib/types';
+import PostCard from './PostCard.astro';
+import { rssPath, type Post } from './posts';
+
+interface Props {
+  lang: Lang;
+  posts: Post[];
+}
+const { lang, posts } = Astro.props;
+const strings = t(lang, 'blog');
+---
+{posts.length > 0 ? (
+  <ul class="post-list" aria-label={strings.listLabel}>
+    {posts.map((post) => <li><PostCard post={post} /></li>)}
+  </ul>
+) : (
+  <div class="post-list__empty">
+    <p class="h3">{strings.emptyTitle}</p>
+    <p class="post-list__empty-body">{strings.emptyBody}</p>
+    <a class="btn btn--ghost" href={rssPath(lang)}>{strings.rssLabel}</a>
+  </div>
+)}

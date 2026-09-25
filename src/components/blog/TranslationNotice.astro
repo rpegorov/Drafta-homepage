@@ -1,0 +1,24 @@
+---
+/* "Translated automatically from Russian · Read the original →" under a
+   machine-translated post's title. The link goes to the original when it is
+   published; without it the notice still says what the reader is looking at. */
+import { t } from '../../i18n';
+import type { Lang } from '../../lib/types';
+
+interface Props {
+  lang: Lang;
+  sourceLang: Lang;
+  originalHref?: string;
+}
+const { lang, sourceLang, originalHref } = Astro.props;
+const strings = t(lang, 'blog');
+---
+<p class="translation-notice" role="note">
+  <span>{strings.translatedFrom[sourceLang]}</span>
+  {originalHref && (
+    <>
+      <span class="translation-notice__sep" aria-hidden="true">·</span>
+      <a href={originalHref} hreflang={sourceLang}>{strings.readOriginal}</a>
+    </>
+  )}
+</p>

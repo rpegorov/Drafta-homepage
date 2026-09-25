@@ -10,7 +10,8 @@ import type { Lang } from '../lib/types';
 
 interface Props {
   lang: Lang;
-  paths: Record<Lang, string>;
+  /** This page in each language it exists in (see Base `alternates`). */
+  paths: Partial<Record<Lang, string>>;
 }
 const { lang, paths } = Astro.props;
 const home = localePath('/', lang);

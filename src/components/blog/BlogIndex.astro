@@ -1,0 +1,28 @@
+---
+/* The blog list page of one language — /blog/ and /ru/blog/. */
+import '../../styles/blog.css';
+import Base from '../../layouts/Base.astro';
+import { t } from '../../i18n';
+import type { Lang } from '../../lib/types';
+import PostList from './PostList.astro';
+import { blogIndexPath, postsOf, rssPath } from './posts';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const strings = t(lang, 'blog');
+const posts = await postsOf(lang);
+---
+<Base lang={lang} title={strings.metaTitle} description={strings.metaDescription} canonicalPath={blogIndexPath(lang)}>
+  <link slot="head" rel="alternate" type="application/rss+xml" title={strings.rssTitle} href={rssPath(lang)}>
+  <div class="wrap wrap--narrow blog">
+    <header class="blog__header">
+      <p class="eyebrow">{strings.eyebrow}</p>
+      <h1 class="display-2 blog__title">{strings.h1}</h1>
+      <p class="lede">{strings.lede}</p>
+      <a class="blog__rss" href={rssPath(lang)}>{strings.rssLabel}</a>
+    </header>
+    <PostList lang={lang} posts={posts} />
+  </div>
+</Base>

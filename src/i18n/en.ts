@@ -97,7 +97,29 @@ export const en = {
   checkoutDeepLink: 'Selected below: {value}. Press its own button when you are ready — nothing is charged yet.',
   checkoutNoTransport: 'The accounts API client did not load. Reload the page to try again.',
   checkoutNoRenderer: 'The plans could not be loaded. Reload the page to try again.',
+
+  /* ---- blog (ЗАДАЧА-2.1) ---- */
+  blog: {
+    metaTitle: 'Blog — Drafta',
+    metaDescription: 'Notes from building Drafta: releases, design decisions and how the Markdown editor works inside. Written in Drafta, published straight from it.',
+    eyebrow: 'Blog',
+    h1: 'Notes from building Drafta.',
+    lede: 'Releases, design decisions and how the app works inside — written in Drafta and published straight from it.',
+    listLabel: 'Posts',
+    emptyTitle: 'No posts yet.',
+    emptyBody: 'The first one is on its way. Subscribe to the feed and it will reach you when it is out.',
+    rssLabel: 'RSS feed',
+    rssTitle: 'Drafta blog',
+    rssDescription: 'Notes from building Drafta: releases, design decisions and how the app works inside.',
+    allPosts: '← All posts',
+    published: 'Published',
+    updated: 'Updated',
+    tagsLabel: 'Tags',
+    translatedFrom: { en: 'Translated automatically from English', ru: 'Translated automatically from Russian' } as Record<string, string>,
+    readOriginal: 'Read the original →',
+  },
 };
+
 
 export type Messages = typeof en;
 export type MessageKey = keyof Messages;

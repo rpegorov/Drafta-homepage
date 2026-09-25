@@ -8,6 +8,10 @@
                     hreflang en/ru/x-default and the language switcher are derived from it.
      noindex        adds robots noindex, follow (service pages).
      ogImage        site path or absolute URL of the social card; defaults to /og.png.
+     alternates     this page in each language it exists in; defaults to both twins derived
+                    from canonicalPath. hreflang is written only for the languages listed,
+                    x-default points at the English one (or this page when there is none).
+                    Partial only on blog posts published in one language.
    Slots: "head" — extra <head> content such as JSON-LD; default — the page's <main> content. */
 import '../styles/tokens.css';
 import '../styles/product.css';
@@ -26,9 +30,18 @@ interface Props {
   canonicalPath: string;
   noindex?: boolean;
   ogImage?: string;
+  alternates?: Partial<Record<Lang, string>>;
 }
 
-const { lang, title, description, canonicalPath, noindex = false, ogImage = '/og.png' } = Astro.props;
+const {
+  lang,
+  title,
+  description,
+  canonicalPath,
+  noindex = false,
+  ogImage = '/og.png',
+  alternates = localePaths(canonicalPath),
+} = Astro.props;
 
 if (!canonicalPath.startsWith('/') || !canonicalPath.endsWith('/')) {
   throw new Error(`Base: canonicalPath must start and end with "/", got "${canonicalPath}"`);
@@ -39,7 +52,8 @@ if (langOfPath(canonicalPath) !== lang) {
 
 const site = Astro.site ?? new URL('https://drafta.org');
 const absolute = (path: string) => new URL(path, site).href;
-const paths = localePaths(canonicalPath);
+const hreflangs = (Object.entries(alternates) as Array<[Lang, string]>).filter(([, path]) => Boolean(path));
+const xDefault = alternates.en ?? canonicalPath;
 const OG_LOCALE: Record<Lang, string> = { en: 'en_US', ru: 'ru_RU' };
 ---
 <!DOCTYPE html>
@@ -51,9 +65,8 @@ const OG_LOCALE: Record<Lang, string> = { en: 'en_US', ru: 'ru_RU' };
   <meta name="description" content={description}>
   {noindex && <meta name="robots" content="noindex, follow">}
   <link rel="canonical" href={absolute(canonicalPath)}>
-  <link rel="alternate" hreflang="en" href={absolute(paths.en)}>
-  <link rel="alternate" hreflang="ru" href={absolute(paths.ru)}>
-  <link rel="alternate" hreflang="x-default" href={absolute(paths.en)}>
+  {hreflangs.map(([code, path]) => <link rel="alternate" hreflang={code} href={absolute(path)}>)}
+  <link rel="alternate" hreflang="x-default" href={absolute(xDefault)}>
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Drafta">
   <meta property="og:locale" content={OG_LOCALE[lang]}>
@@ -74,7 +87,7 @@ const OG_LOCALE: Record<Lang, string> = { en: 'en_US', ru: 'ru_RU' };
 </head>
 <body>
   <SkipLink lang={lang} />
-  <Header lang={lang} paths={paths} />
+  <Header lang={lang} paths={alternates} />
   <main id="main" tabindex="-1">
     <slot />
   </main>

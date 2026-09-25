@@ -1,12 +1,15 @@
 ---
 /* EN/RU switcher: two plain links to this page's twins. Works without JavaScript;
-   scripts/lang.ts only remembers the choice through [data-lang]. */
+   scripts/lang.ts only remembers the choice through [data-lang].
+   A language the page does not exist in (a blog post published in one language)
+   links to that language's blog index instead of a missing page. */
 import { t } from '../i18n';
+import { localePath } from '../lib/lang';
 import type { Lang } from '../lib/types';
 
 interface Props {
   lang: Lang;
-  paths: Record<Lang, string>;
+  paths: Partial<Record<Lang, string>>;
 }
 const { lang, paths } = Astro.props;
 const options: Array<{ code: Lang; label: string }> = [
@@ -18,7 +21,7 @@ const options: Array<{ code: Lang; label: string }> = [
   {options.map(({ code, label }) => (
     <a
       class:list={['lang__btn', { 'lang__btn--active': code === lang }]}
-      href={paths[code]}
+      href={paths[code] ?? localePath('/blog/', code)}
       hreflang={code}
       lang={code}
       data-lang={code}

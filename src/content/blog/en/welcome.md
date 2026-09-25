@@ -7,6 +7,13 @@ date: "2026-09-25"
 updated: "2026-09-25"
 draftaId: "fixture-welcome-en"
 tags: ["meta"]
+machineTranslated: true
+translation:
+  sourceHash: "fixture-sha256-0000000000000000000000000000000000000000000000000000000000000000"
+  sourceLang: "ru"
+  provider: "anthropic"
+  model: "claude-haiku-4-5"
+  at: "2026-09-25T00:00:00Z"
 ---
 
 This is a fixture post for **ЗАДАЧА-2.0**: it proves the `blog` content
