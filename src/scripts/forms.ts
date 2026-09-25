@@ -1,7 +1,7 @@
 /* Drafta — form validation, form messages and the one JSON call.
    Imported by page scripts; does nothing until a page calls it. */
 
-import { DRAFTA } from '../lib/config';
+import { api } from '../lib/config';
 import type { PostResult } from '../lib/types';
 import { t, type MessageKey } from '../i18n';
 
@@ -102,9 +102,9 @@ export function setBusy(formEl: Element | null | undefined, busy: boolean): void
   if (formEl && formEl.setAttribute) formEl.setAttribute('aria-busy', on ? 'true' : 'false');
 }
 
-/** POST JSON to DRAFTA.api + path (or to an absolute URL). Never rejects. */
+/** POST JSON to config `api` + path (or to an absolute URL). Never rejects. */
 export async function post(path: string, body?: unknown, token?: string | null): Promise<PostResult> {
-  const base = String(DRAFTA.api || DEFAULT_API);
+  const base = String(api || DEFAULT_API);
   const target = /^https?:\/\//i.test(String(path || '')) ? String(path) : base + String(path || '');
   const headers: Record<string, string> = { 'Content-Type': 'application/json', Accept: 'application/json' };
   if (token) headers['Authorization'] = 'Bearer ' + token;

@@ -224,13 +224,15 @@ pre code{background:none;border:0;padding:0;color:inherit;font-size:inherit}
   display:flex;
   align-items:center;
   gap:var(--space-6);
-  min-block-size:var(--nav-height);
+  min-block-size:calc(var(--nav-height) - 1px); /* + the 1px hairline = 56px */
 }
 .nav__logo{
   display:inline-flex;
   align-items:center;
   gap:var(--space-2);
-  min-block-size:var(--control-height);
+  /* The logo sets the header row's height, so the row stays 56px when the
+     menu panel wraps below it. */
+  min-block-size:calc(var(--nav-height) - 1px);
   font-family:var(--font-display);
   font-size:var(--text-h3);
   font-weight:600;
@@ -944,6 +946,7 @@ details[open] > .faq__q{margin-bottom:var(--space-3)}
   .nav__inner{gap:var(--space-2);flex-wrap:wrap}
   .nav__links{order:4;flex-basis:100%;flex-wrap:wrap;gap:var(--space-4);margin-inline-start:0;padding-block-end:var(--space-2)}
   .nav__actions{margin-inline-start:auto;gap:var(--space-2)}
+  .nav__link{display:inline-flex;align-items:center;min-block-size:var(--control-height)}
   .nav--menu .nav__toggle:not([hidden]){display:inline-flex}
   .nav--menu .nav__links{display:none}
   .nav--menu.is-open .nav__links{

@@ -3,7 +3,7 @@
    with language links, and the product signature `by craftzman` with the 16px seal. */
 import DraftaMark from './DraftaMark.astro';
 import { t } from '../i18n';
-import { DRAFTA } from '../lib/config';
+import { releases } from '../lib/config';
 import { localePath } from '../lib/lang';
 import type { Lang } from '../lib/types';
 
@@ -33,7 +33,7 @@ const columns = [
   },
   {
     title: t(lang, 'footerDownloads'),
-    links: [{ href: DRAFTA.releases, label: t(lang, 'footerLatestRelease') }],
+    links: [{ href: releases, label: t(lang, 'footerLatestRelease') }],
   },
   {
     title: t(lang, 'footerLegal'),

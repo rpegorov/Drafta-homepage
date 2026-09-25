@@ -4,7 +4,7 @@
 import DraftaMark from './DraftaMark.astro';
 import LangSwitch from './LangSwitch.astro';
 import { t } from '../i18n';
-import { DRAFTA } from '../lib/config';
+import { releases } from '../lib/config';
 import { localePath } from '../lib/lang';
 import type { Lang } from '../lib/types';
 
@@ -36,7 +36,7 @@ const links = [
     </div>
     <div class="nav__actions">
       <LangSwitch lang={lang} paths={paths} />
-      <a class="btn" href={DRAFTA.releases}>{t(lang, 'download')}</a>
+      <a class="btn" href={releases}>{t(lang, 'download')}</a>
     </div>
   </nav>
 </header>

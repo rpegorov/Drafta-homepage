@@ -11,7 +11,7 @@
    finally a muted trial sentence. Storage and notes are read from the plan
    object, never from a literal. */
 
-import { DRAFTA } from '../lib/config';
+import { api, endpoints, planFallback } from '../lib/config';
 import { esc } from '../lib/esc';
 import type { Lang, Plan } from '../lib/types';
 import { normalizeLang, t } from '../i18n';
@@ -163,12 +163,11 @@ function renderPricing(el: HTMLElement, plans: Plan[], lang: Lang, mode: PlansMo
 }
 
 function fallback(): Plan[] {
-  const list = DRAFTA.planFallback;
-  return Array.isArray(list) ? list.slice() : [];
+  return planFallback.slice();
 }
 
 async function fetchPlans(): Promise<Plan[]> {
-  const url = String(DRAFTA.api || '') + String((DRAFTA.endpoints || {}).plans || '');
+  const url = String(api || '') + String(endpoints.plans || '');
   try {
     const response = await fetch(url, { headers: { Accept: 'application/json' } });
     if (!response.ok) return fallback();
