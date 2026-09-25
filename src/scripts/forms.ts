@@ -13,7 +13,6 @@ type SlotClass = 'form__error' | 'form__ok';
 const MIN_EMAIL_LENGTH = 3;
 const MIN_PASSWORD_LENGTH = 8;
 const MAX_PASSWORD_LENGTH = 1024;
-const DEFAULT_API = 'https://api.drafta.org';
 
 function pageLang(): string {
   const declared = (document.documentElement.getAttribute('lang') || '').toLowerCase();
@@ -104,7 +103,7 @@ export function setBusy(formEl: Element | null | undefined, busy: boolean): void
 
 /** POST JSON to config `api` + path (or to an absolute URL). Never rejects. */
 export async function post(path: string, body?: unknown, token?: string | null): Promise<PostResult> {
-  const base = String(api || DEFAULT_API);
+  const base = api;
   const target = /^https?:\/\//i.test(String(path || '')) ? String(path) : base + String(path || '');
   const headers: Record<string, string> = { 'Content-Type': 'application/json', Accept: 'application/json' };
   if (token) headers['Authorization'] = 'Bearer ' + token;
