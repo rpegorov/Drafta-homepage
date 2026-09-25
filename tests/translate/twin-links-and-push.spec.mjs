@@ -2,8 +2,8 @@
 // - two Russian posts that link each other get English twins in one run, and
 //   each twin links the other twin under its English title;
 // - a link never points at an English page that does not exist: when the
-//   hand-written English twin fails to build, the translated page links the
-//   Russian original;
+//   hand-written English twin fails to build, a machine twin stands in for it
+//   and the translated page links that;
 // - a translation the provider was paid for is never lost: when the push is
 //   rejected it is reported as translated or deferred (reason git), and
 //   translationChars counts every paid character.
@@ -51,7 +51,7 @@ describe('translated twins: links and paid work', () => {
     }
   });
 
-  it('B has a hand-written English note that fails to build → the English A links the Russian B', () => {
+  it('B has a hand-written English note that fails to build → the English A links B\'s machine twin, a page that exists', () => {
     const w = world();
     linkedPair(w);
     writeNote(w, {
@@ -62,9 +62,13 @@ describe('translated twins: links and paid work', () => {
     const r = translateRun(w);
     expect(w.siteHas(EN(A.slug)), JSON.stringify({ errors: r.json.errors, deferred: r.json.translationDeferred })).toBe(true);
 
+    // The broken hand-written twin does not ship, so B gets a machine twin in
+    // the same run — and A may link it, because that page exists.
     const enA = w.readSitePost(EN(A.slug)).body;
-    expect(enA).toMatch(linkTo(`/ru/blog/${B.slug}/`));
-    expect(enA).not.toMatch(linkTo(`/blog/${B.slug}/`));
+    const enB = w.readSitePost(EN(B.slug));
+    expect(enB.data.machineTranslated, 'the machine twin stands in for the broken hand-written one').toBe(true);
+    expect(enA).toMatch(linkTo(`/blog/${B.slug}/`));
+    expect(enA).toContain(`[${String(enB.data.title)}](`);
   });
 
   it('push rejected during translation of 3 jobs: every paid translation is translated or deferred for git, chars all counted', () => {

@@ -44,8 +44,10 @@ export function markNotified(state, reason, at) {
 
 export const TRANSLATION_BACKOFF_MS = Object.freeze([1 * HOUR_MS, 4 * HOUR_MS, 24 * HOUR_MS]);
 export const TRANSLATION_DISABLE_AFTER = 3;
-// Not failures of a note: the run held it back, ran out of budget or time.
-const NOT_FAILURES = new Set(['held', 'quota', 'timeout']);
+// Not failures of a note: the run held it back, ran out of budget or time, or
+// git refused the push — the translation sits in the local commit and the next
+// attempt serves it from cache, while the push failure has its own notice.
+const NOT_FAILURES = new Set(['held', 'quota', 'timeout', 'git']);
 // Failures that come from the note's own text: retrying the same text is futile,
 // so after TRANSLATION_DISABLE_AFTER of them the note waits for an edit. Key,
 // network and provider failures keep retrying on the backoff instead — fixing
