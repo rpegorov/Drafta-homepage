@@ -1,0 +1,36 @@
+<!doctype html>
+<!-- DOM hooks of /checkout/ at commit c497677: [data-plans], #quota-line, #order-form,
+     #order-hint, #order-error, #order-ok, #order-fields, #order-note, #order-login.
+     tests/checkout.spec.mjs checks dist/checkout/ still has them. -->
+<html lang="en" data-theme="paper">
+<head><meta charset="utf-8"><title>Checkout — Drafta</title></head>
+<body>
+  <main id="main">
+    <section class="band">
+      <div class="wrap wrap--narrow">
+        <h1 class="h1">One plan. Two ways to pay.</h1>
+      </div>
+    </section>
+    <section class="band band--soft" id="plans">
+      <div class="wrap">
+        <div class="plans" data-plans></div>
+        <p class="muted is-hidden" id="quota-line"></p>
+      </div>
+    </section>
+    <section class="band" id="order">
+      <div class="wrap wrap--narrow">
+        <div class="form" id="order-form">
+          <p class="form__hint" id="order-hint">Checking your session…</p>
+          <div class="form__error is-hidden" id="order-error" role="alert"></div>
+          <div class="form__ok is-hidden" id="order-ok" role="status"></div>
+          <dl class="mono" id="order-fields" hidden></dl>
+          <p class="form__hint" id="order-note" hidden>Nothing has been charged.</p>
+          <div class="form__actions">
+            <a class="btn btn--ghost" id="order-login" href="/login/?next=/checkout/" hidden>Sign in</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
