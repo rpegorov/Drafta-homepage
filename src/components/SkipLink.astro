@@ -1,0 +1,11 @@
+---
+/* First focusable element of every page; jumps past the header to <main id="main">. */
+import { t } from '../i18n';
+import type { Lang } from '../lib/types';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+---
+<a class="btn btn--primary skip-link" href="#main">{t(lang, 'skipLink')}</a>

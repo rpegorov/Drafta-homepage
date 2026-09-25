@@ -1,0 +1,1 @@
+{ "name": "Drafta", "short_name": "Drafta", "icons": [ { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }, { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" } ], "theme_color": "#fbf7f0", "background_color": "#fbf7f0", "display": "browser" }

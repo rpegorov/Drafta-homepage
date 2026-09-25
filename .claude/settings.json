@@ -1,0 +1,11 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          { "type": "command", "command": "~/.claude/skills/craftzman-brand/scripts/stop-hook.sh" }
+        ]
+      }
+    ]
+  }
+}

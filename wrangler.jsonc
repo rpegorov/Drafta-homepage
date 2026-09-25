@@ -1,11 +1,12 @@
-// Cloudflare Worker that serves drafta.org: static assets only, no script.
-// Workers Builds deploys it from this repository; the name must match the
-// existing worker, which the edge proxy on the demo server forwards to.
+// Cloudflare Worker that serves drafta.org: the prerendered Astro build, no script.
+// Workers Builds runs `npm ci && npm run build`, then `npx wrangler deploy`.
+// The name must match the existing worker: the edge proxy on the demo server
+// forwards drafta.org to drafta-homepage.<account>.workers.dev.
 {
   "name": "drafta-homepage",
   "compatibility_date": "2026-09-24",
   "assets": {
-    "directory": "./",
+    "directory": "./dist",
     // An unknown path answers 404 with the nearest 404.html instead of an empty body.
     "not_found_handling": "404-page",
     // foo/index.html is served at foo/, and /index.html redirects to / — the URLs the pages link to.

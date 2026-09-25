@@ -1,0 +1,42 @@
+---
+/* Site header: 56px glass nav — Drafta mark left, sections and actions right.
+   DOM hooks used by scripts/nav.ts: .nav, .nav__toggle, .nav__links. */
+import DraftaMark from './DraftaMark.astro';
+import LangSwitch from './LangSwitch.astro';
+import { t } from '../i18n';
+import { releases } from '../lib/config';
+import { localePath } from '../lib/lang';
+import type { Lang } from '../lib/types';
+
+interface Props {
+  lang: Lang;
+  paths: Record<Lang, string>;
+}
+const { lang, paths } = Astro.props;
+const home = localePath('/', lang);
+const links = [
+  { href: `${home}#features`, label: t(lang, 'navFeatures') },
+  { href: `${home}#pricing`, label: t(lang, 'navPricing') },
+  { href: `${home}#faq`, label: t(lang, 'navFaq') },
+  { href: localePath('/docs/', lang), label: t(lang, 'navDocs') },
+];
+---
+<header class="nav">
+  <nav class="nav__inner wrap" aria-label={t(lang, 'navLabel')}>
+    <a class="nav__logo" href={home} translate="no">
+      <DraftaMark class="nav__mark" />
+      <span class="nav__logo-text">Drafta</span>
+    </a>
+    <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links" hidden>
+      <span class="nav__toggle-icon" aria-hidden="true"></span>
+      <span class="nav__toggle-label">{t(lang, 'menu')}</span>
+    </button>
+    <div class="nav__links" id="nav-links">
+      {links.map(({ href, label }) => <a class="nav__link" href={href}>{label}</a>)}
+    </div>
+    <div class="nav__actions">
+      <LangSwitch lang={lang} paths={paths} />
+      <a class="btn" href={releases}>{t(lang, 'download')}</a>
+    </div>
+  </nav>
+</header>

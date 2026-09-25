@@ -1,0 +1,62 @@
+/* Drafta on the craftzman brand — the product layer over tokens.css.
+   tokens.css is the brand's file verbatim; this file only
+   (1) points the one action colour at Drafta's product accent in both themes,
+   (2) adds metric-matched fallbacks to the brand's font stacks, and
+   (3) names the brand's type scale in rem, so text follows the reader's font size.
+   Every value is derived from a brand token or the brand's published scale. */
+
+/* (1) Product accent. The attribute selector outranks the brand's
+   [data-theme="…"] rules, and --product-drafta already differs per theme. */
+:root,
+html[data-theme] {
+  --accent: var(--product-drafta);
+  --accent-hover: color-mix(in srgb, var(--product-drafta) 80%, var(--ink));
+  --accent-soft: color-mix(in srgb, var(--product-drafta) 12%, transparent);
+}
+
+/* (2) While a woff2 is still loading, text is set in a local face scaled to the
+   web font's advance and vertical metrics, so the swap moves nothing (it was the
+   whole of the page's layout shift). Ratios measured against Arial and Georgia,
+   Latin and Cyrillic averaged. */
+@font-face {
+  font-family: "Golos Fallback";
+  src: local("Arial"), local("ArialMT"), local("Liberation Sans");
+  size-adjust: 108.5%;
+  ascent-override: 90.3%;
+  descent-override: 20.3%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Lora Fallback";
+  src: local("Georgia");
+  size-adjust: 104.5%;
+  ascent-override: 96.3%;
+  descent-override: 26.2%;
+  line-gap-override: 0%;
+}
+
+:root {
+  --font-display: "Lora", "Lora Fallback", Georgia, "Times New Roman", serif;
+  --font-sans: "Golos Text", "Golos Fallback", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+
+  /* (3) The brand scale (SKILL §4) in rem: 1rem = 16px at the default font size. */
+  --text-label: 0.75rem;        /* 12 — mono labels, eyebrows */
+  --text-caption: 0.8125rem;    /* 13 */
+  --text-sm: 0.9375rem;         /* 15 — body-sm, buttons */
+  --text-body: 1.0625rem;       /* 17 */
+  --text-lead: 1.1875rem;       /* 19 */
+  --text-h3: 1.25rem;           /* 20 */
+  --text-quote: 1.375rem;       /* 22 */
+  --text-h2: 1.5rem;            /* 24 */
+  --text-h1: 2rem;              /* 32 */
+  --text-display-2: 2.5rem;     /* 40 */
+  --text-display-1: clamp(2.5rem, 5vw, 3.5rem); /* 56, 40 on phones */
+
+  --leading-body: 1.65;
+  --leading-display: 1.08;
+  --tracking-display: -0.02em;
+  --tracking-label: 0.08em;
+
+  /* Controls: the brand's 44px target, written in its spacing units. */
+  --control-height: calc(var(--space-7) - var(--space-1));
+}

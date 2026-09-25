@@ -1,0 +1,34 @@
+---
+/* Drafta's product mark: the app icon's "D" drawn in ten ruled lines, traced to a
+   vector (source: Drafta/icon/icon_light_1024.png). It takes the current text
+   colour, so it follows the theme; the lighter rows of the icon are drawn at
+   reduced opacity. Decorative — the link or heading around it carries the name. */
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+
+const ROW = 44;
+const FIRST_ROW = 6;
+const y = (row: number) => FIRST_ROW + row * ROW;
+/* [row, x1, x2, muted] */
+const bars: Array<[number, number, number, boolean]> = [
+  [0, 0, 356, false],
+  [1, 0, 130, false], [1, 242, 406, false],
+  [2, 0, 130, false], [2, 285, 439, false],
+  [3, 0, 130, false], [3, 308, 459, false],
+  [4, 0, 130, false], [4, 319, 469, false],
+  [5, 0, 130, true], [5, 319, 469, true],
+  [6, 0, 130, true], [6, 308, 459, true],
+  [7, 0, 130, false], [7, 285, 439, false],
+  [8, 0, 130, true], [8, 242, 406, true],
+  [9, 0, 356, true],
+];
+const strong = bars.filter((bar) => !bar[3]).map(([row, x1, x2]) => `M${x1} ${y(row)}H${x2}`).join('');
+const muted = bars.filter((bar) => bar[3]).map(([row, x1, x2]) => `M${x1} ${y(row)}H${x2}`).join('');
+---
+<svg class={className} viewBox="-8 -40.5 485 485" aria-hidden="true" focusable="false"
+  fill="none" stroke="currentColor" stroke-width="18" stroke-linecap="round">
+  <path d={strong} />
+  <path d={muted} opacity="0.55" />
+</svg>
