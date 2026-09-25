@@ -47,13 +47,13 @@ function conceal(el: HTMLElement | null): void {
    single "/" and carry no backslash or whitespace that a browser could fold
    into a protocol-relative URL. */
 function nextTarget(): string {
-  const match = /[?&]next=([^&#]*)/.exec(window.location.search);
-  if (!match) return DEFAULT_NEXT;
+  const raw = /[?&]next=([^&#]*)/.exec(window.location.search)?.[1];
+  if (raw === undefined) return DEFAULT_NEXT;
   let value: string;
   try {
-    value = decodeURIComponent(match[1].replace(/\+/g, ' '));
+    value = decodeURIComponent(raw.replace(/\+/g, ' '));
   } catch {
-    value = match[1];
+    value = raw;
   }
   if (value.charAt(0) !== '/' || value.charAt(1) === '/' || /[\\\s]/.test(value)) return DEFAULT_NEXT;
   return value;

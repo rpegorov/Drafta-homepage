@@ -173,8 +173,8 @@ function renderPlansBlock(): Promise<void> | null {
 function handleDeepLink(ready: Promise<void> | null): void {
   let wanted = '';
   try {
-    const m = /[?&]plan=([^&#]*)/.exec(window.location.search);
-    if (m) wanted = decodeURIComponent(m[1].replace(/\+/g, ' '));
+    const raw = /[?&]plan=([^&#]*)/.exec(window.location.search)?.[1];
+    if (raw !== undefined) wanted = decodeURIComponent(raw.replace(/\+/g, ' '));
   } catch { wanted = ''; }
   if (!wanted) return;
 
