@@ -27,7 +27,7 @@ const bars: Array<[number, number, number, boolean]> = [
 const strong = bars.filter((bar) => !bar[3]).map(([row, x1, x2]) => `M${x1} ${y(row)}H${x2}`).join('');
 const muted = bars.filter((bar) => bar[3]).map(([row, x1, x2]) => `M${x1} ${y(row)}H${x2}`).join('');
 ---
-<svg class={className} viewBox="-8 -40.5 485 485" aria-hidden="true" focusable="false"
+<svg class={className} viewBox="-20 -50.5 509 509" aria-hidden="true" focusable="false"
   fill="none" stroke="currentColor" stroke-width="18" stroke-linecap="round">
   <path d={strong} />
   <path d={muted} opacity="0.55" />
