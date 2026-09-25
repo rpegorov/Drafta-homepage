@@ -35,6 +35,7 @@ const LOCKUP_TEXT = 34;
 const TITLE_SIZE = { long: 60, short: 72 } as const;
 const TITLE_LONG_AFTER = 48; // characters; longer titles step down a size
 const DESCRIPTION_SIZE = 28;
+const TITLE_LINES = 3;
 const DESCRIPTION_LINES = 2;
 const FOOTER_SIZE = 24;
 const TRACKING_DISPLAY = -0.02; // em, the display-2 class
@@ -115,8 +116,10 @@ function card({ title, lang, description }: OgInput, palette: Palette): Node {
     el(
       'div',
       {
+        display: 'block',
         fontFamily: 'Lora',
         fontWeight: 600,
+        lineClamp: TITLE_LINES,
         fontSize: titleSize,
         lineHeight: 1.08,
         letterSpacing: `${TRACKING_DISPLAY}em`,

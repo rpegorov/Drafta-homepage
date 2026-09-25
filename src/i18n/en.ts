@@ -120,6 +120,5 @@ export const en = {
   },
 };
 
-
 export type Messages = typeof en;
 export type MessageKey = keyof Messages;

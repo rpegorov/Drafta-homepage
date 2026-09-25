@@ -8,7 +8,7 @@ import type { Lang } from '../../lib/types';
 interface Props {
   lang: Lang;
   sourceLang: Lang;
-  originalHref?: string;
+  originalHref?: string | undefined;
 }
 const { lang, sourceLang, originalHref } = Astro.props;
 const strings = t(lang, 'blog');
@@ -16,9 +16,9 @@ const strings = t(lang, 'blog');
 <p class="translation-notice" role="note">
   <span>{strings.translatedFrom[sourceLang]}</span>
   {originalHref && (
-    <>
+    <span class="translation-notice__original">
       <span class="translation-notice__sep" aria-hidden="true">·</span>
       <a href={originalHref} hreflang={sourceLang}>{strings.readOriginal}</a>
-    </>
+    </span>
   )}
 </p>

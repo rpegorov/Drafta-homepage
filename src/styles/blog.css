@@ -1,18 +1,20 @@
 /* Blog — the list (/blog/) and the post page (Post.astro).
    Tokens only (tokens.css + product.css): no raw colour, no px type size.
    The text column is the brand's reading measure, 680px, not counting the gutters.
-   Callout asides are styled in callouts.css (shared with the docs). */
+   Callout asides are styled in callouts.css (shared with the docs).
+   Base's site.css loads after this file, so rules that refine a shared class
+   (.wrap, .display-2, .lede) carry both classes to win on specificity. */
 
 /* ---------- frame ---------- */
 
-.blog,
-.post{
+.wrap.blog,
+.wrap.post{
   max-width:calc(var(--measure-reading) + var(--space-6) * 2);
   padding-block:var(--space-8) var(--space-9);
 }
 
-.blog__title,
-.post__title{
+.display-2.blog__title,
+.display-2.post__title{
   font-size:clamp(var(--text-h1), 5vw + var(--space-2), var(--text-display-2));
 }
 
@@ -133,8 +135,8 @@
   font-size:var(--text-sm);
   font-weight:600;
 }
-.post__title{margin-block-end:var(--space-4)}
-.post__lede{margin-block-end:var(--space-5)}
+.display-2.post__title{margin-block-end:var(--space-4)}
+.lede.post__lede{margin-block-end:var(--space-5)}
 
 .translation-notice{
   display:flex;
@@ -150,6 +152,7 @@
   line-height:1.55;
   color:var(--ink-soft);
 }
+.translation-notice__original{display:inline-flex;gap:var(--space-2)}
 .translation-notice__sep{color:var(--muted)}
 .translation-notice a{font-weight:600}
 .translation-notice a:hover{text-decoration:underline;text-underline-offset:0.2em}
@@ -274,7 +277,7 @@
 /* ---------- phones ---------- */
 
 @media (max-width:820px){
-  .blog,
-  .post{padding-block:var(--space-6) var(--space-8)}
+  .wrap.blog,
+  .wrap.post{padding-block:var(--space-6) var(--space-8)}
   .post-card{padding:var(--space-4)}
 }

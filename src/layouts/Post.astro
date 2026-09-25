@@ -22,7 +22,7 @@ import {
 
 interface Props {
   post: Post;
-  twin?: Post;
+  twin?: Post | undefined;
 }
 const { post, twin } = Astro.props;
 const { lang, slug, title, description, date, updated, tags, cover, machineTranslated, translation } = post.data;

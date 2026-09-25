@@ -7,7 +7,7 @@ import { formatDay } from './posts';
 interface Props {
   lang: Lang;
   date: string;
-  updated?: string;
+  updated?: string | undefined;
   tags: string[];
 }
 const { lang, date, updated, tags } = Astro.props;

@@ -128,4 +128,3 @@ export const ru: Messages = {
     readOriginal: 'Читать оригинал →',
   },
 };
-
