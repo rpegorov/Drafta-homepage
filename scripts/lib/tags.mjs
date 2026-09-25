@@ -127,18 +127,31 @@ export function mapProse(content, fn) {
     .join('\n');
 }
 
+// A run of tags that ends a line: `… text. #site/blog #drafta`.
+const TRAILING_TAGS = /(^|[ \t])((?:#[^\s#`]+[ \t]*)+)$/u;
+
+function withoutTrailingTags(line, wanted) {
+  const match = TRAILING_TAGS.exec(line);
+  if (!match) return line;
+  const run = match[2].trim().split(/[ \t]+/);
+  const kept = run.filter((tag) => !wanted.has(tag.slice(1).toLowerCase()));
+  if (kept.length === run.length) return line;
+  const head = line.slice(0, match.index).trimEnd();
+  return [head, ...kept].filter(Boolean).join(' ');
+}
+
 /**
- * Removes the given full-path tags (e.g. `site/blog`) from prose, with the
- * space before them — they are publishing switches, not text for readers.
+ * Removes the given full-path tags (e.g. `site/blog`) where they trail a line
+ * of prose — they are publishing switches, not text for readers. A tag in the
+ * middle of a sentence stays: cutting it would break the sentence.
  */
 export function removeTags(content, tags) {
   const wanted = new Set(tags.map((tag) => tag.toLowerCase()));
-  const REMOVED = '\u0000';
-  return mapProse(content, (text) =>
-    text
-      .replace(TAG_PATTERN, (match, raw) => (wanted.has(raw.toLowerCase()) ? REMOVED : match))
-      .replace(/[ \t]*\u0000/g, ''),
-  );
+  return splitFences(content)
+    .flatMap((segment) =>
+      segment.kind === 'fence' ? segment.lines : segment.lines.map((line) => withoutTrailingTags(line, wanted)),
+    )
+    .join('\n');
 }
 
 function masked(content) {

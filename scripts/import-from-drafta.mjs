@@ -345,12 +345,12 @@ async function main(argv) {
     return EXIT_OK;
   }
   if (options.translate) {
-    console.error('--translate: not implemented yet (ЗАДАЧА-2.5)');
+    reportFailure(options.json, '--translate', 'not implemented yet (ЗАДАЧА-2.5)');
     return EXIT_FAILED;
   }
   const problem = usageError(options);
   if (problem) {
-    console.error(`${problem}\n${USAGE}`);
+    reportFailure(options.json, 'usage', `${problem}\n${USAGE}`);
     return EXIT_FAILED;
   }
 
@@ -364,11 +364,11 @@ async function main(argv) {
 }
 
 /** A run that failed before it had a plan still owes `--json` callers one JSON object. */
-function reportFatal(argv, error) {
-  console.error(`import-from-drafta: ${error.message}`);
-  if (!argv.includes('--json')) return;
+function reportFailure(json, title, message) {
+  console.error(`import-from-drafta: ${title}: ${message}`);
+  if (!json) return;
   const empty = { created: [], updated: [], deleted: [], unchanged: [], skipped: [], warnings: [] };
-  console.log(JSON.stringify({ ...empty, errors: [{ title: 'export', message: error.message }], committed: false, pushed: false }));
+  console.log(JSON.stringify({ ...empty, errors: [{ title, message }], committed: false, pushed: false }));
 }
 
 const argv = process.argv.slice(2);
@@ -377,7 +377,7 @@ main(argv).then(
     process.exitCode = code;
   },
   (error) => {
-    reportFatal(argv, error);
+    reportFailure(argv.includes('--json'), 'export', error.message);
     process.exitCode = EXIT_FAILED;
   },
 );
