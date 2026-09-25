@@ -31,6 +31,13 @@ export function isValidSlug(value) {
   return typeof value === 'string' && SLUG.test(value);
 }
 
+/** `2026-02-30` has the right shape and is not a day: the calendar must give the same Y/M/D back. */
+function isRealDay(day) {
+  const [year, month, date] = day.split('-').map(Number);
+  const parsed = new Date(Date.UTC(year, month - 1, date));
+  return parsed.getUTCFullYear() === year && parsed.getUTCMonth() === month - 1 && parsed.getUTCDate() === date;
+}
+
 function unquote(value) {
   const quoted = /^"(.*)"$/.exec(value) ?? /^'(.*)'$/.exec(value);
   return quoted ? quoted[1] : null;
@@ -78,10 +85,10 @@ function validate(raw, problems) {
   if (raw.description) fields.description = raw.description;
   if (raw.date) {
     const match = DATE_WITH_TIME.exec(raw.date);
-    if (match) {
+    if (match && isRealDay(match[1])) {
       fields.date = match[1];
       if (match[2]) fields.time = match[2];
-    } else problems.push(`date "${raw.date}" is not YYYY-MM-DD or YYYY-MM-DD HH:MM`);
+    } else problems.push(`date "${raw.date}" is not a real YYYY-MM-DD or YYYY-MM-DD HH:MM`);
   }
   if (raw.order) {
     const order = Number(raw.order);
