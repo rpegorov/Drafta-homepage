@@ -73,6 +73,7 @@ export function renderBlogFrontmatter({
   lang,
   slug,
   date,
+  created,
   updated,
   draftaId,
   tags,
@@ -87,10 +88,11 @@ export function renderBlogFrontmatter({
     `lang: ${yamlScalar(lang)}`,
     `slug: ${yamlScalar(slug)}`,
     `date: ${yamlScalar(date)}`,
-    `updated: ${yamlScalar(updated)}`,
-    `draftaId: ${yamlScalar(draftaId)}`,
-    `tags: ${yamlStringArray(tags ?? [])}`,
   ];
+  // The note's creation instant (ISO-8601): posts of one day are listed in
+  // the order they were written, so a series reads in order.
+  if (created !== undefined) lines.push(`created: ${yamlScalar(created)}`);
+  lines.push(`updated: ${yamlScalar(updated)}`, `draftaId: ${yamlScalar(draftaId)}`, `tags: ${yamlStringArray(tags ?? [])}`);
   if (cover !== undefined) lines.push(`cover: ${yamlScalar(cover)}`);
   if (machineTranslated !== undefined) lines.push(`machineTranslated: ${yamlScalar(machineTranslated)}`);
   pushTranslation(lines, translation);

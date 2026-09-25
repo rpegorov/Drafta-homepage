@@ -10,9 +10,22 @@ export type Post = CollectionEntry<'blog'>;
 
 const INTL_LOCALE: Record<Lang, string> = { en: 'en-GB', ru: 'ru-RU' };
 
-/** Newest first; posts from the same day keep a stable order by title. */
+/**
+ * Newest day first. Within one day the posts run in the order they were
+ * written (`created` ascending — a series reads in order; a release
+ * announcement written first comes first); posts without `created` follow
+ * those with it, then the title keeps the order stable.
+ */
 export function byNewest(a: Post, b: Post): number {
-  return b.data.date.localeCompare(a.data.date) || a.data.title.localeCompare(b.data.title);
+  return b.data.date.localeCompare(a.data.date) || byCreated(a, b) || a.data.title.localeCompare(b.data.title);
+}
+
+function byCreated(a: Post, b: Post): number {
+  const ca = a.data.created;
+  const cb = b.data.created;
+  if (ca && cb) return ca.localeCompare(cb);
+  if (ca || cb) return ca ? -1 : 1;
+  return 0;
 }
 
 /** Every post of one language, newest first. */

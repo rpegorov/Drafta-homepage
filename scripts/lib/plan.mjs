@@ -84,6 +84,8 @@ export function renderPage({ note, section, site, tags, body, cover, title, mach
           lang: site.lang,
           slug: site.slug,
           date: site.date ?? isoDay(note.createdAt),
+          // Also on a translation: the twin sorts next to its original.
+          created: new Date(note.createdAt).toISOString(),
           tags,
           cover,
         })
