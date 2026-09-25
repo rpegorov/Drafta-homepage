@@ -1,0 +1,36 @@
+<!doctype html>
+<!-- DOM hooks of /login/ at commit c497677: [data-login-form], #email, #password,
+     [data-signed-in], [data-next-link]. The port keeps them 1:1 (PLAN v2 §5,
+     "Принципы декомпозиции"); tests/login.spec.mjs checks dist/login/ still has them. -->
+<html lang="en" data-theme="paper">
+<head><meta charset="utf-8"><title>Sign in — Drafta</title></head>
+<body>
+  <main id="main">
+    <section class="band band--soft">
+      <div class="wrap wrap--narrow">
+        <h1 class="h1">Sign in</h1>
+        <form class="form" method="post" action="" data-login-form novalidate>
+          <div class="form__field">
+            <label class="form__label" for="email">Email</label>
+            <input class="form__input" id="email" name="email" type="email" autocomplete="email" required>
+          </div>
+          <div class="form__field">
+            <label class="form__label" for="password">Password</label>
+            <input class="form__input" id="password" name="password" type="password" autocomplete="current-password" required>
+          </div>
+          <div class="form__actions">
+            <button class="btn btn--primary btn--block" type="submit">Sign in</button>
+          </div>
+          <p class="form__alt">No account yet? <a class="btn btn--ghost" href="/register/">Create an account</a></p>
+        </form>
+        <div class="form is-hidden" data-signed-in hidden role="status">
+          <p class="form__ok">Signed in.</p>
+          <div class="form__actions">
+            <a class="btn btn--primary" href="/checkout/" data-next-link>Continue to checkout</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
