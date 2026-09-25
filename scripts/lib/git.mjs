@@ -54,13 +54,38 @@ export async function pushFastForward(dir, branch, { exec = defaultExec } = {}) 
   return { pushed: true };
 }
 
+// The directories the exporter writes; untracked leftovers there (an aborted
+// run, a hand-made file) are discarded by the reset, nothing outside them is.
+const CONTENT_ROOT = 'src/content';
+
 /**
  * Resets the publisher's disposable clone to `origin/<branch>` before an
  * export (PLAN v2 §11.1 п. 2): its state is always derivable from origin and
- * the library, so there is nothing local to keep. For the publisher (2.4),
- * never for a working copy.
+ * the library, so there is nothing local to keep — local edits and unpushed
+ * commits are dropped, not carried over (brain: `git checkout -B` onto origin
+ * keeps local edits or aborts on a conflict). For the publisher (2.4), never
+ * for a working copy.
  */
 export async function syncToOrigin(dir, branch, { exec = defaultExec } = {}) {
   await git(exec, dir, ['fetch', '--quiet', 'origin', branch]);
+  await git(exec, dir, ['reset', '--hard', '--quiet', `origin/${branch}`]);
   await git(exec, dir, ['checkout', '--quiet', '-B', branch, `origin/${branch}`]);
+  await git(exec, dir, ['clean', '-fd', '--quiet', '--', CONTENT_ROOT]);
+}
+
+/**
+ * Replays the clone's unpushed commits onto a fresh `origin/<branch>` after a
+ * rejected push, so a translation already committed is not paid for again.
+ * @returns {Promise<boolean>} false when the replay conflicted — the rebase is
+ *   aborted and the caller has to fall back to `syncToOrigin`.
+ */
+export async function rebaseOntoOrigin(dir, branch, { exec = defaultExec } = {}) {
+  await git(exec, dir, ['fetch', '--quiet', 'origin', branch]);
+  try {
+    await git(exec, dir, ['rebase', '--quiet', `origin/${branch}`]);
+    return true;
+  } catch {
+    await git(exec, dir, ['rebase', '--abort']);
+    return false;
+  }
 }
