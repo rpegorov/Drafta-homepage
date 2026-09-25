@@ -34,7 +34,7 @@ import {
   rewriteAttachmentRefs,
 } from './lib/attachments.mjs';
 import { parseFrontmatter } from './lib/frontmatter.mjs';
-import { aheadOfOrigin, commitPaths, defaultExec, pushFastForward } from './lib/git.mjs';
+import { aheadOfOrigin, commitPaths, currentBranch, defaultExec, pushFastForward } from './lib/git.mjs';
 import { decodeNote } from './lib/notes.mjs';
 import { buildPlan, contentDirs, pageTarget, renderPage, withoutTitleLine } from './lib/plan.mjs';
 import { PublishConfigError, readPublishConfig } from './lib/publish-config.mjs';
@@ -523,14 +523,28 @@ function importCommitMessage(plan) {
   return `content: ${clauses.join(', ')} from Drafta`;
 }
 
+/**
+ * Nothing new to commit, yet HEAD is ahead of origin/<branch>: the publisher's
+ * retry after a rejected push, whose originals the previous attempt committed.
+ * Only on <branch> itself — an owner's working copy on a feature branch must
+ * not have its commits pushed to main by a stray --push.
+ */
+async function hasUnpushedOriginals({ site, branch }) {
+  if (!(await aheadOfOrigin(site, branch, { exec: gitExec }))) return false;
+  const checkedOut = await currentBranch(site, { exec: gitExec });
+  if (checkedOut !== branch) {
+    throw new Error(`HEAD is ahead of origin/${branch} but the checked-out branch is ${checkedOut ?? 'detached'} — refusing to push it`);
+  }
+  return true;
+}
+
 async function publish(options, plan) {
   const outcome = { committed: false, pushed: false, errors: [] };
   try {
     const touched = applyPlan(options.site, plan);
     const commit = await commitPaths(options.site, touched, importCommitMessage(plan), { exec: gitExec });
     Object.assign(outcome, commit.committed ? { committed: true, sha: commit.sha } : {});
-    // Also after a retry: the originals were committed by the previous attempt and are still unpushed.
-    if (options.push && (commit.committed || (await aheadOfOrigin(options.site, options.branch, { exec: gitExec })))) {
+    if (options.push && (commit.committed || (await hasUnpushedOriginals(options)))) {
       outcome.pushed = (await pushFastForward(options.site, options.branch, { exec: gitExec })).pushed;
     }
   } catch (error) {
