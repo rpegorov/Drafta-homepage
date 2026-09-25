@@ -31,4 +31,9 @@ export const planFallback: readonly Plan[] = [
 ];
 
 /** Capabilities the site shows but does not deliver yet; wave 1 closes with only OWNER fields here. */
-export const unwiredCapabilities: string[] = [];
+export const unwiredCapabilities: string[] = [
+  'OWNER: seller name and INN on /terms/, /privacy/, /refund/, /contact/ (EN and RU) are placeholders',
+  'OWNER: support email support@drafta.org on the legal pages is unconfirmed',
+  'OWNER: jurisdiction on the legal pages is a draft',
+  'OWNER: refund rule on /refund/ is a draft',
+];
