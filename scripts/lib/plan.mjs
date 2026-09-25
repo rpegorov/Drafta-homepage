@@ -50,10 +50,6 @@ export function pageTarget(section, lang, slug) {
   return { path: `${dir}/${slug}.md`, assetDir: `${dir}/${slug}`, url: `${SITE_URL}${sitePath}`, sitePath };
 }
 
-function isoDay(timestamp) {
-  return new Date(timestamp).toISOString().slice(0, 10);
-}
-
 /** Drops the note's own title line: the site renders `title` as the page heading. */
 export function withoutTitleLine(body) {
   const lines = body.split('\n');
@@ -72,7 +68,7 @@ export function renderPage({ note, section, site, tags, body, cover, title, mach
   const common = {
     title: title ?? note.title,
     description: site.description,
-    updated: isoDay(note.updatedAt),
+    updated: ownerDay(note.updatedAt),
     draftaId: note.id,
     ...(machine ? { machineTranslated: true, translation: machine.translation } : {}),
   };
