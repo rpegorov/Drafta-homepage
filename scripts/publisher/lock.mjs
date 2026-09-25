@@ -19,10 +19,16 @@ function isAlive(pid) {
   }
 }
 
-/** `ps` start time of a process, or null when there is none. */
+/**
+ * `ps` start time of a process, or null when there is none. Always in the C
+ * locale: `lstart` follows LANG, and a launchd run (C) and a Terminal run
+ * (ru_RU) comparing differently spelled times would each take the other for
+ * dead (brain: macOS ps -o lstart is locale-formatted).
+ */
 export function processStartTime(pid) {
   try {
-    const out = execFileSync('ps', ['-o', 'lstart=', '-p', String(pid)], { encoding: 'utf8' }).trim();
+    const env = { ...process.env, LC_ALL: 'C' };
+    const out = execFileSync('ps', ['-o', 'lstart=', '-p', String(pid)], { encoding: 'utf8', env }).trim();
     return out || null;
   } catch {
     return null;
