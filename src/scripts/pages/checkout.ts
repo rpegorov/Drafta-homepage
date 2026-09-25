@@ -148,7 +148,7 @@ function onSelect(plan: Plan): void {
   const code = plan && plan.code ? plan.code : String(plan);
   const name = plan && plan.name ? plan.name : String(code || '');
   /* The card that was pressed, so its own button shows the busy state. */
-  const button = plansEl ? plansEl.querySelector<HTMLElement>('.plan__cta[data-plan="' + code + '"]') : null;
+  const button = plansEl ? plansEl.querySelector<HTMLElement>('.plan__cta[data-plan="' + window.CSS.escape(code) + '"]') : null;
   subscribe(code, name, button);
 }
 
@@ -184,7 +184,10 @@ function handleDeepLink(ready: Promise<void> | null): void {
   chain.then(() => loadPlans().then((list) => {
     const plan = (list || []).find((p) => p && String(p.code) === String(wanted));
     if (plan) say(hintEl, fill(t(LANG, 'checkoutDeepLink'), plan.name || wanted));
-  }));
+  })).catch((error: unknown) => {
+    console.error('Drafta: the deep-linked plan could not be loaded', error);
+    say(hintEl, t(LANG, 'checkoutNoRenderer'));
+  });
 }
 
 /* 3 — the quota line, rendered from the plan object: never a literal. */
