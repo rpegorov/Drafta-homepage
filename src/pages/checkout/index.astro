@@ -1,0 +1,94 @@
+---
+/* /checkout/ (ЗАДАЧА-1.3) — ported from commit c497677's checkout/index.html.
+   The plans cards and the order form are wired by scripts/pages/checkout.ts;
+   this file only owns markup and copy. Card payment is not connected yet
+   (PLAN v2 §8): nothing here charges anything or changes the subscribe
+   contract. */
+import Base from '../../layouts/Base.astro';
+import { t } from '../../i18n';
+import { releases } from '../../lib/config';
+
+const lang = 'en';
+---
+<Base
+  lang={lang}
+  title={t(lang, 'checkoutTitle')}
+  description={t(lang, 'checkoutMetaDescription')}
+  canonicalPath="/checkout/"
+  noindex
+>
+  <!-- Opening — paper band -->
+  <section class="band">
+    <div class="wrap wrap--narrow">
+      <p class="eyebrow">{t(lang, 'checkoutEyebrow')}</p>
+      <h1 class="h1">{t(lang, 'checkoutH1')}</h1>
+      <p class="lede">{t(lang, 'checkoutLede')}</p>
+      <div class="callout callout--accent">
+        <p><strong>{t(lang, 'checkoutCalloutStrong')}</strong> {t(lang, 'checkoutCalloutRest')}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing — soft band; the two cards are the anchor of the page -->
+  <section class="band band--soft" id="plans">
+    <div class="wrap">
+      <p class="eyebrow">{t(lang, 'checkoutPricingEyebrow')}</p>
+      <h2 class="h2">{t(lang, 'checkoutPricingH2')}</h2>
+      <p class="lede">{t(lang, 'checkoutPricingLede')}</p>
+      <div class="plans" data-plans></div>
+      <p class="muted is-hidden" id="quota-line"></p>
+      <p class="muted">{t(lang, 'checkoutQuotaNote')}</p>
+    </div>
+  </section>
+
+  <!-- Order — paper band; where the server's answer lands -->
+  <section class="band" id="order">
+    <div class="wrap wrap--narrow">
+      <h2 class="h2">{t(lang, 'checkoutOrderH2')}</h2>
+      <div class="form" id="order-form">
+        <p class="form__hint" id="order-hint">{t(lang, 'checkoutOrderChecking')}</p>
+        <div class="form__error is-hidden" id="order-error" role="alert"></div>
+        <div class="form__ok is-hidden" id="order-ok" role="status"></div>
+        <dl class="mono" id="order-fields" hidden></dl>
+        <p class="form__hint" id="order-note" hidden>{t(lang, 'checkoutOrderNote')}</p>
+        <div class="form__actions">
+          <a class="btn btn--ghost" id="order-login" href="/login/?next=/checkout/" hidden>{t(lang, 'footerSignIn')}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- The one ink band: the straight answer about the money -->
+  <section class="band band--ink">
+    <div class="wrap wrap--narrow">
+      <h2 class="h2">{t(lang, 'checkoutInkH2')}</h2>
+      <p>{t(lang, 'checkoutInkP')}</p>
+      <blockquote class="pullquote">{t(lang, 'checkoutPullquote')}<span class="pullquote__source">{t(lang, 'checkoutPullquoteSource')}</span></blockquote>
+    </div>
+  </section>
+
+  <!-- Questions — paper band, kept to three rows -->
+  <section class="band" id="faq">
+    <div class="wrap wrap--narrow">
+      <h2 class="h2">{t(lang, 'checkoutFaqH2')}</h2>
+      <div class="faq">
+        <div class="faq__item">
+          <div class="faq__q">{t(lang, 'checkoutFaqQ1')}</div>
+          <div class="faq__a">{t(lang, 'checkoutFaqA1')}</div>
+        </div>
+        <div class="faq__item">
+          <div class="faq__q">{t(lang, 'checkoutFaqQ2')}</div>
+          <div class="faq__a">{t(lang, 'checkoutFaqA2')}</div>
+        </div>
+        <div class="faq__item">
+          <div class="faq__q">{t(lang, 'checkoutFaqQ3')}</div>
+          <div class="faq__a">{t(lang, 'checkoutFaqA3Pre')}<a href={releases}>{t(lang, 'checkoutFaqA3Link')}</a>{t(lang, 'checkoutFaqA3Post')}</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    import '../../scripts/pages/checkout.ts';
+  </script>
+</Base>
