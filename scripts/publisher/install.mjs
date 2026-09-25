@@ -18,7 +18,7 @@
 import { execFile, spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { parseArgs, promisify } from 'node:util';
 import { syncToOrigin } from '../lib/git.mjs';
 import { PROVIDER_IDS } from '../translate/providers.mjs';
@@ -183,7 +183,14 @@ async function install() {
   console.log(`log:    ${paths.log}`);
 }
 
-install().catch((error) => {
-  console.error(error instanceof InstallError ? error.message : `publisher:install failed: ${error.stderr?.trim() || error.message}`);
-  process.exitCode = 1;
-});
+// Importing this module (a syntax check, a test) must not install anything.
+function isMain() {
+  return Boolean(process.argv[1]) && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href;
+}
+
+if (isMain()) {
+  install().catch((error) => {
+    console.error(error instanceof InstallError ? error.message : `publisher:install failed: ${error.stderr?.trim() || error.message}`);
+    process.exitCode = 1;
+  });
+}

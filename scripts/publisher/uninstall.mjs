@@ -5,7 +5,8 @@
 //
 // Unloads the job and deletes its plist. The clone, state.json and the log
 // stay for inspection; --purge deletes them too.
-import { rmSync } from 'node:fs';
+import { realpathSync, rmSync } from 'node:fs';
+import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
 import { bootoutIfLoaded } from './launchctl.mjs';
 import { LABEL, PROBE_LABEL, layout } from './layout.mjs';
@@ -25,7 +26,13 @@ async function uninstall() {
   console.log(`purged: ${paths.base}, ${paths.log}`);
 }
 
-uninstall().catch((error) => {
-  console.error(`publisher:uninstall failed: ${error.stderr?.trim() || error.message}`);
-  process.exitCode = 1;
-});
+function isMain() {
+  return Boolean(process.argv[1]) && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href;
+}
+
+if (isMain()) {
+  uninstall().catch((error) => {
+    console.error(`publisher:uninstall failed: ${error.stderr?.trim() || error.message}`);
+    process.exitCode = 1;
+  });
+}
