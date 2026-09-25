@@ -218,6 +218,7 @@ const DEFER_LABELS = {
   'invalid-output': 'модель нарушила разметку',
   'no-key': 'нет ключа',
   error: 'внутренняя ошибка',
+  git: 'перевод готов, но git не принял push — повторю',
 };
 
 function limitFromEnv(env, name, fallback) {
@@ -338,9 +339,15 @@ function mergeAttempts(previous, latest) {
     updated: unionBy(previous.updated ?? [], latest.updated ?? [], pageKey),
     deleted: unionBy(previous.deleted ?? [], latest.deleted ?? [], pageKey),
     translated: unionBy(previous.translated ?? [], latest.translated ?? [], translationKey, paidFirst),
-    translationDeferred: unionBy(previous.translationDeferred ?? [], latest.translationDeferred ?? [], translationKey),
+    translationDeferred: stillDeferred(previous, latest),
     translationChars: (previous.translationChars ?? 0) + (latest.translationChars ?? 0),
   };
+}
+
+/** Deferred on either attempt and translated on neither: a translation the retry made is no longer deferred. */
+function stillDeferred(previous, latest) {
+  const done = new Set([...(previous.translated ?? []), ...(latest.translated ?? [])].map(translationKey));
+  return unionBy(previous.translationDeferred ?? [], latest.translationDeferred ?? [], translationKey).filter((entry) => !done.has(translationKey(entry)));
 }
 
 /** The retry may spend only what the first attempt left of the run's budget. */

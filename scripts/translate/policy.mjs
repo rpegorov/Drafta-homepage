@@ -12,6 +12,8 @@ import { DEFER, TranslationDeferred } from './translate.mjs';
 export const DEFAULT_MAX_CHARS_PER_RUN = 60_000;
 export const HELD = 'held';
 export const UNEXPECTED = 'error';
+// The translations are made and committed, but git would not take them to origin.
+export const GIT_REFUSED = 'git';
 // After one of these, every later request of the run would fail the same way.
 export const RUN_WIDE_DEFERRALS = new Set([DEFER.noKey, DEFER.offline, DEFER.auth, DEFER.timeout]);
 
@@ -74,30 +76,49 @@ async function translatePhase(jobs, { budget, hold }, translate, out) {
  * @param {{budget: number, hold: Set<string>, provider: string}} limits
  * @param {{translate: (job: object) => Promise<{done: object, usage: object, model: string}>,
  *   build: (items: {job: object, done: object}[]) => ({page: object} | {error: string})[],
- *   publish: (job: object, page: object) => Promise<string|undefined>}} io
+ *   commit: (pages: {job: object, page: object}[]) => Promise<string|undefined>,
+ *   push: () => Promise<void>}} io
  *   translate — the model call (throws TranslationDeferred on a text or provider problem);
  *   build — the pages of every translation made, aligned with `items`; an error is a text problem;
- *   publish — writes and commits one page, resolving the commit sha
+ *   commit — writes every page and commits them together, resolving the commit sha;
+ *   push — takes the commit to origin (a no-op when the run does not push)
  * @returns {Promise<{translated: object[], deferred: object[], chars: number, sha?: string, errors: object[]}>}
  */
-export async function runTranslations(jobs, { budget, hold, provider }, { translate, build, publish }) {
+export async function runTranslations(jobs, { budget, hold, provider }, { translate, build, commit, push }) {
   const out = { translated: [], deferred: [], chars: 0, sha: undefined, errors: [] };
   const made = await translatePhase(jobs, { budget, hold }, translate, out);
-  const built = made.length > 0 ? await build(made.map(({ job, done }) => ({ job, done }))) : [];
-
+  const built = await buildPhase(made, build);
+  const pages = [];
   for (const [i, item] of made.entries()) {
-    const result = built[i];
-    if (!result?.page) {
-      item.defer(DEFER.invalid, result?.error ?? 'no page built');
-      continue;
-    }
-    try {
-      out.sha = (await publish(item.job, result.page)) ?? out.sha;
-    } catch (error) {
-      out.errors.push({ title: 'git', message: (error.stderr || error.message || String(error)).trim() });
-      break;
-    }
-    out.translated.push({ ...item.base, cached: false, url: result.page.url, path: result.page.path, provider, model: item.model, usage: item.usage, chars: item.chars });
+    if (built[i]?.page) pages.push({ item, page: built[i].page });
+    else item.defer(DEFER.invalid, built[i]?.error ?? 'no page built');
+  }
+  if (pages.length === 0) return out;
+
+  // One commit and one push for every translation of the run: a page never
+  // reaches origin ahead of the twin it links. When git refuses, every job is
+  // deferred as `git`; the pages stay in the local commit and the retry's
+  // rebase serves them from the cache instead of paying for them again.
+  try {
+    out.sha = (await commit(pages.map(({ item, page }) => ({ job: item.job, page })))) ?? out.sha;
+    await push();
+  } catch (error) {
+    out.errors.push({ title: 'git', message: (error.stderr || error.message || String(error)).trim() });
+    for (const { item } of pages) item.defer(GIT_REFUSED);
+    return out;
+  }
+  for (const { item, page } of pages) {
+    out.translated.push({ ...item.base, cached: false, url: page.url, path: page.path, provider, model: item.model, usage: item.usage, chars: item.chars });
   }
   return out;
+}
+
+/** Phase 2 never throws: a build that blows up makes every translation of the run invalid. */
+async function buildPhase(made, build) {
+  if (made.length === 0) return [];
+  try {
+    return await build(made.map(({ job, done }) => ({ job, done })));
+  } catch (error) {
+    return made.map(() => ({ error: `page build failed: ${error?.message ?? String(error)}` }));
+  }
 }

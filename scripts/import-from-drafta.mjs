@@ -389,12 +389,24 @@ function usageDelta(before, after) {
   };
 }
 
-/** Writes, commits and (with --push) pushes one translation; returns the commit sha. */
-async function publishTranslation(options, job, page) {
-  writePage(options.site, { page });
-  const commit = await commitPaths(options.site, [page.path, page.assetDir], `content: translate ${job.slug} (${job.from}→${job.to})`, { exec: gitExec });
-  if (options.push) await pushFastForward(options.site, options.branch, { exec: gitExec });
+/** Writes every translation of the run and commits them together; returns the commit sha. */
+async function commitTranslations(options, pages) {
+  for (const { page } of pages) writePage(options.site, { page });
+  const paths = pages.flatMap(({ page }) => [page.path, page.assetDir]);
+  const commit = await commitPaths(options.site, paths, translationCommitMessage(pages), { exec: gitExec });
   return commit.committed ? commit.sha : undefined;
+}
+
+function translationCommitMessage(pages) {
+  if (pages.length === 1) {
+    const { job } = pages[0];
+    return `content: translate ${job.slug} (${job.from}→${job.to})`;
+  }
+  return `content: translate ${pages.length} pages from Drafta`;
+}
+
+async function pushTranslations(options) {
+  if (options.push) await pushFastForward(options.site, options.branch, { exec: gitExec });
 }
 
 /**
@@ -419,11 +431,16 @@ async function translateJob(job, source, translator) {
  */
 function buildTranslations(items, { candidates, context }) {
   const versions = items.map(({ job, done }) => ({ job, version: translatedVersion(job, candidates.get(job.noteId), done) }));
+  // What the index held before this run's translations — a machine twin
+  // already on the site — comes back for a translation that fails to build.
+  const before = new Map(versions.map(({ job }) => [twinKey(job.section, job.slug), context.twins.get(twinKey(job.section, job.slug))]));
   const seedTwins = (skip) => {
     for (const { job, version } of versions) {
       const key = twinKey(job.section, job.slug);
-      if (skip.has(job)) context.twins.delete(key);
-      else context.twins.set(key, { sitePath: version.target.sitePath, title: version.title });
+      const previous = before.get(key);
+      if (!skip.has(job)) context.twins.set(key, { sitePath: version.target.sitePath, title: version.title });
+      else if (previous) context.twins.set(key, previous);
+      else context.twins.delete(key);
     }
   };
   const buildAll = () => versions.map(({ job, version }) => buildPage(candidates.get(job.noteId), context, version));
@@ -461,7 +478,8 @@ function translateAll(options, run, env) {
   return runTranslations(jobs, limits, {
     translate: (job) => translateJob(job, sources.get(job.noteId), translator),
     build: (items) => buildTranslations(items, { candidates, context: run.context }),
-    publish: (job, page) => publishTranslation(options, job, page),
+    commit: (pages) => commitTranslations(options, pages),
+    push: () => pushTranslations(options),
   });
 }
 
@@ -540,14 +558,16 @@ function buildPages(candidates, context) {
 function planRun(options, { tagNamespace }) {
   const library = readLibrary(options.library, sectionTagsFor(tagNamespace));
   const roots = attachmentRoots(options.library);
-  let context = { links: titleIndex(library.candidates), roots, site: options.site };
+  let linkable = library.candidates;
+  let context = { links: titleIndex(linkable), roots, site: options.site };
   let built = buildPages(library.candidates, context);
   if (built.failed.length > 0) {
     // A wiki-link must not point at a page that is not going out: rebuild
     // without the failed notes in the index (a page fails on its attachments,
     // not on its links, so the second pass fails the same notes).
     const failedIds = new Set(built.failed.map(({ candidate }) => candidate.note.id));
-    context = { ...context, links: titleIndex(library.candidates.filter((candidate) => !failedIds.has(candidate.note.id))) };
+    linkable = library.candidates.filter((candidate) => !failedIds.has(candidate.note.id));
+    context = { ...context, links: titleIndex(linkable) };
     built = buildPages(library.candidates, context);
   }
   const { pages, warnings } = built;
@@ -557,7 +577,7 @@ function planRun(options, { tagNamespace }) {
   }
   const existing = readSiteFiles(options.site);
   markStillPublished(library.errors, existing);
-  context.twins = twinIndex(library.candidates, existing);
+  context.twins = twinIndex(linkable, existing);
   const plan = buildPlan({
     pages,
     existing,
@@ -600,22 +620,23 @@ function importCommitMessage(plan) {
  * Only on <branch> itself — an owner's working copy on a feature branch must
  * not have its commits pushed to main by a stray --push.
  */
-async function hasUnpushedOriginals({ site, branch }) {
-  if (!(await aheadOfOrigin(site, branch, { exec: gitExec }))) return false;
+/** `--push --branch <b>` is honoured only from <b> itself: a working copy on another branch never has its commits pushed there. */
+async function assertOnPushBranch({ site, branch }) {
   const checkedOut = await currentBranch(site, { exec: gitExec });
   if (checkedOut !== branch) {
-    throw new Error(`HEAD is ahead of origin/${branch} but the checked-out branch is ${checkedOut ?? 'detached'} — refusing to push it`);
+    throw new Error(`--push --branch ${branch}, but the checked-out branch is ${checkedOut ?? 'detached'} — refusing`);
   }
-  return true;
 }
 
 async function publish(options, plan) {
   const outcome = { committed: false, pushed: false, errors: [] };
   try {
+    if (options.push) await assertOnPushBranch(options);
     const touched = applyPlan(options.site, plan);
     const commit = await commitPaths(options.site, touched, importCommitMessage(plan), { exec: gitExec });
     Object.assign(outcome, commit.committed ? { committed: true, sha: commit.sha } : {});
-    if (options.push && (commit.committed || (await hasUnpushedOriginals(options)))) {
+    // Also after the publisher's retry: the originals were committed by the previous attempt and are still unpushed.
+    if (options.push && (commit.committed || (await aheadOfOrigin(options.site, options.branch, { exec: gitExec })))) {
       outcome.pushed = (await pushFastForward(options.site, options.branch, { exec: gitExec })).pushed;
     }
   } catch (error) {
