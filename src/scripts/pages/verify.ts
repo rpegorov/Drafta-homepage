@@ -4,6 +4,7 @@
    fresh confirmation by inspecting the server's response. */
 import { normalizeLang } from '../../i18n';
 import { post } from '../forms';
+import { pendingLanguageRedirect } from '../lang';
 import { api, endpoints } from '../../lib/config';
 import type { Lang } from '../../lib/types';
 import type { PostResult } from '../../lib/types';
@@ -40,12 +41,12 @@ function show(name: StateName): void {
 }
 
 function tokenFromQuery(): string {
-  const match = /[?&]token=([^&#]*)/.exec(window.location.search);
-  if (!match) return '';
+  const raw = /[?&]token=([^&#]*)/.exec(window.location.search)?.[1];
+  if (raw === undefined) return '';
   try {
-    return decodeURIComponent(match[1].replace(/\+/g, ' '));
+    return decodeURIComponent(raw.replace(/\+/g, ' '));
   } catch {
-    return match[1];
+    return raw;
   }
 }
 
@@ -92,7 +93,10 @@ if (retryButton) {
 
 const token = tokenFromQuery();
 
-if (!token) {
+if (pendingLanguageRedirect()) {
+  // lang.ts is replacing this load with the /ru/ twin; that page posts the
+  // single-use token, so this one must not spend it first.
+} else if (!token) {
   show('incomplete');
 } else if (!endpoints.verify) {
   show('error');

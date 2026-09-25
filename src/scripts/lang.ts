@@ -38,13 +38,25 @@ function rememberChoice(event: Event): void {
   if (value) store(value);
 }
 
+/* Where initLang is about to send this page, or null when it stays. Exported so
+   a page script that spends a single-use token (verify) can skip the request on
+   a load that is going to be replaced by its /ru/ twin — otherwise both loads
+   post the same token. */
+export function pendingLanguageRedirect(
+  doc: Document = document,
+  loc: Location = location,
+  nav: Navigator = navigator,
+): string | null {
+  const ru = isRuPage(doc, loc);
+  if (ru || stored() || preferredLanguage(nav).indexOf('ru') !== 0) return null;
+  return twinPath(loc.pathname, ru) + ruSearch(loc.search) + loc.hash;
+}
+
 export function initLang(): void {
   document.addEventListener('click', rememberChoice);
 
-  const ru = isRuPage();
-  if (!ru && !stored() && preferredLanguage().indexOf('ru') === 0) {
-    location.replace(twinPath(location.pathname, ru) + ruSearch(location.search) + location.hash);
-  }
+  const target = pendingLanguageRedirect();
+  if (target) location.replace(target);
 }
 
 initLang();
