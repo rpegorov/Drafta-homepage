@@ -18,3 +18,6 @@ npm-debug.log*
 .wrangler/
 .claude/worktrees/
 .claude/settings.local.json
+
+# Owner-side screenshots kept next to the site, not published
+drafta-screen/
