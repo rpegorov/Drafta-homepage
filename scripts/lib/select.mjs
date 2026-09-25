@@ -60,9 +60,18 @@ export function selectNote(note) {
     section: sections[0],
     site: block.fields,
     body: block.body,
-    tags: tags.filter((tag) => tag !== 'site' && !tag.startsWith('site/')),
+    tags: publicTags(note.body),
     warnings: block.warnings,
   };
+}
+
+/**
+ * The tags a reader sees on the page and in RSS: only those written in the
+ * note's text. Front matter `extraTags` are the app's hidden bookkeeping and
+ * `site/*` are publishing switches — neither is content.
+ */
+function publicTags(body) {
+  return fullTags(body).filter((tag) => tag !== 'site' && !tag.startsWith('site/'));
 }
 
 function skip(reason) {
