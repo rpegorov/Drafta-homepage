@@ -5,6 +5,15 @@
     <description>Обновления Drafta</description>
     <language>ru</language>
     <item>
+      <title>1.1.1</title>
+      <pubDate>Sat, 26 Sep 2026 14:52:30 +0300</pubDate>
+      <sparkle:version>1.1.1</sparkle:version>
+      <sparkle:shortVersionString>1.1.1</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+      <description>&lt;p&gt;Drafta 1.1.1 adds nested tags and fixes a crash.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;b&gt;Nested tags.&lt;/b&gt; Writing &lt;code&gt;#drafta/blog&lt;/code&gt; in a note now gives one tag, &lt;code&gt;drafta/blog&lt;/code&gt;, shown as &lt;code&gt;drafta › blog&lt;/code&gt;. Before, only &lt;code&gt;blog&lt;/code&gt; was kept.&lt;/li&gt;&lt;li&gt;&lt;b&gt;Tags as a tree in the sidebar.&lt;/b&gt; Fold and unfold branches the way you do notebooks. Selecting a parent tag lists its notes and the notes under all of its child tags.&lt;/li&gt;&lt;li&gt;&lt;b&gt;Tags never move notes.&lt;/b&gt; A tag with a path used to move the note into a notebook with the same name and silently create that notebook if it was missing. It no longer does.&lt;/li&gt;&lt;li&gt;&lt;b&gt;Renaming or deleting a parent tag&lt;/b&gt; applies to all its child tags too: &lt;code&gt;drafta&lt;/code&gt; → &lt;code&gt;work&lt;/code&gt; rewrites &lt;code&gt;#drafta/blog&lt;/code&gt; to &lt;code&gt;#work/blog&lt;/code&gt;. Tags inside code blocks and inline code are never changed. A note open in the editor shows the new text right away.&lt;/li&gt;&lt;li&gt;&lt;b&gt;Tag colours carry over&lt;/b&gt; from the old tag names to the nested ones.&lt;/li&gt;&lt;li&gt;&lt;b&gt;Deleting a tag from the sidebar&lt;/b&gt; always asks first.&lt;/li&gt;&lt;li&gt;&lt;b&gt;MCP server:&lt;/b&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;search_notes&lt;/code&gt; with a tag also finds the notes under its child tags, and a single word such as &lt;code&gt;blog&lt;/code&gt; finds &lt;code&gt;drafta/blog&lt;/code&gt;;&lt;/li&gt;&lt;li&gt;&lt;code&gt;list_tags&lt;/code&gt; shows full paths with note counts;&lt;/li&gt;&lt;li&gt;&lt;code&gt;tag_note&lt;/code&gt; accepts any spelling of a tag and can remove tags.&lt;/li&gt;&lt;li&gt;&lt;b&gt;Fixed:&lt;/b&gt; Drafta could crash when you pinned or trashed a note by swiping its row. Pinning twice in a row now leaves the note pinned.&lt;/li&gt;&lt;/ul&gt;</description>
+      <enclosure url="https://github.com/rpegorov/Drafta-releases/releases/download/v1.1.1/Drafta-1.1.1.dmg" type="application/octet-stream" length="22824974" sparkle:edSignature="vmvaSpeVe8gc2odlSfCY4PuAUDN9xefqZxzI9ELOylFyeJ2C5nbbMwjF/LMT5q07CIvBfT7ag4KNkTvviupbCg==" />
+    </item>
+    <item>
       <title>1.1</title>
       <pubDate>Sat, 26 Sep 2026 10:21:48 +0300</pubDate>
       <sparkle:version>1.1</sparkle:version>
