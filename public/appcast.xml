@@ -5,6 +5,15 @@
     <description>Обновления Drafta</description>
     <language>ru</language>
     <item>
+      <title>1.1</title>
+      <pubDate>Sat, 26 Sep 2026 10:21:48 +0300</pubDate>
+      <sparkle:version>1.1</sparkle:version>
+      <sparkle:shortVersionString>1.1</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+      <description>&lt;p&gt;Drafta 1.1 is about speed. Typing, search, launch and switching notes are much faster in large libraries.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;b&gt;Typing never stalls.&lt;/b&gt; Autosave now updates only the note you edited. Before, it rescanned the whole library, which caused hitches while you typed. In a 5,000-note library each save went from about 150 ms to about 7 ms.&lt;/li&gt;&lt;li&gt;&lt;b&gt;Full-text search is instant.&lt;/b&gt; Search runs in the background against a prepared index, and the list filter waits for you to pause typing. A search now takes milliseconds instead of more than a second.&lt;/li&gt;&lt;li&gt;&lt;b&gt;⌘P Quick Open&lt;/b&gt; returns results as you type. Title matches come first, then matches in note text.&lt;/li&gt;&lt;li&gt;&lt;b&gt;Faster launch.&lt;/b&gt; The library loads in the background with parallel reads, so a large library opens in a fraction of a second.&lt;/li&gt;&lt;li&gt;&lt;b&gt;Instant note switching.&lt;/b&gt; The editor now stays loaded between notes. Math, code highlighting and diagrams load only when a note uses them, and the preview redraws only the blocks you changed.&lt;/li&gt;&lt;li&gt;&lt;b&gt;New: cycle the view with ⌥⌘P&lt;/b&gt; — Editor → Split → Preview → Editor. Your cursor, selection and scroll position stay where they were. ⌥⌘1, ⌥⌘2 and ⌥⌘3 jump straight to a mode, all from the View menu. You can rebind the shortcut in Settings → Keybindings.&lt;/li&gt;&lt;li&gt;&lt;b&gt;Safer edits under sync.&lt;/b&gt; If sync, an MCP client or another app changes a note while you are typing, your text stays in the editor and a bar lets you choose which version to keep. The other version is saved to the note&amp;#x27;s revisions, so neither is lost. If the note&amp;#x27;s file is deleted elsewhere while you are editing it, &lt;b&gt;Keep note&lt;/b&gt; restores it with your text.&lt;/li&gt;&lt;li&gt;The sidebar counts, the note list and the table of contents no longer redraw on every keystroke.&lt;/li&gt;&lt;/ul&gt;</description>
+      <enclosure url="https://github.com/rpegorov/Drafta-releases/releases/download/v1.1/Drafta-1.1.dmg" type="application/octet-stream" length="23420412" sparkle:edSignature="qvqzfiy9OAowfpzKw9MnegKuNpGxySi9cgHc9G0cBJh4EQEIJt0Lpx5wslXnLYWjanOyIkUXSLPHsLgEHJ9KDA==" />
+    </item>
+    <item>
       <title>1.0.7</title>
       <pubDate>Sat, 26 Sep 2026 01:36:48 +0300</pubDate>
       <sparkle:version>1.0.7</sparkle:version>
