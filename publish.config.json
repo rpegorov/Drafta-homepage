@@ -1,3 +1,20 @@
 {
-  "tagNamespace": "drafta"
+  "contract": 1,
+  "tagNamespace": "drafta",
+  "siteUrl": "https://drafta.org",
+  "notifyTitle": "drafta.org",
+  "translate": { "ru": "en" },
+  "sections": {
+    "blog": {
+      "kind": "blog",
+      "dirs": { "en": "src/content/blog/en", "ru": "src/content/blog/ru" },
+      "urls": { "en": "/blog/{slug}/", "ru": "/ru/blog/{slug}/" }
+    },
+    "docs": {
+      "kind": "docs",
+      "dirs": { "en": "src/content/docs/docs", "ru": "src/content/docs/ru/docs" },
+      "urls": { "en": "/docs/{slug}/", "ru": "/ru/docs/{slug}/" },
+      "index": { "slug": "index", "urls": { "en": "/docs/", "ru": "/ru/docs/" } }
+    }
+  }
 }
