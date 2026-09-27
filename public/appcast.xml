@@ -5,6 +5,15 @@
     <description>Обновления Drafta</description>
     <language>ru</language>
     <item>
+      <title>1.2.1</title>
+      <pubDate>Mon, 28 Sep 2026 00:45:43 +0300</pubDate>
+      <sparkle:version>1.2.1</sparkle:version>
+      <sparkle:shortVersionString>1.2.1</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+      <description>&lt;p&gt;Drafta 1.2.1 fixes sign-in.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;b&gt;You stay signed in.&lt;/b&gt; At launch Drafta sends several requests at once. If your session had expired, each of them tried to renew it, and the losing request could wipe the new session. Now they share a single renewal. A server that is briefly unavailable no longer signs you out either.&lt;/li&gt;&lt;li&gt;&lt;b&gt;The sign-in and unlock screens are always opaque.&lt;/b&gt; After you locked the library or signed out, these screens could show through the window&amp;#x27;s glass effect.&lt;/li&gt;&lt;/ul&gt;</description>
+      <enclosure url="https://github.com/rpegorov/Drafta-releases/releases/download/v1.2.1/Drafta-1.2.1.dmg" type="application/octet-stream" length="23080738" sparkle:edSignature="58uaqJDxK4vT4t7b3ksWv+QFCDM1uitgm93Ny+/EIdd4ehGvGENzK6opptat/fmX2rbXd3enDXuLqYtokM0sAQ==" />
+    </item>
+    <item>
       <title>1.2</title>
       <pubDate>Sun, 27 Sep 2026 12:36:08 +0300</pubDate>
       <sparkle:version>1.2</sparkle:version>
