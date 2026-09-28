@@ -5,6 +5,15 @@
     <description>Обновления Drafta</description>
     <language>ru</language>
     <item>
+      <title>1.2.3</title>
+      <pubDate>Mon, 28 Sep 2026 15:03:28 +0300</pubDate>
+      <sparkle:version>1.2.3</sparkle:version>
+      <sparkle:shortVersionString>1.2.3</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+      <description>&lt;p&gt;Drafta 1.2.3 fixes empty AI answers.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;b&gt;⌘J no longer comes back empty.&lt;/b&gt; A model that thinks (DeepSeek, a local Qwen, OpenAI or Gemini at a reasoning level) could spend the whole answer limit on thinking, and the answer arrived empty and marked as cut off. This happened more often with long notes and prompts typed in the prompt line.&lt;/li&gt;&lt;li&gt;&lt;b&gt;Cloud models answer ⌘J with no limit.&lt;/b&gt; DeepSeek, OpenAI, Gemini and OpenCode Zen think and answer as long as they need. Claude, whose API requires a limit, gets its model&amp;#x27;s maximum.&lt;/li&gt;&lt;li&gt;&lt;b&gt;Local models keep a limit,&lt;/b&gt; with room for thinking on top, so a model that keeps thinking stops within minutes instead of holding your Mac&amp;#x27;s GPU.&lt;/li&gt;&lt;li&gt;&lt;b&gt;Ghost text keeps its short limit&lt;/b&gt;, with room for thinking, so suggestions stay quick.&lt;/li&gt;&lt;li&gt;&lt;b&gt;If an answer is still empty,&lt;/b&gt; the ⌘J window now explains that the model spent its budget thinking and suggests Regenerate or a lower reasoning level.&lt;/li&gt;&lt;/ul&gt;</description>
+      <enclosure url="https://github.com/rpegorov/Drafta-releases/releases/download/v1.2.3/Drafta-1.2.3.dmg" type="application/octet-stream" length="24469940" sparkle:edSignature="40M9++g2aC2nYegxRM6WcawPUsOuxOdQd7yosIjQXxKFWw43VEIQcm3LIdCYK0hF8DufCstVAtHb+K844I68CQ==" />
+    </item>
+    <item>
       <title>1.2.2</title>
       <pubDate>Mon, 28 Sep 2026 13:21:52 +0300</pubDate>
       <sparkle:version>1.2.2</sparkle:version>
