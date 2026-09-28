@@ -5,7 +5,7 @@ lang: "ru"
 slug: "drafta-1-0"
 date: "2026-09-25"
 published: "2026-09-25T18:00:00+03:00"
-updated: "2026-09-26"
+updated: "2026-09-28"
 draftaId: "ED105007-1785-43BC-B6A3-776BABC5E2D8"
 tags: []
 ---

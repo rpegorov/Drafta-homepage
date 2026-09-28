@@ -5,7 +5,7 @@ lang: "ru"
 slug: "mcp-server"
 date: "2026-09-25"
 published: "2026-09-25T16:50:00+03:00"
-updated: "2026-09-26"
+updated: "2026-09-28"
 draftaId: "BDF9D978-96D5-4E01-8EFA-C238EC5DF7AE"
 tags: []
 ---

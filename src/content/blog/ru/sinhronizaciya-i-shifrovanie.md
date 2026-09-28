@@ -5,7 +5,7 @@ lang: "ru"
 slug: "sinhronizaciya-i-shifrovanie"
 date: "2026-09-25"
 published: "2026-09-25T17:10:00+03:00"
-updated: "2026-09-26"
+updated: "2026-09-28"
 draftaId: "CBD52079-3C8C-41E0-9B05-6F89343C250A"
 tags: []
 ---

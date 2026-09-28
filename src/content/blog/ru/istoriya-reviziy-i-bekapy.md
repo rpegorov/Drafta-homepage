@@ -5,7 +5,7 @@ lang: "ru"
 slug: "istoriya-reviziy-i-bekapy"
 date: "2026-09-25"
 published: "2026-09-25T17:20:00+03:00"
-updated: "2026-09-26"
+updated: "2026-09-28"
 draftaId: "8CD5CC41-14ED-4DE7-A57A-FF158D686335"
 tags: []
 ---

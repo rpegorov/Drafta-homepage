@@ -5,7 +5,7 @@ lang: "ru"
 slug: "drafta-s-klaviatury"
 date: "2026-09-25"
 published: "2026-09-25T17:30:00+03:00"
-updated: "2026-09-26"
+updated: "2026-09-28"
 draftaId: "713B8EA5-C975-4315-8FB3-785C9EADDD94"
 tags: []
 ---
