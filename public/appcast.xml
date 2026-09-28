@@ -5,6 +5,15 @@
     <description>Обновления Drafta</description>
     <language>ru</language>
     <item>
+      <title>1.2.4</title>
+      <pubDate>Mon, 28 Sep 2026 17:53:59 +0300</pubDate>
+      <sparkle:version>1.2.4</sparkle:version>
+      <sparkle:shortVersionString>1.2.4</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+      <description>&lt;p&gt;Drafta 1.2.4 fixes a gesture conflict.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;b&gt;Scrolling a wide table sideways no longer hides the sidebar.&lt;/b&gt; A two-finger swipe over the editor shows or hides the sidebar and the note list. It used to fire even when the swipe scrolled a wide table, a code block or the preview sideways. Now a swipe that scrolls content is only a scroll.&lt;/li&gt;&lt;li&gt;&lt;b&gt;The panel swipe still works&lt;/b&gt; over content that does not scroll sideways, or once a table has reached its edge.&lt;/li&gt;&lt;/ul&gt;</description>
+      <enclosure url="https://github.com/rpegorov/Drafta-releases/releases/download/v1.2.4/Drafta-1.2.4.dmg" type="application/octet-stream" length="24472233" sparkle:edSignature="+u5fHzC61Vg9SdPiky+r3ee+rC0s8OY9u46VyCaGirlaWPhxIIZPL8iGS1hBqva59xs0cYyg4xDmW/jdp83hDA==" />
+    </item>
+    <item>
       <title>1.2.3</title>
       <pubDate>Mon, 28 Sep 2026 15:03:28 +0300</pubDate>
       <sparkle:version>1.2.3</sparkle:version>
