@@ -5,6 +5,15 @@
     <description>Обновления Drafta</description>
     <language>ru</language>
     <item>
+      <title>1.2.5</title>
+      <pubDate>Mon, 28 Sep 2026 18:42:05 +0300</pubDate>
+      <sparkle:version>1.2.5</sparkle:version>
+      <sparkle:shortVersionString>1.2.5</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+      <description>&lt;p&gt;Drafta 1.2.5 lets you edit Markdown files in place.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;b&gt;Opening a .md file from Finder works again.&lt;/b&gt; Open, Open With and double-click did nothing: the file never reached the library.&lt;/li&gt;&lt;li&gt;&lt;b&gt;The file you open stays linked to its note.&lt;/b&gt; Every edit is saved back to the original file as plain Markdown, so you can share the edited file right away, with no export. Images keep their original paths, and images you add in Drafta are copied next to the file.&lt;/li&gt;&lt;li&gt;&lt;b&gt;Edits made to the file elsewhere come in&lt;/b&gt; the next time you open it in Drafta.&lt;/li&gt;&lt;li&gt;A linked file that was moved or deleted is not recreated; the note stays in your library.&lt;/li&gt;&lt;/ul&gt;</description>
+      <enclosure url="https://github.com/rpegorov/Drafta-releases/releases/download/v1.2.5/Drafta-1.2.5.dmg" type="application/octet-stream" length="24504695" sparkle:edSignature="QcTZBRsCasJcxJoZbCrlX1AtoKdBNbeRj7sHNwYndwKV+8JABn3xDujRU3To2pQGHcnZ4ILagg9AtNyeracfCA==" />
+    </item>
+    <item>
       <title>1.2.4</title>
       <pubDate>Mon, 28 Sep 2026 17:53:59 +0300</pubDate>
       <sparkle:version>1.2.4</sparkle:version>
