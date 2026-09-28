@@ -5,6 +5,15 @@
     <description>Обновления Drafta</description>
     <language>ru</language>
     <item>
+      <title>1.2.2</title>
+      <pubDate>Mon, 28 Sep 2026 13:21:52 +0300</pubDate>
+      <sparkle:version>1.2.2</sparkle:version>
+      <sparkle:shortVersionString>1.2.2</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+      <description>&lt;p&gt;Drafta 1.2.2 cleans up note previews and brings back the light app icon.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;b&gt;Note previews are plain text.&lt;/b&gt; The line under a note&amp;#x27;s title in the list no longer shows Markdown: no &lt;code&gt;**&lt;/code&gt;, &lt;code&gt;&amp;gt;&lt;/code&gt;, &lt;code&gt;[!NOTE]&lt;/code&gt;, list bullets, task boxes, link addresses or HTML tags. Code blocks, rules, table separators and lines of tags only are skipped.&lt;/li&gt;&lt;li&gt;&lt;b&gt;The app icon follows your Mac&amp;#x27;s appearance.&lt;/b&gt; Drafta shows a light icon in Light mode and a dark one in Dark mode, following System Settings → Appearance → Icon &amp;amp; widget style.&lt;/li&gt;&lt;/ul&gt;</description>
+      <enclosure url="https://github.com/rpegorov/Drafta-releases/releases/download/v1.2.2/Drafta-1.2.2.dmg" type="application/octet-stream" length="24470779" sparkle:edSignature="hBpSihfDXx9J/T4G5QnhDwpg799If7hhgpjyFfL3nC3he5RZm27oIdo/qIIFElzoXbF+POSC4V6mCfKnspXJAw==" />
+    </item>
+    <item>
       <title>1.2.1</title>
       <pubDate>Mon, 28 Sep 2026 00:45:43 +0300</pubDate>
       <sparkle:version>1.2.1</sparkle:version>
