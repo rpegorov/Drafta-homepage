@@ -12,11 +12,7 @@
     "astro:build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "test": "vitest run",
-    "import:drafta": "node scripts/import-from-drafta.mjs",
-    "publisher:install": "node scripts/publisher/install.mjs",
-    "publisher:uninstall": "node scripts/publisher/uninstall.mjs",
-    "publisher:run": "node scripts/publisher/run.mjs"
+    "test": "vitest run"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "7.3.1",

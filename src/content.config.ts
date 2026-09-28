@@ -7,10 +7,10 @@
 // (one `defineCollection` + one export entry per collection) rather than
 // folding new content types into an existing one.
 //
-// `blog`'s schema and `docs`'s schema extension mirror the front matter
-// contract in scripts/lib/frontmatter.mjs (renderBlogFrontmatter /
-// renderDocsFrontmatter) — the exporter (wave 2.2) writes what these schemas
-// accept. Keep the two in sync when either changes.
+// `blog`'s schema and `docs`'s schema extension accept the front matter that
+// drafta-publisher (github.com/rpegorov/drafta-publisher) writes; its frozen
+// samples live in tests/fixtures/publisher-contract/ and
+// tests/publisher-contract.spec.mjs keeps the two in sync.
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
