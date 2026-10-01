@@ -7,7 +7,7 @@ sidebar:
 
 ## Требования
 
-macOS 26 или новее, Apple Silicon или Intel. Drafta — нативное приложение на Swift и SwiftUI, не веб-приложение и не оболочка Electron.
+macOS 15 Sequoia или новее, Apple Silicon или Intel. Drafta — нативное приложение на Swift и SwiftUI, не веб-приложение и не оболочка Electron.
 
 ## Установка
 

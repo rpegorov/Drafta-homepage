@@ -82,7 +82,7 @@ export const en = {
   checkoutFaqQ2: 'What happens when the trial ends?',
   checkoutFaqA2: 'The 30-day trial starts when you confirm your email and needs no card. After it, the app is read-only until a plan is on your account: your notes stay readable, while creating, editing and exporting need the plan chosen on this page.',
   checkoutFaqQ3: 'What does the app need?',
-  checkoutFaqA3Pre: 'macOS 26 or later, on Apple Silicon and Intel. The app comes from the ',
+  checkoutFaqA3Pre: 'macOS 15 or later, on Apple Silicon and Intel. The app comes from the ',
   checkoutFaqA3Link: 'releases page',
   checkoutFaqA3Post: ' — it is not a web app.',
 

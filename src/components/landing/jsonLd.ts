@@ -56,7 +56,7 @@ export function softwareApplication(lang: Lang, site: URL): Record<string, unkno
     description: DESCRIPTION[lang],
     applicationCategory: 'DeveloperApplication',
     applicationSubCategory: 'Markdown editor',
-    operatingSystem: 'macOS 26 or later',
+    operatingSystem: 'macOS 15 or later',
     softwareVersion: '1.0',
     downloadUrl: releases,
     image: new URL('/og.png', site).href,
