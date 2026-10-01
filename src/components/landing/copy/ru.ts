@@ -10,7 +10,7 @@ export const ru: LandingCopy = {
   meta: {
     title: 'Drafta — заметки в Markdown для программистов на macOS',
     description:
-      'Нативный редактор Markdown для macOS, сделанный для программистов. CodeMirror 6, 50+ языков, предпросмотр Mermaid и KaTeX, блокноты, теги и история ревизий. Заметки остаются обычными файлами .md. macOS 26 или новее, Apple Silicon и Intel.',
+      'Нативный редактор Markdown для macOS, сделанный для программистов. CodeMirror 6, 50+ языков, предпросмотр Mermaid и KaTeX, блокноты, теги и история ревизий. Заметки остаются обычными файлами .md. macOS 15 или новее, Apple Silicon и Intel.',
   },
 
   hero: {
@@ -20,7 +20,7 @@ export const ru: LandingCopy = {
       'Вложенные блокноты, подсветка 50+ языков, предпросмотр Mermaid и KaTeX, теги, статусы, история ревизий с диффами. Каждая заметка — обычный файл .md с YAML front-matter: его откроет любой редактор, сегодня и через десять лет.',
     download: 'Скачать для macOS',
     pricing: 'Смотреть тарифы',
-    platform: 'macOS 26 или новее · Apple Silicon и Intel',
+    platform: 'macOS 15 или новее · Apple Silicon и Intel',
     shot: {
       slot: 'editor',
       alt: 'Drafta на macOS: в сайдбаре блокноты, статусы и теги, в центре список заметок, справа заметка в Markdown с номерами строк и оглавлением.',
@@ -197,7 +197,7 @@ export const ru: LandingCopy = {
     items: [
       {
         q: 'Что нужно для работы Drafta?',
-        html: 'macOS 26 или новее, Apple Silicon или Intel. Это нативное приложение на Swift и SwiftUI — не веб-приложение и не оболочка Electron.',
+        html: 'macOS 15 или новее, Apple Silicon или Intel. Это нативное приложение на Swift и SwiftUI — не веб-приложение и не оболочка Electron.',
       },
       {
         q: 'Как установить?',

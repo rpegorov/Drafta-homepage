@@ -7,7 +7,7 @@ sidebar:
 
 ## Requirements
 
-macOS 26 or later, on Apple Silicon or Intel. Drafta is a native Swift and SwiftUI app — not a web app and not an Electron shell.
+macOS 15 Sequoia or later, on Apple Silicon or Intel. Drafta is a native Swift and SwiftUI app — not a web app and not an Electron shell.
 
 ## Install
 

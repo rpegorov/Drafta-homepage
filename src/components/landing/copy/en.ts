@@ -11,7 +11,7 @@ export const en: LandingCopy = {
   meta: {
     title: 'Drafta — Markdown notes for programmers on macOS',
     description:
-      'A native macOS Markdown editor for programmers. CodeMirror 6, 50+ languages, Mermaid and KaTeX preview, notebooks, tags and revision history. Your notes stay plain .md files. macOS 26 or later, Apple Silicon & Intel.',
+      'A native macOS Markdown editor for programmers. CodeMirror 6, 50+ languages, Mermaid and KaTeX preview, notebooks, tags and revision history. Your notes stay plain .md files. macOS 15 or later, Apple Silicon & Intel.',
   },
 
   hero: {
@@ -21,7 +21,7 @@ export const en: LandingCopy = {
       'Nested notebooks, highlighting for 50+ languages, Mermaid and KaTeX preview, tags, statuses and revision history with diffs. Every note is a plain .md file with YAML front-matter — any editor opens it, today and in ten years.',
     download: 'Download for macOS',
     pricing: 'See pricing',
-    platform: 'macOS 26 or later · Apple Silicon & Intel',
+    platform: 'macOS 15 or later · Apple Silicon & Intel',
     shot: {
       slot: 'editor',
       alt: 'Drafta on macOS: notebooks, statuses and tags in the sidebar, the note list, and a Markdown note open in the editor with line numbers and a table of contents.',
@@ -198,7 +198,7 @@ export const en: LandingCopy = {
     items: [
       {
         q: 'What does Drafta require?',
-        html: 'macOS 26 or later, on Apple Silicon or Intel. It is a native Swift and SwiftUI app — not a web app, not an Electron shell.',
+        html: 'macOS 15 or later, on Apple Silicon or Intel. It is a native Swift and SwiftUI app — not a web app, not an Electron shell.',
       },
       {
         q: 'How do I install it?',
