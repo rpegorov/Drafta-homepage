@@ -21,7 +21,7 @@ export const en: LandingCopy = {
       'Nested notebooks, highlighting for 50+ languages, Mermaid and KaTeX preview, tags, statuses and revision history with diffs. Every note is a plain .md file with YAML front-matter — any editor opens it, today and in ten years.',
     download: 'Download for macOS',
     pricing: 'See pricing',
-    platform: 'macOS 26 or later · Apple Silicon & Intel · Apache-2.0',
+    platform: 'macOS 26 or later · Apple Silicon & Intel',
     shot: {
       slot: 'editor',
       alt: 'Drafta on macOS: notebooks, statuses and tags in the sidebar, the note list, and a Markdown note open in the editor with line numbers and a table of contents.',
@@ -40,8 +40,8 @@ export const en: LandingCopy = {
       html: `Plain Markdown with YAML front-matter on your disk. Open it in VS Code, ${mono('grep')} it, keep it for good.`,
     },
     {
-      title: 'Apache-2.0',
-      html: 'The full app source is public under the Apache License 2.0. No proprietary format holds your notes.',
+      title: 'No lock-in',
+      html: 'No proprietary format holds your notes. If you ever leave Drafta, your library is already ordinary Markdown files on your Mac.',
     },
   ],
 
@@ -173,7 +173,6 @@ export const en: LandingCopy = {
       'Up to 30 revisions per note, stored locally',
       'No proprietary database, no export-only escape hatch',
       'Version control, grep and any other editor keep working',
-      'Licensed under Apache-2.0',
     ],
     stats: [
       { value: '30', label: 'revisions per note kept on disk' },

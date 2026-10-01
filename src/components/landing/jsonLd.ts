@@ -59,7 +59,6 @@ export function softwareApplication(lang: Lang, site: URL): Record<string, unkno
     operatingSystem: 'macOS 26 or later',
     softwareVersion: '1.0',
     downloadUrl: releases,
-    license: 'https://www.apache.org/licenses/LICENSE-2.0',
     image: new URL('/og.png', site).href,
     author: { '@type': 'Person', name: 'Rostislav Egorov', url: 'https://craftzman.ru' },
     offers: plans.map((plan) => offer(plan, site, lang)),

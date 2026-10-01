@@ -62,7 +62,7 @@ export const ru: Messages = {
   footerPrivacy: 'Конфиденциальность',
   footerRefund: 'Возврат',
   footerContact: 'Контакты',
-  footerCopyright: '© 2026 Drafta · Apache-2.0',
+  footerCopyright: '© 2026 Drafta',
   footerMadeBy: 'by craftzman',
 
   /* ---- checkout page (ЗАДАЧА-1.3) ---- */

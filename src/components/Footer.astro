@@ -1,5 +1,5 @@
 ---
-/* Site footer: product, account, downloads and legal columns, the licence line
+/* Site footer: product, account, downloads and legal columns, the copyright line
    with language links, and the product signature `by craftzman` with the 16px seal. */
 import DraftaMark from './DraftaMark.astro';
 import { blogIndexPath, rssPath } from './blog/posts';
@@ -48,7 +48,7 @@ const columns = [
     ],
   },
 ];
-/* The licence line names the other language first, as the old pages did. */
+/* The copyright line names the other language first, as the old pages did. */
 const languages = lang === 'ru'
   ? [{ code: 'en', href: '/', label: 'English' }, { code: 'ru', href: '/ru/', label: 'Русский' }]
   : [{ code: 'ru', href: '/ru/', label: 'Русский' }, { code: 'en', href: '/', label: 'English' }];

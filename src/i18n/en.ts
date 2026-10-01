@@ -53,7 +53,7 @@ export const en = {
   footerPrivacy: 'Privacy',
   footerRefund: 'Refund',
   footerContact: 'Contact',
-  footerCopyright: '© 2026 Drafta · Apache-2.0',
+  footerCopyright: '© 2026 Drafta',
   footerMadeBy: 'by craftzman',
 
   /* ---- checkout page (ЗАДАЧА-1.3) ---- */
