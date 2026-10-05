@@ -5,7 +5,7 @@ lang: "en"
 slug: "redaktor-markdown-prevyu-split"
 date: "2026-09-25"
 published: "2026-09-25T17:50:00+03:00"
-updated: "2026-09-26"
+updated: "2026-09-28"
 draftaId: "1B30BE9B-FC43-490B-A655-6AF65116A969"
 tags: []
 machineTranslated: true

@@ -5,7 +5,7 @@ lang: "en"
 slug: "ai-assistent"
 date: "2026-09-25"
 published: "2026-09-25T17:00:00+03:00"
-updated: "2026-09-26"
+updated: "2026-09-28"
 draftaId: "D814D252-012D-4E33-BCC0-D3B0672A4FEC"
 tags: []
 machineTranslated: true

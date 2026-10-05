@@ -5,7 +5,7 @@ lang: "en"
 slug: "zametki-eto-faily"
 date: "2026-09-25"
 published: "2026-09-25T17:40:00+03:00"
-updated: "2026-09-26"
+updated: "2026-09-28"
 draftaId: "3F72365D-F481-407A-8CD3-746A1BAA689E"
 tags: []
 machineTranslated: true

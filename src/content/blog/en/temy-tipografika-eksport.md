@@ -5,7 +5,7 @@ lang: "en"
 slug: "temy-tipografika-eksport"
 date: "2026-09-25"
 published: "2026-09-25T16:40:00+03:00"
-updated: "2026-09-26"
+updated: "2026-09-28"
 draftaId: "6A94E8CA-E33E-4CDD-B16B-E4E084E85D1B"
 tags: []
 machineTranslated: true
