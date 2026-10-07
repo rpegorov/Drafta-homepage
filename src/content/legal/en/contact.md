@@ -1,12 +1,10 @@
 ---
 title: 'Contact'
 description: 'How to reach Drafta and who sells the subscription.'
-updated: '2026-09-25'
+updated: '2026-10-07'
 noindex: true
 owner:
-  - 'everything below is a placeholder — seller identity, contact address and jurisdiction.'
-  - 'seller identity placeholder — self-employed / NPD taxpayer status is real, the name and INN are not.'
-  - 'jurisdiction placeholder.'
+  - 'support@drafta.org works only once mail is set up on the domain.'
 ---
 
 ## Support
@@ -16,10 +14,10 @@ For any question about your account, billing or these pages, write to
 
 ## Seller
 
-Drafta subscriptions are sold by a self-employed individual (a payer of the
-professional income tax, NPD): [name — to be filled in], self-employed, INN
-[INN — to be filled in], a payer of the professional income tax (NPD). As an NPD
-taxpayer, no VAT is charged on the sale.
+The Drafta subscription service is provided by a self-employed individual (a
+payer of the professional income tax, NPD): Rostislav Pavlovich Egorov, INN
+110117757200. Phone: +7 912 541-20-01. As an NPD taxpayer, no VAT is charged.
+The contract terms are in the [public offer](/ru/offer/) (Russian only).
 
 ## Jurisdiction
 

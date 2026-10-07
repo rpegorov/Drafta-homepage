@@ -1,6 +1,6 @@
 // Content collections for drafta.org.
 // `docs` and `i18n` belong to Starlight (/docs/ and /ru/docs/).
-// `legal` holds the service pages (terms/privacy/refund/contact), one Markdown
+// `legal` holds the service pages (terms/privacy/refund/contact, and the Russian-only offer), one Markdown
 // file per language under src/content/legal/{en,ru}/<slug>.md — the loader's id
 // is "<lang>/<slug>" (e.g. "en/terms"). `blog` holds posts under
 // src/content/blog/{en,ru}/<slug>.md, same id shape. Keep this file additive

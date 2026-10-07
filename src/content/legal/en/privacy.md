@@ -1,12 +1,11 @@
 ---
 title: 'Privacy Policy'
 description: 'What Drafta stores about your account and your synced notes, and how note content is encrypted.'
-updated: '2026-09-25'
+updated: '2026-10-07'
 noindex: true
 owner:
-  - 'seller identity and contact are placeholders — see the entries below.'
-  - 'jurisdiction placeholder — replace with the seller''s actual jurisdiction.'
-  - 'contact address placeholder.'
+  - 'jurisdiction (Russian law) is pending confirmation; the text is not reviewed by a lawyer.'
+  - 'support@drafta.org works only once mail is set up on the domain.'
 ---
 
 ## What we store
@@ -19,6 +18,12 @@ To provide an account and cloud sync, Drafta's server stores:
   of its encrypted data.
 
 We do not read your notes' content — see "Encryption" below.
+
+## Payment
+
+Payments are taken by the Robokassa payment service. Your card details are
+entered on its side; we neither receive nor store them, and only get the
+confirmation of the payment and its amount.
 
 ## Your account password
 
@@ -36,7 +41,7 @@ cannot read.
 
 If you connect Drafta to a CouchDB instance you run yourself, your notes are
 stored on your own server instead of Drafta's. Your account — email, plan and
-licence status — is still stored by the Drafta service, and an account is
+subscription status — is still stored by the Drafta service, and an account is
 still required.
 
 ## Account deletion
@@ -51,6 +56,7 @@ This policy is governed by the law of the Russian Federation.
 
 ## Contact
 
+The data operator is Rostislav Pavlovich Egorov, self-employed, INN 110117757200.
 Questions about your data: [support@drafta.org](mailto:support@drafta.org).
 
 ---

@@ -59,6 +59,7 @@ export const ru: Messages = {
   footerLatestRelease: 'Последний релиз',
   footerLegal: 'Документы',
   footerTerms: 'Условия',
+  footerOffer: 'Публичная оферта',
   footerPrivacy: 'Конфиденциальность',
   footerRefund: 'Возврат',
   footerContact: 'Контакты',

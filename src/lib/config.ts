@@ -32,8 +32,8 @@ export const planFallback: readonly Plan[] = [
 
 /** Capabilities the site shows but does not deliver yet; wave 1 closes with only OWNER fields here. */
 export const unwiredCapabilities: string[] = [
-  'OWNER: seller name and INN on /terms/, /privacy/, /refund/, /contact/ (EN and RU) are placeholders',
-  'OWNER: support email support@drafta.org on the legal pages is unconfirmed',
-  'OWNER: jurisdiction on the legal pages is a draft',
-  'OWNER: refund rule on /refund/ is a draft',
+  'OWNER: Robokassa is named on the legal pages and the offer but is not wired into checkout yet',
+  'OWNER: rouble prices (990 / 9,500 RUB) are written on the legal pages only; the API plans and checkout still serve USD',
+  'OWNER: support email support@drafta.org on the legal pages receives nothing until mail is set up on the domain',
+  'OWNER: jurisdiction, the offer text and the refund rule are drafts pending a lawyer and the seller',
 ];

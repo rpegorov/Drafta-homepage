@@ -50,6 +50,7 @@ export const en = {
   footerLatestRelease: 'Latest release',
   footerLegal: 'Legal',
   footerTerms: 'Terms',
+  footerOffer: 'Public offer (Russian)',
   footerPrivacy: 'Privacy',
   footerRefund: 'Refund',
   footerContact: 'Contact',

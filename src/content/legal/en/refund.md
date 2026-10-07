@@ -1,30 +1,29 @@
 ---
 title: 'Refund Policy'
-description: 'How refunds work for Drafta subscriptions billed per period in cryptocurrency.'
-updated: '2026-09-25'
+description: 'How refunds work for Drafta subscriptions paid per period by MIR, Visa or Mastercard card.'
+updated: '2026-10-07'
 noindex: true
 owner:
-  - 'seller identity, contact and the refund window below are placeholders.'
-  - 'refund window and condition are a placeholder rule pending the seller''s decision.'
-  - 'payment provider is not connected yet, so no refund can be processed through this site today.'
-  - 'contact address placeholder.'
+  - 'the refund window and condition (14 days, app unused) are a placeholder rule pending the seller''s decision.'
+  - 'support@drafta.org works only once mail is set up on the domain.'
 ---
 
 ## How billing works
 
-Drafta has no automatic charges. Each billing period ($9.99 monthly or
-$95.88 yearly, in USD, paid in USDT or USDC) is its own invoice, so there is
-nothing to cancel — simply do not pay the next invoice and the account moves
-to read-only mode at the end of the paid period instead of renewing.
+Drafta has no automatic charges. Each billing period (990 ₽ monthly or
+9,500 ₽ yearly; $9.99 or $95.88 outside Russia; paid by MIR, Visa or
+Mastercard card)
+is its own order, so there is nothing to cancel — simply do not pay the next
+one and the account moves to read-only mode at the end of the paid period
+instead of renewing.
 
 ## Refunds
 
 A payment can be refunded within 14 days of the payment date, provided the
 app was not used during the paid period.
 
-The payment provider that will process invoices and refunds is not yet
-connected. Until it is, no payment or refund can be requested through this
-site.
+A refund goes back to the card the payment was made with, through the Robokassa
+payment service.
 
 ## How to request a refund
 
