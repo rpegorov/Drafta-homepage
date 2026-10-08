@@ -30,10 +30,18 @@ export const planFallback: readonly Plan[] = [
   { code: 'pro_monthly', name: 'Pro — monthly', billing: 'monthly', priceCents: 999, monthlyCents: 999, quotaBytes: 32212254720, quotaNotes: 0 },
 ];
 
+/* Rouble prices shown on the Russian pages, keyed by billing period. `perMonth`
+   is the yearly plan's monthly equivalent (9,500 / 12, rounded). They mirror the
+   legal pages and the offer; the API still serves USD. */
+export const rubPrices: Readonly<Record<string, { total: number; perMonth: number }>> = {
+  monthly: { total: 990, perMonth: 990 },
+  yearly: { total: 9500, perMonth: 792 },
+};
+
 /** Capabilities the site shows but does not deliver yet; wave 1 closes with only OWNER fields here. */
 export const unwiredCapabilities: string[] = [
   'OWNER: Robokassa is named on the legal pages and the offer but is not wired into checkout yet',
-  'OWNER: rouble prices (990 / 9,500 RUB) are written on the legal pages only; the API plans and checkout still serve USD',
+  'OWNER: rouble prices (990 / 9,500 RUB) are display-only on the Russian pricing cards; the API plans and checkout still charge USD',
   'OWNER: support email support@drafta.org on the legal pages receives nothing until mail is set up on the domain',
   'OWNER: jurisdiction, the offer text and the refund rule are drafts pending a lawyer and the seller',
 ];

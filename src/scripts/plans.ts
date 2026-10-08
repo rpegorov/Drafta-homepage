@@ -11,7 +11,7 @@
    finally a muted trial sentence. Storage and notes are read from the plan
    object, never from a literal. */
 
-import { api, endpoints, planFallback } from '../lib/config';
+import { api, endpoints, planFallback, rubPrices } from '../lib/config';
 import { esc } from '../lib/esc';
 import type { Lang, Plan } from '../lib/types';
 import { normalizeLang, t } from '../i18n';
@@ -40,11 +40,19 @@ function group(number: number, lang: Lang): string {
   return String(number).replace(/\B(?=(\d{3})+(?!\d))/g, sep);
 }
 
-/** 9588 -> "$95.88"; 0 or invalid -> "—". Prices are US cents in both languages. */
+/** 9588 -> "$95.88"; 0 or invalid -> "—". The API prices are US cents. */
 export function formatPrice(cents: unknown, _lang?: string): string {
   const value = Number(cents);
   if (!isFinite(value) || value <= 0) return '—';
   return '$' + (value / CENTS_PER_DOLLAR).toFixed(2);
+}
+
+/* The price line for a card: roubles on Russian pages (fixed list), US dollars
+   everywhere else and whenever a period has no rouble price. */
+function priceText(plan: Plan, lang: Lang, monthlyEquivalent: boolean): string {
+  const rub = lang === 'ru' ? rubPrices[plan.billing] : undefined;
+  if (rub) return group(monthlyEquivalent ? rub.perMonth : rub.total, lang) + ' ₽';
+  return formatPrice(monthlyEquivalent ? plan.monthlyCents : plan.priceCents, lang);
 }
 
 /** 32212254720 -> "30 GB storage"; <= 0 or absent -> "Unlimited storage". Binary units (GiB). */
@@ -87,7 +95,6 @@ function requestedCode(): string {
    annual total as a muted note beneath it; the monthly card is the quiet alternative. */
 function cardHtml(plan: Plan, lang: Lang, mode: PlansMode, isFeatured: boolean, selected: boolean): string {
   const equivalent = plan.billing === 'yearly' && Number(plan.monthlyCents) > 0;
-  const headline = equivalent ? Number(plan.monthlyCents) : Number(plan.priceCents);
   const unit = t(lang, 'periodShort')[equivalent ? 'monthly' : plan.billing] || '';
   const priceClass = 'plan__price' + (equivalent ? ' plan__equiv' : '');
   const ctaClass = 'plan__cta btn ' + (isFeatured ? 'btn--primary plan__cta--featured' : 'btn--ghost');
@@ -100,10 +107,10 @@ function cardHtml(plan: Plan, lang: Lang, mode: PlansMode, isFeatured: boolean, 
   return '<article class="plan' + (isFeatured ? ' plan--featured' : '')
     + (selected ? ' plan--selected' : '') + '" data-period="' + esc(plan.billing) + '">'
     + '<h3 class="plan__name">' + esc(t(lang, 'periodLabel')[plan.billing] || '') + '</h3>'
-    + '<div class="' + priceClass + '">' + esc(formatPrice(headline, lang))
+    + '<div class="' + priceClass + '">' + esc(priceText(plan, lang, equivalent))
     + '<span class="plan__period"> / ' + esc(unit) + '</span></div>'
     + (equivalent
-      ? '<div class="plan__note">' + esc(fill(t(lang, 'billedAnnually'), formatPrice(plan.priceCents, lang))) + '</div>'
+      ? '<div class="plan__note">' + esc(fill(t(lang, 'billedAnnually'), priceText(plan, lang, false))) + '</div>'
       : '')
     + cta
     + '</article>';
