@@ -5,6 +5,15 @@
     <description>Обновления Drafta</description>
     <language>ru</language>
     <item>
+      <title>1.4.0</title>
+      <pubDate>Wed, 14 Oct 2026 14:55:57 +0300</pubDate>
+      <sparkle:version>1.4.0</sparkle:version>
+      <sparkle:shortVersionString>1.4.0</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>15.0.0</sparkle:minimumSystemVersion>
+      <description>&lt;ul&gt;&lt;li&gt;Open Knowledge Format (OKF v0.2): File → Export as OKF Bundle… and Import OKF Bundle… write and read a bundle as a folder or a .zip. Notebooks become directories, notes become concept files with index.md listings, and front-matter keys Drafta does not know are kept as they are.&lt;/li&gt;&lt;li&gt;The MCP server gained export_okf and import_okf, and read_note accepts format &amp;quot;okf&amp;quot;.&lt;/li&gt;&lt;li&gt;Vim mode: Ctrl-w h and Ctrl-w l move focus between the editor, the note list and the sidebar; j/k step through rows, Return opens, Esc goes back to the editor.&lt;/li&gt;&lt;li&gt;Quick Open (⌘P): a mode prefix (&amp;gt;, #, &amp;quot;b &amp;quot;, &amp;quot;t &amp;quot;) is consumed instead of staying in the field, Tab turns a lone b or t into the mode, and deleting text no longer leaves the mode.&lt;/li&gt;&lt;/ul&gt;</description>
+      <enclosure url="https://github.com/rpegorov/Drafta-releases/releases/download/v1.4.0/Drafta-1.4.0.dmg" type="application/octet-stream" length="25654554" sparkle:edSignature="OKvEAHEwPIF96QtDi8pZ4j7becplKuOsXd/X9MrxHdRQV3YdmkEohI8fJsqDb5zQAUqtnJPY4bn3aWa4DA87CQ==" />
+    </item>
+    <item>
       <title>1.3</title>
       <pubDate>Sun, 04 Oct 2026 23:31:40 +0300</pubDate>
       <sparkle:version>1.3</sparkle:version>
