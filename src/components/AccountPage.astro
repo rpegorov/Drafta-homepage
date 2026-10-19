@@ -51,12 +51,30 @@ const legal = [
         </dl>
       </section>
 
+      <section class="card account__card" aria-labelledby="account-autorenew-h" data-autorenew-block hidden>
+        <h2 class="h2" id="account-autorenew-h">{t(lang, 'accountAutoRenewH2')}</h2>
+        <div class="account__stack" role="status">
+          <p class="account__status" data-autorenew-text></p>
+          <p class="form__hint" data-autorenew-detail hidden></p>
+          <p class="form__hint" data-autorenew-flight hidden></p>
+        </div>
+        <div class="form__actions">
+          <button class="btn btn--ghost" type="button" data-autorenew-cancel hidden>{t(lang, 'accountAutoRenewCancel')}</button>
+        </div>
+        <p class="form__error" data-autorenew-cancel-error role="alert" hidden>{t(lang, 'accountAutoRenewError')}</p>
+        <div class="account__problem" data-autorenew-error role="alert" hidden>
+          <p class="form__error">{t(lang, 'accountAutoRenewError')}</p>
+          <button class="btn btn--ghost" type="button" data-autorenew-retry>{t(lang, 'accountRetry')}</button>
+        </div>
+      </section>
+
       <section class="card account__card" aria-labelledby="account-renew-h">
         <h2 class="h2" id="account-renew-h">{t(lang, 'accountRenewH2')}</h2>
         <div class="form__actions">
           <a class="btn btn--primary" href={renew('pro_monthly')} data-renew="pro_monthly">{t(lang, 'accountRenewMonth')}</a>
           <a class="btn btn--ghost" href={renew('pro_yearly')} data-renew="pro_yearly">{t(lang, 'accountRenewYear')}</a>
         </div>
+        <p class="form__hint" id="account-renew-note" data-renew-note role="status" hidden></p>
         <p class="form__hint">{t(lang, 'accountRenewNote')}</p>
       </section>
 

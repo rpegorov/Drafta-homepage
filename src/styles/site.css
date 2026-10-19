@@ -947,6 +947,7 @@ details[open] > .faq__q{margin-bottom:var(--space-3)}
 .account__card{display:grid;gap:var(--space-4);align-content:start}
 .account__card .h2{margin:0}
 .account__status{margin:0;font-size:var(--text-body);color:var(--ink)}
+.account__stack{display:grid;gap:var(--space-2)}
 .account__problem{display:grid;gap:var(--space-3);justify-items:start}
 .account__meta{display:grid;gap:var(--space-1);margin:0}
 .account__meta dt{font-size:var(--text-sm);color:var(--muted)}
@@ -959,6 +960,7 @@ details[open] > .faq__q{margin-bottom:var(--space-3)}
   font-size:var(--text-sm);
   color:var(--ink);
 }
+.btn[data-renew][aria-describedby]{outline:1px dashed var(--muted);outline-offset:2px}
 .account__foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--space-4)}
 .account__legal{display:flex;flex-wrap:wrap;gap:var(--space-4);font-size:var(--text-sm)}
 

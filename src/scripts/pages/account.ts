@@ -3,8 +3,9 @@
 import { api, endpoints } from '../../lib/config';
 import { localePath } from '../../lib/lang';
 import { normalizeLang, t } from '../../i18n';
-import type { LicenceView, OrderRow } from '../../lib/types';
-import { licenceView, orderRows } from '../account-model';
+import type { AutoRenewView, LicenceView, OrderRow } from '../../lib/types';
+import { autoRenewView, licenceView, orderRows } from '../account-model';
+import { loadAutoRenewAvailable } from '../plans';
 import { accessToken, clearSession, loginHref, refreshToken, signedInEmail } from '../session';
 import '../session-nav';
 
@@ -139,6 +140,116 @@ async function loadOrders(): Promise<void> {
   }
 }
 
+/* ---- auto-renewal ---- */
+
+const PAST_DUE_KEYS = {
+  failures: 'accountAutoRenewPastDue',
+  price_changed: 'accountAutoRenewPriceChanged',
+  plan_unavailable: 'accountAutoRenewPlanUnavailable',
+  expired: 'accountAutoRenewExpired',
+  other: 'accountAutoRenewPastDue',
+} as const;
+const CANCEL_KEYS = {
+  user: 'accountAutoRenewCancelled',
+  superseded: 'accountAutoRenewCancelled',
+  plan_switched: 'accountAutoRenewPlanSwitched',
+  other: 'accountAutoRenewCancelled',
+} as const;
+
+/** Main status line: what auto-renewal is doing, given whether the server runs charges at all. */
+function autoRenewText(view: AutoRenewView, chargesRun: boolean): string {
+  switch (view.kind) {
+    case 'off': return t(LANG, 'accountAutoRenewOff');
+    case 'past_due': return t(LANG, PAST_DUE_KEYS[view.reason]);
+    case 'cancelled': return t(LANG, CANCEL_KEYS[view.reason]);
+    case 'active':
+      if (!chargesRun) return t(LANG, 'accountAutoRenewPaused');
+      if (view.inFlight) return t(LANG, 'accountAutoRenewInFlight');
+      return view.next ? t(LANG, 'accountAutoRenewActive').split('{value}').join(view.next) : '';
+  }
+}
+
+function renewNoteText(view: AutoRenewView): string {
+  if (view.kind === 'active') return t(LANG, 'accountAutoRenewInFlightRenewNote').split('{amount}').join(view.amount);
+  return t(LANG, 'accountAutoRenewInFlight');
+}
+
+/** Marks the renew buttons while a charge is in progress: a manual payment would add a second period. */
+function markRenewButtons(note: string | null): void {
+  setText(el('data-renew-note'), note ?? '');
+  setHidden(el('data-renew-note'), note === null);
+  const noteId = el('data-renew-note')?.id ?? '';
+  for (const button of document.querySelectorAll<HTMLElement>('[data-renew]')) {
+    if (note === null) button.removeAttribute('aria-describedby');
+    else button.setAttribute('aria-describedby', noteId);
+  }
+}
+
+function showAutoRenew(view: AutoRenewView, chargesRun: boolean): void {
+  const active = view.kind === 'active';
+  const inFlight = view.kind !== 'off' && view.inFlight;
+  const text = autoRenewText(view, chargesRun);
+  const flightLine = inFlight && !(active && chargesRun);
+  setText(el('data-autorenew-text'), text);
+  setHidden(el('data-autorenew-text'), text === '');
+  setText(el('data-autorenew-detail'), active ? `${view.plan} · ${view.amount}` : '');
+  setHidden(el('data-autorenew-detail'), !active);
+  setText(el('data-autorenew-flight'), flightLine ? t(LANG, 'accountAutoRenewInFlight') : '');
+  setHidden(el('data-autorenew-flight'), !flightLine);
+  setHidden(el('data-autorenew-cancel'), !active);
+  setHidden(el('data-autorenew-cancel-error'), true);
+  setHidden(el('data-autorenew-error'), true);
+  setHidden(el('data-autorenew-block'), false);
+  markRenewButtons(inFlight ? renewNoteText(view) : null);
+}
+
+function showAutoRenewError(): void {
+  setHidden(el('data-autorenew-block'), false);
+  for (const hook of ['data-autorenew-text', 'data-autorenew-detail', 'data-autorenew-flight', 'data-autorenew-cancel', 'data-autorenew-cancel-error']) {
+    setHidden(el(hook), true);
+  }
+  setHidden(el('data-autorenew-error'), false);
+  markRenewButtons(null);
+}
+
+/** The block exists only when charges are offered or the account already has a record. */
+async function loadAutoRenew(): Promise<void> {
+  const availability = loadAutoRenewAvailable();
+  try {
+    const data = await getJson(endpoints.autorenew);
+    const available = await availability;
+    const record = data && typeof data === 'object' ? (data as Record<string, unknown>).autoRenew : undefined;
+    const view = autoRenewView(record, LANG);
+    if (view === null) { if (available) showAutoRenewError(); return; }
+    if (view.kind === 'off' && !available) { setHidden(el('data-autorenew-block'), true); return; }
+    showAutoRenew(view, available);
+  } catch (error) {
+    if (error instanceof SessionExpired) { expire(); return; }
+    console.warn('Drafta: auto-renewal could not be loaded', error);
+    if (await availability) showAutoRenewError();
+  }
+}
+
+async function cancelAutoRenew(): Promise<void> {
+  const message = `${t(LANG, 'accountAutoRenewCancelConfirm')} ${t(LANG, 'accountAutoRenewCancelInFlightNote')}`;
+  if (!window.confirm(message)) return;
+  const button = el<HTMLButtonElement>('data-autorenew-cancel');
+  if (button) button.disabled = true;
+  try {
+    const response = await fetch(api + endpoints.autorenewCancel, {
+      method: 'POST',
+      headers: { Accept: 'application/json', Authorization: 'Bearer ' + accessToken() },
+    });
+    if (response.status === UNAUTHORIZED) { expire(); return; }
+    if (!response.ok) throw new Error('request failed: ' + response.status);
+    await loadAutoRenew();
+  } catch {
+    setHidden(el('data-autorenew-cancel-error'), false);
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
 /* ---- sign out ---- */
 
 async function requestLogout(): Promise<void> {
@@ -165,8 +276,10 @@ function start(): void {
   if (!accessToken()) { goToLogin(); return; }
   el('data-licence-retry')?.addEventListener('click', () => { void loadLicence(); });
   el('data-orders-retry')?.addEventListener('click', () => { void loadOrders(); });
+  el('data-autorenew-retry')?.addEventListener('click', () => { void loadAutoRenew(); });
+  el('data-autorenew-cancel')?.addEventListener('click', () => { void cancelAutoRenew(); });
   el('data-logout')?.addEventListener('click', () => { void logout(); });
-  void Promise.all([loadLicence(), loadEmail(), loadOrders()]);
+  void Promise.all([loadLicence(), loadEmail(), loadOrders(), loadAutoRenew()]);
 }
 
 start();

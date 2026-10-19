@@ -40,6 +40,15 @@ const ACCOUNT_HOOKS = [
   'data-orders-empty',
   'data-orders-error',
   'data-orders-retry',
+  'data-autorenew-block',
+  'data-autorenew-text',
+  'data-autorenew-detail',
+  'data-autorenew-flight',
+  'data-autorenew-cancel',
+  'data-autorenew-cancel-error',
+  'data-autorenew-error',
+  'data-autorenew-retry',
+  'data-renew-note',
   'data-logout',
 ];
 

@@ -11,6 +11,15 @@ const HTML = (lang) => `<!doctype html><html lang="${lang}"><body>
   <div data-orders-table hidden><table><tbody data-orders></tbody></table></div>
   <p data-orders-empty hidden>No payments yet.</p>
   <div data-orders-error hidden><button data-orders-retry type="button">retry</button></div>
+  <div data-autorenew-block hidden>
+    <p data-autorenew-text></p><p data-autorenew-detail hidden></p><p data-autorenew-flight hidden></p>
+    <button data-autorenew-cancel type="button" hidden>Turn off</button>
+    <p data-autorenew-cancel-error hidden>cancel failed</p>
+    <div data-autorenew-error hidden><button data-autorenew-retry type="button">retry</button></div>
+  </div>
+  <a data-renew="pro_monthly" href="/checkout/?plan=pro_monthly">month</a>
+  <a data-renew="pro_yearly" href="/checkout/?plan=pro_yearly">year</a>
+  <p data-renew-note id="account-renew-note" hidden></p>
   <button data-logout type="button">Sign out</button>
 </body></html>`;
 const SIGNED_IN = { drafta_access: 'acc-1', drafta_refresh: 'ref-1', drafta_email: 'stored@example.com' };
@@ -19,7 +28,15 @@ const ok = {
   '/v1/license/status': () => json(200, { license: { status: 'trial', trialDaysLeft: 12 } }),
   '/v1/account/me': () => json(200, { email: 'me@example.com', emailVerified: true }),
   '/v1/billing/orders': () => json(200, { orders: [ORDER] }),
+  '/v1/billing/autorenew': () => json(200, { available: false, autoRenew: null }),
+  '/v1/plans': () => json(200, { plans: [], autoRenew: { available: false } }),
 };
+const PLANS_ON = { '/v1/plans': () => json(200, { plans: [], autoRenew: { available: true } }) };
+const RECORD = {
+  status: 'active', plan: 'pro_monthly', amountKopecks: 99000,
+  nextChargeAt: '2026-11-16T00:00:00Z', chargeInFlight: false, stopReason: null,
+};
+const withRecord = (record, available = true) => ({ '/v1/billing/autorenew': () => json(200, { available, autoRenew: record }) });
 
 let page;
 afterEach(() => { page?.close(); page = undefined; });
@@ -47,8 +64,9 @@ describe('account page', () => {
     expect(q('data-orders-table').hidden).toBe(false);
     expect(q('data-orders-empty').hidden).toBe(true);
     expect(q('data-orders').textContent).toMatch(/9,500/);
-    expect(fetch.calls.map((c) => c.path).sort()).toEqual(['/v1/account/me', '/v1/billing/orders', '/v1/license/status']);
-    for (const call of fetch.calls) expect(call.init.headers.Authorization).toBe('Bearer acc-1');
+    const authed = fetch.calls.filter((c) => c.path !== '/v1/plans');
+    expect(authed.map((c) => c.path).sort()).toEqual(['/v1/account/me', '/v1/billing/autorenew', '/v1/billing/orders', '/v1/license/status']);
+    for (const call of authed) expect(call.init.headers.Authorization).toBe('Bearer acc-1');
   });
 
   it('[+] the Russian page renders Russian text', async () => {
@@ -169,5 +187,140 @@ describe('account page', () => {
     q('data-logout').click();
     await vi.waitFor(() => expect(lastNav()).toBe('https://drafta.org/'));
     expect(localStorage.length).toBe(0);
+  });
+
+  describe('auto-renewal block', () => {
+    const shown = () => vi.waitFor(() => expect(q('data-autorenew-block').hidden).toBe(false));
+    const confirmWith = (answer) => { page.window.confirm = vi.fn(() => answer); return page.window.confirm; };
+
+    it('[+] stays hidden while unavailable and without a record, and the renew buttons are unmarked', async () => {
+      await open();
+      await vi.waitFor(() => expect(q('data-orders').children).toHaveLength(1));
+      expect(q('data-autorenew-block').hidden).toBe(true);
+      expect(q('data-renew-note').hidden).toBe(true);
+    });
+
+    it('[+] available with no record shows the off state without a cancel button', async () => {
+      await open({ routes: PLANS_ON });
+      await shown();
+      expect(q('data-autorenew-text').textContent).toBe('Off.');
+      expect(q('data-autorenew-cancel').hidden).toBe(true);
+    });
+
+    it('[+] an active record shows plan, amount, next charge and the cancel button', async () => {
+      await open({ routes: { ...PLANS_ON, ...withRecord(RECORD) } });
+      await shown();
+      expect(q('data-autorenew-text').textContent).toMatch(/Next charge: .*2026/);
+      expect(q('data-autorenew-detail').textContent).toMatch(/990/);
+      expect(q('data-autorenew-cancel').hidden).toBe(false);
+      expect(q('data-renew-note').hidden).toBe(true);
+    });
+
+    it('[+] the Russian page shows Russian text', async () => {
+      await open({ lang: 'ru', routes: { ...PLANS_ON, ...withRecord(RECORD) } });
+      await shown();
+      expect(q('data-autorenew-text').textContent).toMatch(/Следующее списание/);
+    });
+
+    it('[+] flag off with an existing active record still shows the block with cancel, saying charges are paused', async () => {
+      await open({ routes: withRecord(RECORD, false) });
+      await shown();
+      expect(q('data-autorenew-text').textContent).toMatch(/paused/);
+      expect(q('data-autorenew-cancel').hidden).toBe(false);
+    });
+
+    it('[+] past_due and cancelled records show their reason without a cancel button', async () => {
+      await open({ routes: withRecord({ ...RECORD, status: 'past_due', nextChargeAt: null, stopReason: 'price_changed' }, false) });
+      await shown();
+      expect(q('data-autorenew-text').textContent).toMatch(/price/i);
+      expect(q('data-autorenew-cancel').hidden).toBe(true);
+      page.close();
+      await open({ routes: withRecord({ ...RECORD, status: 'cancelled', nextChargeAt: null, stopReason: 'plan_switched' }, false) });
+      await shown();
+      expect(q('data-autorenew-text').textContent).toMatch(/another plan/);
+      expect(q('data-autorenew-cancel').hidden).toBe(true);
+    });
+
+    it('[+] a charge in flight marks the renew buttons with the explanation', async () => {
+      await open({ routes: { ...PLANS_ON, ...withRecord({ ...RECORD, chargeInFlight: true, nextChargeAt: null }) } });
+      await shown();
+      expect(q('data-renew-note').hidden).toBe(false);
+      expect(q('data-renew-note').textContent).toMatch(/in progress/);
+      for (const link of page.document.querySelectorAll('[data-renew]')) {
+        expect(link.getAttribute('aria-describedby')).toBe('account-renew-note');
+      }
+    });
+
+    it('[+] cancel asks first, warns about a charge in flight, then POSTs with the bearer and reloads the block', async () => {
+      let record = RECORD;
+      const fetch = await open({ routes: {
+        ...PLANS_ON,
+        '/v1/billing/autorenew': () => json(200, { available: true, autoRenew: record }),
+        '/v1/billing/autorenew/cancel': () => { record = { ...RECORD, status: 'cancelled', nextChargeAt: null, stopReason: 'user' }; return json(200, {}); },
+      } });
+      await shown();
+      const confirm = confirmWith(true);
+      q('data-autorenew-cancel').click();
+      await vi.waitFor(() => expect(q('data-autorenew-cancel').hidden).toBe(true));
+      expect(confirm.mock.calls[0][0]).toMatch(/already started may still go through/);
+      const post = fetch.calls.find((c) => c.path === '/v1/billing/autorenew/cancel');
+      expect(post.init.method).toBe('POST');
+      expect(post.init.headers.Authorization).toBe('Bearer acc-1');
+      expect(q('data-autorenew-text').textContent).toMatch(/stays active/);
+      expect(fetch.calls.filter((c) => c.path === '/v1/billing/autorenew')).toHaveLength(2);
+    });
+
+    it('[-] a declined confirmation sends nothing', async () => {
+      const fetch = await open({ routes: { ...PLANS_ON, ...withRecord(RECORD) } });
+      await shown();
+      confirmWith(false);
+      q('data-autorenew-cancel').click();
+      await new Promise((done) => setTimeout(done, 20));
+      expect(fetch.calls.some((c) => c.path.endsWith('/cancel'))).toBe(false);
+    });
+
+    it('[-] a failed cancel shows its error and keeps the record and the button', async () => {
+      await open({ routes: { ...PLANS_ON, ...withRecord(RECORD), '/v1/billing/autorenew/cancel': () => json(500, {}) } });
+      await shown();
+      confirmWith(true);
+      q('data-autorenew-cancel').click();
+      await vi.waitFor(() => expect(q('data-autorenew-cancel-error').hidden).toBe(false));
+      expect(q('data-autorenew-cancel').hidden).toBe(false);
+      expect(q('data-autorenew-cancel').disabled).toBe(false);
+    });
+
+    it('[-] a 401 on cancel goes to login', async () => {
+      await open({ routes: { ...PLANS_ON, ...withRecord(RECORD), '/v1/billing/autorenew/cancel': () => json(401, {}) } });
+      await shown();
+      confirmWith(true);
+      q('data-autorenew-cancel').click();
+      await vi.waitFor(() => expect(lastNav()).toBe('https://drafta.org/login/?next=%2Faccount%2F'));
+    });
+
+    it('[-] a failing GET shows its own error with retry, the licence and orders stay, retry reloads only this block', async () => {
+      let calls = 0;
+      const fetch = await open({ routes: { ...PLANS_ON, '/v1/billing/autorenew': () => (calls++ ? json(200, { available: true, autoRenew: RECORD }) : json(500, {})) } });
+      await vi.waitFor(() => expect(q('data-autorenew-error').hidden).toBe(false));
+      await vi.waitFor(() => expect(q('data-orders').children).toHaveLength(1));
+      expect(q('data-licence-error').hidden).toBe(true);
+      expect(q('data-orders-error').hidden).toBe(true);
+      const before = fetch.calls.length;
+      q('data-autorenew-retry').click();
+      await vi.waitFor(() => expect(q('data-autorenew-error').hidden).toBe(true));
+      expect(q('data-autorenew-cancel').hidden).toBe(false);
+      expect(fetch.calls.slice(before).map((c) => c.path)).toEqual(['/v1/billing/autorenew']);
+    });
+
+    it('[-] a record off the contract is an error, and a failing licence request does not touch the block', async () => {
+      await open({ routes: { ...PLANS_ON, ...withRecord({ status: 'mystery' }), '/v1/license/status': () => json(500, {}) } });
+      await vi.waitFor(() => expect(q('data-autorenew-error').hidden).toBe(false));
+      await vi.waitFor(() => expect(q('data-licence-error').hidden).toBe(false));
+    });
+
+    it('[-] a failing GET while charges are not offered keeps the block hidden', async () => {
+      await open({ routes: { '/v1/billing/autorenew': () => json(404, {}) } });
+      await vi.waitFor(() => expect(q('data-orders').children).toHaveLength(1));
+      expect(q('data-autorenew-block').hidden).toBe(true);
+    });
   });
 });
