@@ -8,7 +8,7 @@ import { post, showError, showOk } from '../forms';
 import { accessToken, signedInEmail, loginHref } from '../session';
 import { endpoints } from '../../lib/config';
 import { t } from '../../i18n';
-import type { Lang, Plan } from '../../lib/types';
+import type { Lang, Plan, PostResult } from '../../lib/types';
 
 function pageLang(): Lang {
   const declared = (document.documentElement.getAttribute('lang') || '').toLowerCase();
@@ -67,6 +67,14 @@ function isHttpsUrl(value: unknown): value is string {
   try { return new URL(value).protocol === 'https:'; } catch { return false; }
 }
 
+/* A server error with a JSON `error` keeps its own text; a plain-text or empty
+   5xx body (e.g. the shop is not configured) gets the honest availability line. */
+function failureText(res: PostResult, status: number): string {
+  if (status >= 500 && (res.unparsed || !res.data.error)) return t(LANG, 'checkoutUnavailable');
+  if (res.data.error) return String(res.data.error);
+  return t(LANG, 'checkoutNetwork') + ' (HTTP ' + status + ')';
+}
+
 /* Choosing a plan needs a session; without one the buyer goes to /login/. */
 function subscribe(code: string, button: HTMLElement | null): void {
   if (sending) return;
@@ -96,11 +104,7 @@ function subscribe(code: string, button: HTMLElement | null): void {
       setError(t(LANG, 'checkoutBadPaymentUrl'));
       say(hintEl, t(LANG, 'checkoutRetry'));
     } else {
-      /* The server's own error text, verbatim. */
-      const message = res && res.data && res.data.error
-        ? String(res.data.error)
-        : t(LANG, 'checkoutNetwork') + ' (HTTP ' + status + ')';
-      setError(message);
+      setError(failureText(res, status));
       if (status === 401 || status === 403) {
         say(hintEl, t(LANG, 'checkoutExpired'));
         show(loginEl);

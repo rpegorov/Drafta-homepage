@@ -4,6 +4,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { fixture, json, openPage, resetScripts, runScript, stubFetch } from './helpers/browser.mjs';
 import { loadRoute } from './helpers/dist.mjs';
+import { en } from '../src/i18n/en';
 
 const OWNER = 'ЗАДАЧА-1.0/1.3';
 const PLANS = {
@@ -141,6 +142,27 @@ describe('ЗАДАЧА-1.3 checkout', () => {
       await vi.waitFor(() => expect(page.document.getElementById('order-error').textContent).toBe('token expired'));
       expect(page.document.getElementById('order-login').hidden).toBe(false);
       expect(page.navigations).toEqual([]);
+    });
+
+    it('[-] 503 with a plain-text body shows the availability line and re-enables the button', async () => {
+      await pressPlan({ subscribe: () => new Response('payments unavailable', { status: 503, headers: { 'Content-Type': 'text/plain' } }) });
+      await vi.waitFor(() => expect(page.document.getElementById('order-error').textContent).toBe(en.checkoutUnavailable));
+      expect(page.navigations).toEqual([]);
+      expect(cta('pro_yearly').disabled).toBe(false);
+    });
+
+    it('[-] 500 with a JSON error keeps the server text and re-enables the button', async () => {
+      await pressPlan({ subscribe: () => json(500, { error: 'shop misconfigured' }) });
+      await vi.waitFor(() => expect(page.document.getElementById('order-error').textContent).toBe('shop misconfigured'));
+      expect(page.navigations).toEqual([]);
+      expect(cta('pro_yearly').disabled).toBe(false);
+    });
+
+    it('[-] a network failure shows the offline message and re-enables the button', async () => {
+      await pressPlan({ subscribe: () => { throw new TypeError('Failed to fetch'); } });
+      await vi.waitFor(() => expect(page.document.getElementById('order-error').textContent).toBe(en.offline));
+      expect(page.navigations).toEqual([]);
+      expect(cta('pro_yearly').disabled).toBe(false);
     });
   });
 });

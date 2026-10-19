@@ -128,8 +128,9 @@ export async function post(path: string, body?: unknown, token?: string | null):
   if (text) {
     try { data = JSON.parse(text) as PostResult['data']; } catch { data = null; }
   }
+  const unparsed = data === null;
   if (data === null) {
     data = response.ok ? {} : { error: message('badResponse', pageLang()) };
   }
-  return { ok: response.ok, status: response.status, data };
+  return { ok: response.ok, status: response.status, data, unparsed };
 }
