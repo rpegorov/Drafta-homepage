@@ -1,0 +1,94 @@
+---
+/* The signed-in account page in one language. Markup only: scripts/pages/account.ts
+   fills the data-* hooks below and toggles `hidden`; the renew links are static. */
+import Base from '../layouts/Base.astro';
+import { t } from '../i18n';
+import { localePath } from '../lib/lang';
+import type { Lang } from '../lib/types';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const accountPath = localePath('/account/', lang);
+const renew = (plan: string) => `${localePath('/checkout/', lang)}?plan=${plan}`;
+const columns = ['accountColDate', 'accountColPlan', 'accountColAmount', 'accountColStatus'] as const;
+const legal = [
+  { href: localePath('/terms/', lang), label: t(lang, 'footerTerms') },
+  { href: localePath('/refund/', lang), label: t(lang, 'footerRefund') },
+  { href: localePath('/contact/', lang), label: t(lang, 'footerContact') },
+];
+---
+<Base
+  lang={lang}
+  title={t(lang, 'accountTitle')}
+  description={t(lang, 'accountMetaDescription')}
+  canonicalPath={accountPath}
+  noindex
+>
+  <section class="band">
+    <div class="wrap wrap--narrow account">
+      <p class="eyebrow">{t(lang, 'accountEyebrow')}</p>
+      <h1 class="h1">{t(lang, 'accountH1')}</h1>
+      <p class="lede">{t(lang, 'accountLede')}</p>
+
+      <section class="card account__card" aria-labelledby="account-licence-h">
+        <h2 class="h2" id="account-licence-h">{t(lang, 'accountLicenceH2')}</h2>
+        <div data-licence role="status">
+          <p class="account__status" data-licence-text>{t(lang, 'accountChecking')}</p>
+        </div>
+        <div class="account__problem" data-licence-error role="alert" hidden>
+          <p class="form__error">{t(lang, 'accountLicenceError')}</p>
+          <button class="btn btn--ghost" type="button" data-licence-retry>{t(lang, 'accountRetry')}</button>
+        </div>
+        <dl class="account__meta">
+          <dt>{t(lang, 'accountEmailLabel')}</dt>
+          <dd>
+            <span data-account-email></span>
+            <span class="account__badge" data-account-verified hidden>{t(lang, 'accountEmailVerified')}</span>
+          </dd>
+        </dl>
+      </section>
+
+      <section class="card account__card" aria-labelledby="account-renew-h">
+        <h2 class="h2" id="account-renew-h">{t(lang, 'accountRenewH2')}</h2>
+        <div class="form__actions">
+          <a class="btn btn--primary" href={renew('pro_monthly')} data-renew="pro_monthly">{t(lang, 'accountRenewMonth')}</a>
+          <a class="btn btn--ghost" href={renew('pro_yearly')} data-renew="pro_yearly">{t(lang, 'accountRenewYear')}</a>
+        </div>
+        <p class="form__hint">{t(lang, 'accountRenewNote')}</p>
+      </section>
+
+      <section class="card account__card" aria-labelledby="account-orders-h">
+        <h2 class="h2" id="account-orders-h">{t(lang, 'accountOrdersH2')}</h2>
+        <div class="account__table" data-orders-table tabindex="0" role="region" aria-labelledby="account-orders-h" hidden>
+          <table class="orders">
+            <caption class="visually-hidden">{t(lang, 'accountOrdersCaption')}</caption>
+            <thead>
+              <tr>{columns.map((key) => <th scope="col">{t(lang, key)}</th>)}</tr>
+            </thead>
+            <tbody data-orders></tbody>
+          </table>
+        </div>
+        <p class="account__status" data-orders-empty role="status" hidden>{t(lang, 'accountOrdersEmpty')}</p>
+        <div class="account__problem" data-orders-error role="alert" hidden>
+          <p class="form__error">{t(lang, 'accountOrdersError')}</p>
+          <button class="btn btn--ghost" type="button" data-orders-retry>{t(lang, 'accountRetry')}</button>
+        </div>
+        <p class="form__hint">{t(lang, 'accountSupportHint')}</p>
+      </section>
+
+      <div class="account__foot">
+        <button class="btn" type="button" data-logout>{t(lang, 'accountLogout')}</button>
+        <nav class="account__legal" aria-label={t(lang, 'accountLegalLinks')}>
+          {legal.map(({ href, label }) => <a href={href}>{label}</a>)}
+        </nav>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    import '../scripts/pages/account.ts';
+  </script>
+</Base>

@@ -35,6 +35,7 @@ const links = [
     </button>
     <div class="nav__links" id="nav-links">
       {links.map(({ href, label }) => <a class="nav__link" href={href}>{label}</a>)}
+      <a class="nav__link" href={localePath('/account/', lang)} data-account-link hidden>{t(lang, 'navAccount')}</a>
     </div>
     <div class="nav__actions">
       <LangSwitch lang={lang} paths={paths} />

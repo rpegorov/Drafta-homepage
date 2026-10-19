@@ -5,6 +5,7 @@
 
 import { renderPlans, loadPlans, formatStorage, formatNotes } from '../plans';
 import { post, showError, showOk } from '../forms';
+import { accessToken, signedInEmail, loginHref } from '../session';
 import { endpoints } from '../../lib/config';
 import { t } from '../../i18n';
 import type { Lang, Plan } from '../../lib/types';
@@ -18,8 +19,7 @@ const LANG: Lang = pageLang();
 
 /* The login page returns here with the query intact, so a ?plan= the app or a
    pricing card opened with survives the sign-in. */
-const LOGIN_URL = (LANG === 'ru' ? '/ru/login/' : '/login/')
-  + '?next=' + encodeURIComponent(location.pathname + location.search);
+const LOGIN_URL = loginHref(LANG, location.pathname + location.search);
 /* The access token is written only by /login/, so a sessionless buyer goes
    there. /register/ would answer 409 for a returning customer. */
 
@@ -40,11 +40,6 @@ function say(el: HTMLElement | null, text: string): void { if (el) el.textConten
 function setError(text: string): void { showError(formEl, text); }
 function clearMessages(): void { showError(formEl, ''); showOk(formEl, ''); }
 
-function read(key: string): string {
-  try { return localStorage.getItem(key) || ''; } catch { return ''; }
-}
-function token(): string { return read('drafta_access'); }
-
 /* The card's own CTA is the purchase action, so the busy state lives on the
    button that was pressed rather than on a form-wide submit button. */
 function busy(button: HTMLElement | null, on: boolean): void {
@@ -55,8 +50,8 @@ function busy(button: HTMLElement | null, on: boolean): void {
 }
 
 function initSession(): void {
-  if (token()) {
-    const email = read('drafta_email');
+  if (accessToken()) {
+    const email = signedInEmail();
     say(hintEl, email ? fill(t(LANG, 'checkoutSignedInAs'), email) : t(LANG, 'checkoutSignedIn'));
     hide(loginEl);
   } else {
@@ -75,7 +70,7 @@ function isHttpsUrl(value: unknown): value is string {
 /* Choosing a plan needs a session; without one the buyer goes to /login/. */
 function subscribe(code: string, button: HTMLElement | null): void {
   if (sending) return;
-  const access = token();
+  const access = accessToken();
   if (!access) { window.location.href = LOGIN_URL; return; }
 
   const plan = String(code || '');
@@ -154,7 +149,7 @@ function handleDeepLink(ready: Promise<void> | null): void {
   } catch { wanted = ''; }
   if (!wanted) return;
 
-  if (!token()) { window.location.href = LOGIN_URL; return; }
+  if (!accessToken()) { window.location.href = LOGIN_URL; return; }
 
   const chain = ready && typeof ready.then === 'function' ? ready : Promise.resolve();
   chain.then(() => loadPlans().then((list) => {

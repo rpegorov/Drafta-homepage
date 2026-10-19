@@ -16,8 +16,32 @@ const API_SCRIPTS = [
   'src/scripts/pages/verify.ts',
   'src/scripts/pages/checkout.ts',
   'src/scripts/pages/checkout-success.ts',
+  'src/scripts/pages/account.ts',
 ];
-const ALL_SCRIPTS = ['src/scripts/lang.ts', 'src/scripts/nav.ts', ...API_SCRIPTS];
+const ALL_SCRIPTS = [
+  'src/scripts/lang.ts',
+  'src/scripts/nav.ts',
+  'src/scripts/session.ts',
+  'src/scripts/session-nav.ts',
+  'src/scripts/account-model.ts',
+  ...API_SCRIPTS,
+];
+const ACCOUNT_PAGE_SCRIPT = 'src/scripts/pages/account.ts';
+const ACCOUNT_MARKUP = 'src/components/AccountPage.astro';
+const ACCOUNT_HOOKS = [
+  'data-licence',
+  'data-licence-text',
+  'data-licence-error',
+  'data-licence-retry',
+  'data-account-email',
+  'data-account-verified',
+  'data-orders',
+  'data-orders-table',
+  'data-orders-empty',
+  'data-orders-error',
+  'data-orders-retry',
+  'data-logout',
+];
 
 function resolveImport(fromFile, spec) {
   const base = resolve(dirname(fromFile), spec);
@@ -72,5 +96,39 @@ describe('ЗАДАЧА-1.0 composition root', () => {
     expect(Array.isArray(unwiredCapabilities), 'unwiredCapabilities must be an array').toBe(true);
     const notOwner = unwiredCapabilities.filter((entry) => !/owner/i.test(JSON.stringify(entry)));
     expect(notOwner).toEqual([]);
+  });
+});
+
+describe('account page wiring (source text, no rendered dist)', () => {
+  const scriptSource = () => readFileSync(join(ROOT, ACCOUNT_PAGE_SCRIPT), 'utf8');
+  const markupSource = () => readFileSync(join(ROOT, ACCOUNT_MARKUP), 'utf8');
+
+  it('[+] every relative import of the account script resolves to an existing file', () => {
+    const specs = [...scriptSource().matchAll(/from\s*['"](\.{1,2}\/[^'"]+)['"]|import\s*['"](\.{1,2}\/[^'"]+)['"]/g)]
+      .map((m) => m[1] || m[2]);
+    expect(specs.length).toBeGreaterThan(0);
+    const missing = specs.filter((spec) => !resolveImport(join(ROOT, ACCOUNT_PAGE_SCRIPT), spec));
+    expect(missing, 'unresolved imports in account.ts').toEqual([]);
+  });
+
+  it('[+] every DOM hook the account script queries exists in AccountPage.astro', () => {
+    const script = scriptSource();
+    const markup = markupSource();
+    const unqueried = ACCOUNT_HOOKS.filter((hook) => !script.includes(`'${hook}'`));
+    const missingInMarkup = ACCOUNT_HOOKS.filter((hook) => !new RegExp(`\\b${hook}\\b`).test(markup));
+    expect(unqueried, 'hooks listed for the account page but not used by account.ts').toEqual([]);
+    expect(missingInMarkup, 'hooks used by account.ts but absent from AccountPage.astro').toEqual([]);
+  });
+
+  it('[+] the header account link hook is set by session-nav and rendered by Header.astro', () => {
+    const nav = readFileSync(join(ROOT, 'src/scripts/session-nav.ts'), 'utf8'); // lint-allow: test-reads-source hook names are the only contract between the Astro markup and the scripts
+    const header = readFileSync(join(ROOT, 'src/components/Header.astro'), 'utf8');
+    expect(nav).toContain("'[data-account-link]'");
+    expect(header).toMatch(/data-account-link[^>]*\bhidden\b/);
+  });
+
+  it('[+] Base.astro loads the session-nav script next to nav.ts', () => {
+    const base = readFileSync(join(ROOT, 'src/layouts/Base.astro'), 'utf8');
+    expect(base).toContain("import '../scripts/session-nav.ts';");
   });
 });
