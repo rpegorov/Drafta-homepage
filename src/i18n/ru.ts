@@ -180,6 +180,8 @@ export const ru: Messages = {
   accountAutoRenewPriceChanged: 'Цена тарифа изменилась. Автопродление приостановлено до вашего нового согласия.',
   accountAutoRenewPlanUnavailable: 'Тариф больше не продаётся. Автопродление приостановлено.',
   accountAutoRenewCancelled: 'Выключено. Оплаченный период сохраняется.',
+  accountAutoRenewPlanSwitched: 'Выключено: вы оплатили другой тариф, автопродление остановлено.',
+  accountAutoRenewExpired: 'Автопродление приостановлено: оплаченный период закончился до списания.',
   accountAutoRenewCancel: 'Отключить автопродление',
   accountAutoRenewCancelConfirm: 'Отключить автопродление? Оплаченный период сохранится, новых списаний не будет.',
   accountAutoRenewCancelInFlightNote: 'Уже начатое списание может пройти.',

@@ -3,7 +3,16 @@
    drifts to a neighbouring day in the visitor's timezone. */
 
 import { t } from '../i18n';
-import type { AccountOrder, Lang, LicenceView, OrderRow } from '../lib/types';
+import type {
+  AccountOrder,
+  AutoRenewCancelReason,
+  AutoRenewPastDueReason,
+  AutoRenewRecord,
+  AutoRenewView,
+  Lang,
+  LicenceView,
+  OrderRow,
+} from '../lib/types';
 
 const LOCALE: Record<Lang, string> = { en: 'en-US', ru: 'ru-RU' };
 const PLAN_KEYS = { pro_monthly: 'accountPlanMonthly', pro_yearly: 'accountPlanYearly' } as const;
@@ -109,4 +118,55 @@ export function orderRows(data: unknown, lang: Lang): OrderRow[] | null {
   const orders: unknown[] = data.orders;
   if (!orders.every(isOrder)) return null;
   return orders.map((order) => toRow(order, lang));
+}
+
+const RECORD_STATUSES: readonly AutoRenewRecord['status'][] = ['active', 'past_due', 'cancelled'];
+const PAST_DUE_REASONS: readonly AutoRenewPastDueReason[] = ['failures', 'price_changed', 'plan_unavailable', 'expired'];
+const CANCEL_REASONS: readonly AutoRenewCancelReason[] = ['user', 'superseded', 'plan_switched'];
+
+function isRecordStatus(value: unknown): value is AutoRenewRecord['status'] {
+  return RECORD_STATUSES.some((status) => status === value);
+}
+
+function isKopecks(value: unknown): value is number {
+  return Number.isSafeInteger(value) && (value as number) > 0;
+}
+
+function pastDueReason(stopReason: string | null): AutoRenewPastDueReason {
+  return PAST_DUE_REASONS.find((reason) => reason === stopReason) ?? 'other';
+}
+
+function cancelReason(stopReason: string | null): AutoRenewCancelReason {
+  return CANCEL_REASONS.find((reason) => reason === stopReason) ?? 'other';
+}
+
+/**
+ * Turns the `autoRenew` value of GET /v1/billing/autorenew into what the page shows.
+ * `null` means no record (auto-renewal is off). Returns null when the record does not
+ * match the contract, so the page shows an error instead of a wrong status.
+ */
+export function autoRenewView(record: unknown, lang: Lang): AutoRenewView | null {
+  if (record === null) return { kind: 'off' };
+  if (!isDict(record)) return null;
+  const { status, plan, amountKopecks, nextChargeAt, chargeInFlight, stopReason } = record;
+  if (!isRecordStatus(status) || typeof plan !== 'string' || !isKopecks(amountKopecks)) return null;
+  if (typeof chargeInFlight !== 'boolean') return null;
+  if (stopReason !== null && typeof stopReason !== 'string') return null;
+  const next = parseInstant(nextChargeAt);
+  if (nextChargeAt !== null && next === null) return null;
+
+  switch (status) {
+    case 'active':
+      return {
+        kind: 'active',
+        amount: formatRub(amountKopecks, lang),
+        plan: planLabel(plan, lang),
+        next: next ? formatUtcDate(next, lang) : null,
+        inFlight: chargeInFlight,
+      };
+    case 'past_due':
+      return { kind: 'past_due', reason: pastDueReason(stopReason), inFlight: chargeInFlight };
+    case 'cancelled':
+      return { kind: 'cancelled', reason: cancelReason(stopReason), inFlight: chargeInFlight };
+  }
 }

@@ -887,6 +887,20 @@ details[open] > .faq__q{margin-bottom:var(--space-3)}
   font-size:var(--text-body);
   color:var(--ink);
 }
+/* the auto-renewal consent on checkout: a real checkbox, label and link beside it */
+.check{display:grid;gap:var(--space-2)}
+.check__row{display:flex;align-items:flex-start;gap:var(--space-3);cursor:pointer;font-size:var(--text-body);color:var(--ink)}
+.check__box{
+  flex:none;
+  inline-size:1.25rem;
+  block-size:1.25rem;
+  margin:.125rem 0 0;
+  accent-color:var(--accent);
+  cursor:pointer;
+}
+.check__box:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.check__box:disabled{opacity:.6;cursor:not-allowed}
+.check__link{margin-inline-start:calc(1.25rem + var(--space-3));font-size:var(--text-sm)}
 .form__actions{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-5)}
 .form__alt{margin:0;font-size:var(--text-body);color:var(--muted)}
 

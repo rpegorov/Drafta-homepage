@@ -58,7 +58,14 @@ export interface AutoRenewInfo {
   available: boolean;
 }
 
-export type AutoRenewStopReason = 'user' | 'superseded' | 'failures' | 'price_changed' | 'plan_unavailable' | 'expired';
+export type AutoRenewStopReason =
+  | 'user'
+  | 'superseded'
+  | 'plan_switched'
+  | 'failures'
+  | 'price_changed'
+  | 'plan_unavailable'
+  | 'expired';
 
 /** The `autoRenew` record of GET /v1/billing/autorenew; no ids and no contact data. */
 export interface AutoRenewRecord {
@@ -70,11 +77,18 @@ export interface AutoRenewRecord {
   stopReason: AutoRenewStopReason | null;
 }
 
-/** What the account page shows for auto-renewal; `amount`, `plan` and `next` are already formatted. */
+/** Why auto-renewal is paused; `other` covers a missing or unmapped stop reason. */
+export type AutoRenewPastDueReason = 'failures' | 'price_changed' | 'plan_unavailable' | 'expired' | 'other';
+
+/** Why auto-renewal is off; `other` covers a missing or unmapped stop reason. */
+export type AutoRenewCancelReason = 'user' | 'superseded' | 'plan_switched' | 'other';
+
+/**
+ * What the account page shows for auto-renewal; `amount`, `plan` and `next` are already formatted.
+ * `inFlight` marks a charge that has started and may still succeed: renew buttons must say so.
+ */
 export type AutoRenewView =
-  | { kind: 'hidden' }
   | { kind: 'off' }
   | { kind: 'active'; amount: string; plan: string; next: string | null; inFlight: boolean }
-  | { kind: 'past_due'; reason: 'failures' | 'price_changed' | 'plan_unavailable' | 'expired' | 'other' }
-  | { kind: 'cancelled' }
-  | { kind: 'unknown' };
+  | { kind: 'past_due'; reason: AutoRenewPastDueReason; inFlight: boolean }
+  | { kind: 'cancelled'; reason: AutoRenewCancelReason; inFlight: boolean };

@@ -47,6 +47,13 @@ const lang = 'en';
         <p class="form__hint" id="order-hint">{t(lang, 'checkoutOrderChecking')}</p>
         <div class="form__error is-hidden" id="order-error" role="alert"></div>
         <div class="form__ok is-hidden" id="order-ok" role="status"></div>
+        <div class="check is-hidden" id="order-autorenew" hidden>
+          <label class="check__row" for="order-autorenew-input">
+            <input class="check__box" type="checkbox" id="order-autorenew-input" autocomplete="off" />
+            <span class="check__text">{t(lang, 'checkoutAutoRenewLabel')}</span>
+          </label>
+          <a class="check__link" href="/ru/offer/" hreflang="ru" target="_blank" rel="noopener">{t(lang, 'checkoutAutoRenewOfferLink')}</a>
+        </div>
         <div class="form__actions">
           <a class="btn btn--ghost" id="order-login" href="/login/?next=/checkout/" hidden>{t(lang, 'footerSignIn')}</a>
         </div>

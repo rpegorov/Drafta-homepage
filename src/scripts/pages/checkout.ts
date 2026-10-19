@@ -3,7 +3,7 @@
    never holds a price of its own and never reports a purchase: choosing a plan
    only asks the API for a payment URL and sends the buyer there. */
 
-import { renderPlans, loadPlans, formatStorage, formatNotes } from '../plans';
+import { renderPlans, loadPlans, loadAutoRenewAvailable, formatStorage, formatNotes } from '../plans';
 import { post, showError, showOk } from '../forms';
 import { accessToken, signedInEmail, loginHref } from '../session';
 import { endpoints } from '../../lib/config';
@@ -31,6 +31,8 @@ const plansEl = document.querySelector<HTMLElement>('[data-plans]');
 const formEl = document.getElementById('order-form');
 const hintEl = document.getElementById('order-hint');
 const loginEl = document.getElementById('order-login');
+const autoRenewEl = document.getElementById('order-autorenew');
+const autoRenewInput = document.getElementById('order-autorenew-input') as HTMLInputElement | null;
 if (loginEl) loginEl.setAttribute('href', LOGIN_URL);
 
 function show(el: HTMLElement | null): void { if (el) { el.hidden = false; el.classList.remove('is-hidden'); } }
@@ -61,6 +63,7 @@ function initSession(): void {
 }
 
 let sending = false;
+let autoRenewOffered = false;
 
 function isHttpsUrl(value: unknown): value is string {
   if (typeof value !== 'string') return false;
@@ -89,7 +92,10 @@ function subscribe(code: string, button: HTMLElement | null): void {
   say(hintEl, t(LANG, 'checkoutSending'));
   busy(button, true);
 
-  post(endpoints.subscribe, { plan, lang: LANG }, access).then((res) => {
+  const body: Record<string, unknown> = { plan, lang: LANG };
+  if (autoRenewOffered && autoRenewInput?.checked) body.autoRenew = true;
+
+  post(endpoints.subscribe, body, access).then((res) => {
     const status = res ? res.status : 0;
     const paymentUrl = res && res.ok ? res.data.paymentUrl : undefined;
     if (res && res.ok && isHttpsUrl(paymentUrl)) {
@@ -177,7 +183,20 @@ function renderQuotaLine(): void {
   }).catch(() => { /* the shared list already carries both lines */ });
 }
 
+/* 4 — the auto-renewal consent: shown, unchecked, only while the server says it
+   is available; any failure leaves the page as it was. */
+function initAutoRenew(): void {
+  if (!autoRenewEl || !autoRenewInput) return;
+  autoRenewInput.checked = false;
+  loadAutoRenewAvailable().then((available) => {
+    if (!available) return;
+    autoRenewOffered = true;
+    show(autoRenewEl);
+  }).catch(() => { /* stays hidden; the purchase works without it */ });
+}
+
 const rendered = renderPlansBlock();
 initSession();
 handleDeepLink(rendered);
 renderQuotaLine();
+initAutoRenew();

@@ -171,6 +171,8 @@ export const en = {
   accountAutoRenewPriceChanged: 'The plan price changed. Auto-renewal is paused until you agree to the new price.',
   accountAutoRenewPlanUnavailable: 'This plan is no longer sold. Auto-renewal is paused.',
   accountAutoRenewCancelled: 'Off. The period you paid for stays active.',
+  accountAutoRenewPlanSwitched: 'Off: you paid for another plan, so auto-renewal stopped.',
+  accountAutoRenewExpired: 'Auto-renewal is paused: the paid period ended before a charge could be made.',
   accountAutoRenewCancel: 'Turn off auto-renewal',
   accountAutoRenewCancelConfirm: 'Turn off auto-renewal? The period you paid for stays active, and no new charges will be made.',
   accountAutoRenewCancelInFlightNote: 'A charge that has already started may still go through.',

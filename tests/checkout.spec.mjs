@@ -18,6 +18,9 @@ const SIGNED_IN = { drafta_access: 'access-1', drafta_email: 'reader@example.com
 let page;
 afterEach(() => { page?.close(); page = undefined; });
 
+const AUTORENEW_FIELD = `<div class="check is-hidden" id="order-autorenew" hidden>
+  <input type="checkbox" id="order-autorenew-input" autocomplete="off" />
+</div>`;
 const PAYMENT_URL = 'https://auth.robokassa.ru/Merchant/Index.aspx?InvId=7';
 
 async function openCheckout({
@@ -29,7 +32,8 @@ async function openCheckout({
     '/v1/plans': plans,
     '/v1/billing/subscribe': subscribe,
   });
-  page = await openPage({ url: `https://drafta.org/checkout/${search}`, html: fixture('checkout.html'), storage, fetch });
+  const html = fixture('checkout.html').replace('<div class="form__actions">', `${AUTORENEW_FIELD}<div class="form__actions">`);
+  page = await openPage({ url: `https://drafta.org/checkout/${search}`, html, storage, fetch });
   await runScript('src/scripts/forms.ts', OWNER);
   await runScript('src/scripts/plans.ts', OWNER);
   await runScript('src/scripts/pages/checkout.ts', OWNER);
@@ -100,6 +104,56 @@ describe('ЗАДАЧА-1.3 checkout', () => {
     const fetch = await openCheckout({ search: '?plan=pro_yearly', storage: SIGNED_IN });
     await vi.waitFor(() => expect(page.document.querySelectorAll('[data-plans] .plan').length).toBe(2));
     expect(fetch.calls.filter((c) => c.path.endsWith('/v1/billing/subscribe'))).toEqual([]);
+  });
+
+  describe('auto-renewal consent', () => {
+    const available = (value) => () => json(200, { ...PLANS, autoRenew: { available: value } });
+    const field = () => page.document.getElementById('order-autorenew');
+    const box = () => page.document.getElementById('order-autorenew-input');
+    const bodyOf = (fetch) => JSON.parse(fetch.calls.find((c) => c.path.endsWith('/v1/billing/subscribe')).init.body);
+
+    async function press(plans) {
+      const fetch = await openCheckout({ storage: SIGNED_IN, plans });
+      await vi.waitFor(() => expect(page.document.querySelector('[data-plans] .plan__cta[data-plan="pro_yearly"]')).not.toBeNull());
+      return fetch;
+    }
+    const buy = () => page.document.querySelector('[data-plans] .plan__cta[data-plan="pro_yearly"]').click();
+
+    it('[+] available: the box appears unchecked and a checked box adds autoRenew:true', async () => {
+      const fetch = await press(available(true));
+      await vi.waitFor(() => expect(field().hidden).toBe(false));
+      expect(box().checked).toBe(false);
+      box().click();
+      buy();
+      await vi.waitFor(() => expect(page.navigations.length).toBeGreaterThan(0));
+      expect(bodyOf(fetch)).toEqual({ plan: 'pro_yearly', lang: 'en', autoRenew: true });
+    });
+
+    it('[-] available but left unchecked: the body stays exactly {plan, lang}', async () => {
+      const fetch = await press(available(true));
+      await vi.waitFor(() => expect(field().hidden).toBe(false));
+      buy();
+      await vi.waitFor(() => expect(page.navigations.length).toBeGreaterThan(0));
+      expect(bodyOf(fetch)).toEqual({ plan: 'pro_yearly', lang: 'en' });
+    });
+
+    it('[-] unavailable: the box stays hidden and the body is unchanged even if it was ticked', async () => {
+      const fetch = await press(available(false));
+      await vi.waitFor(() => expect(planCalls(fetch).length).toBe(1));
+      expect(field().hidden).toBe(true);
+      box().checked = true;
+      buy();
+      await vi.waitFor(() => expect(page.navigations.length).toBeGreaterThan(0));
+      expect(bodyOf(fetch)).toEqual({ plan: 'pro_yearly', lang: 'en' });
+    });
+
+    it('[-] /v1/plans failing: no box and the purchase still works', async () => {
+      const fetch = await press(() => json(500, { error: 'boom' }));
+      buy();
+      await vi.waitFor(() => expect(page.navigations.length).toBeGreaterThan(0));
+      expect(field().hidden).toBe(true);
+      expect(bodyOf(fetch)).toEqual({ plan: 'pro_yearly', lang: 'en' });
+    });
   });
 
   describe('subscribe', () => {
