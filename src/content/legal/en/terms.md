@@ -1,7 +1,7 @@
 ---
 title: 'Terms of Service'
 description: 'The terms for using Drafta: the trial, billing, read-only mode after a lapsed period, and account deletion.'
-updated: '2026-10-07'
+updated: '2026-10-19'
 noindex: true
 owner:
   - 'jurisdiction (Russian law) and the trial length are pending confirmation; the text is not reviewed by a lawyer.'
@@ -27,9 +27,11 @@ Russia; paying yearly saves about 20 %, roughly 792 ₽ a month. Customers in
 other countries and regions are billed in US dollars: **$9.99 per month** or
 **$95.88 per year** (about $7.99 a month). The currency and amount are shown at
 checkout before you pay. MIR, Visa and
-Mastercard cards are accepted, and payments are processed by Robokassa. There
-are no automatic charges: each billing period is a separate order that you pay
-yourself, and the subscription does not renew on its own.
+Mastercard cards are accepted, and payments are processed by Robokassa. Auto-renewal
+is possible only with a separate consent that you give at payment (see clause
+5.1 of the Russian offer). Without that consent, each billing period is a
+separate order that you pay yourself, and the subscription does not renew on
+its own.
 
 The subscription gives you access to the Drafta app and its cloud sync for the
 paid period. The full contract terms are in the

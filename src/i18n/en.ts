@@ -122,7 +122,7 @@ export const en = {
   checkoutFailBack: 'Back to checkout',
 
   /* ---- checkout auto-renewal consent (S1; wording pending L1) ---- */
-  checkoutAutoRenewLabel: 'Renew automatically: charge the price of the chosen period to this card 3 days before it ends, until I turn auto-renewal off in my account.',
+  checkoutAutoRenewLabel: 'Renew automatically: charge the price of the chosen period to this card in the last 3 days before it ends, after an email notice, until I turn auto-renewal off in my account.',
   checkoutAutoRenewOfferLink: 'Terms — clause 5.1 of the offer.',
   checkoutAutoRenewUnavailable: 'Automatic renewal is not available right now. Nothing was charged; you can pay for one period without it.',
 
