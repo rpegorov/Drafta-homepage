@@ -173,18 +173,36 @@ function fallback(): Plan[] {
   return planFallback.slice();
 }
 
-async function fetchPlans(): Promise<Plan[]> {
+/* Body of GET /v1/plans; null when the request failed or the body is not JSON. */
+interface PlansBody {
+  plans?: unknown;
+  autoRenew?: { available?: unknown } | null;
+}
+
+async function fetchPlansBody(): Promise<PlansBody | null> {
   const url = String(api || '') + String(endpoints.plans || '');
   try {
     const response = await fetch(url, { headers: { Accept: 'application/json' } });
-    if (!response.ok) return fallback();
-    const data = (await response.json()) as { plans?: unknown } | null;
-    const plans = data && data.plans;
-    if (!Array.isArray(plans) || !plans.length) return fallback();
-    return plans as Plan[];
+    if (!response.ok) return null;
+    return (await response.json()) as PlansBody | null;
   } catch {
-    return fallback();
+    return null;
   }
+}
+
+/* One request per page load: the plan list and the auto-renewal flag share this body. */
+let body: Promise<PlansBody | null> | null = null;
+
+function plansBody(): Promise<PlansBody | null> {
+  if (!body) body = fetchPlansBody();
+  return body;
+}
+
+async function fetchPlans(): Promise<Plan[]> {
+  const data = await plansBody();
+  const plans = data && data.plans;
+  if (!Array.isArray(plans) || !plans.length) return fallback();
+  return plans as Plan[];
 }
 
 /* One request per page load: every caller on the page shares this promise. */
@@ -194,6 +212,12 @@ let pending: Promise<Plan[]> | null = null;
 export function loadPlans(): Promise<Plan[]> {
   if (!pending) pending = fetchPlans();
   return pending.then((plans) => plans.slice());
+}
+
+/** True only when GET /v1/plans reports `autoRenew.available === true`; any failure or missing field is false. */
+export async function loadAutoRenewAvailable(): Promise<boolean> {
+  const data = await plansBody();
+  return data?.autoRenew?.available === true;
 }
 
 /** Fills el with the .plans markup: two billing cards, the shared list and the trial line. */

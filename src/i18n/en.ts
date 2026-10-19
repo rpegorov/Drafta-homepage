@@ -121,6 +121,11 @@ export const en = {
   checkoutFailLede: 'Nothing was charged. You can choose a plan and try again whenever you like.',
   checkoutFailBack: 'Back to checkout',
 
+  /* ---- checkout auto-renewal consent (S1; wording pending L1) ---- */
+  checkoutAutoRenewLabel: 'Renew automatically: charge the price of the chosen period to this card 3 days before it ends, until I turn auto-renewal off in my account.',
+  checkoutAutoRenewOfferLink: 'Terms — clause 5.1 of the offer.',
+  checkoutAutoRenewUnavailable: 'Automatic renewal is not available right now. Nothing was charged; you can pay for one period without it.',
+
   /* ---- account page (pages/account.ts, session-nav.ts) ---- */
   accountTitle: 'Your account — Drafta',
   accountMetaDescription: 'Your Drafta licence, renewal options and payment history.',
@@ -156,6 +161,20 @@ export const en = {
   accountPlanMonthly: 'Pro — monthly',
   accountPlanYearly: 'Pro — yearly',
   accountSupportHint: 'Paid but the licence has not changed? Write to support@drafta.org and quote the payment date.',
+  accountAutoRenewH2: 'Auto-renewal',
+  accountAutoRenewActive: 'On. Next charge: {value}.',
+  accountAutoRenewPaused: 'On; charges are temporarily paused.',
+  accountAutoRenewInFlight: 'An automatic charge is in progress.',
+  accountAutoRenewInFlightRenewNote: 'An automatic charge of {amount} is in progress; a manual payment adds one more period.',
+  accountAutoRenewOff: 'Off.',
+  accountAutoRenewPastDue: 'Auto-renewal is paused: charges have stopped.',
+  accountAutoRenewPriceChanged: 'The plan price changed. Auto-renewal is paused until you agree to the new price.',
+  accountAutoRenewPlanUnavailable: 'This plan is no longer sold. Auto-renewal is paused.',
+  accountAutoRenewCancelled: 'Off. The period you paid for stays active.',
+  accountAutoRenewCancel: 'Turn off auto-renewal',
+  accountAutoRenewCancelConfirm: 'Turn off auto-renewal? The period you paid for stays active, and no new charges will be made.',
+  accountAutoRenewCancelInFlightNote: 'A charge that has already started may still go through.',
+  accountAutoRenewError: 'Could not update auto-renewal. Nothing was changed.',
   accountLogout: 'Sign out',
   accountLegalLinks: 'Terms and refunds',
   accountOpenFromSuccess: 'Open your account',

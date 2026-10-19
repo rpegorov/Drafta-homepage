@@ -52,3 +52,29 @@ export interface OrderRow {
   status: 'paid' | 'pending' | 'unpaid' | 'other';
   statusLabel: string;
 }
+
+/** The `autoRenew` block of GET /v1/plans. */
+export interface AutoRenewInfo {
+  available: boolean;
+}
+
+export type AutoRenewStopReason = 'user' | 'superseded' | 'failures' | 'price_changed' | 'plan_unavailable' | 'expired';
+
+/** The `autoRenew` record of GET /v1/billing/autorenew; no ids and no contact data. */
+export interface AutoRenewRecord {
+  status: 'active' | 'past_due' | 'cancelled';
+  plan: string;
+  amountKopecks: number;
+  nextChargeAt: string | null;
+  chargeInFlight: boolean;
+  stopReason: AutoRenewStopReason | null;
+}
+
+/** What the account page shows for auto-renewal; `amount`, `plan` and `next` are already formatted. */
+export type AutoRenewView =
+  | { kind: 'hidden' }
+  | { kind: 'off' }
+  | { kind: 'active'; amount: string; plan: string; next: string | null; inFlight: boolean }
+  | { kind: 'past_due'; reason: 'failures' | 'price_changed' | 'plan_unavailable' | 'expired' | 'other' }
+  | { kind: 'cancelled' }
+  | { kind: 'unknown' };

@@ -17,6 +17,8 @@ export const endpoints = {
   subscribe: '/v1/billing/subscribe',
   orders: '/v1/billing/orders',
   logout: '/v1/auth/logout',
+  autorenew: '/v1/billing/autorenew',
+  autorenewCancel: '/v1/billing/autorenew/cancel',
 } as const;
 
 export const releases = 'https://github.com/rpegorov/drafta-releases/releases/latest';

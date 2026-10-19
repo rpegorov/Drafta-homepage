@@ -130,6 +130,11 @@ export const ru: Messages = {
   checkoutFailLede: 'Деньги не списаны. Выберите тариф и попробуйте снова, когда удобно.',
   checkoutFailBack: 'Вернуться к оплате',
 
+  /* ---- checkout auto-renewal consent (S1; wording pending L1) ---- */
+  checkoutAutoRenewLabel: 'Продлевать автоматически: списывать стоимость выбранного периода с этой карты за 3 дня до его окончания, пока я не отключу автопродление в кабинете.',
+  checkoutAutoRenewOfferLink: 'Условия — п. 5.1 оферты.',
+  checkoutAutoRenewUnavailable: 'Автопродление сейчас недоступно. Ничего не списано; можно оплатить период и без него.',
+
   /* ---- account page (pages/account.ts, session-nav.ts) ---- */
   accountTitle: 'Личный кабинет — Drafta',
   accountMetaDescription: 'Лицензия Drafta, варианты продления и история платежей.',
@@ -165,6 +170,20 @@ export const ru: Messages = {
   accountPlanMonthly: 'Pro — месяц',
   accountPlanYearly: 'Pro — год',
   accountSupportHint: 'Оплатили, а лицензия не изменилась? Напишите на support@drafta.org и укажите дату платежа.',
+  accountAutoRenewH2: 'Автопродление',
+  accountAutoRenewActive: 'Включено. Следующее списание: {value}.',
+  accountAutoRenewPaused: 'Включено; списания временно не выполняются.',
+  accountAutoRenewInFlight: 'Сейчас выполняется автосписание.',
+  accountAutoRenewInFlightRenewNote: 'Сейчас идёт автосписание {amount}; ручная оплата добавит ещё один период.',
+  accountAutoRenewOff: 'Выключено.',
+  accountAutoRenewPastDue: 'Автопродление приостановлено: списания больше не выполняются.',
+  accountAutoRenewPriceChanged: 'Цена тарифа изменилась. Автопродление приостановлено до вашего нового согласия.',
+  accountAutoRenewPlanUnavailable: 'Тариф больше не продаётся. Автопродление приостановлено.',
+  accountAutoRenewCancelled: 'Выключено. Оплаченный период сохраняется.',
+  accountAutoRenewCancel: 'Отключить автопродление',
+  accountAutoRenewCancelConfirm: 'Отключить автопродление? Оплаченный период сохранится, новых списаний не будет.',
+  accountAutoRenewCancelInFlightNote: 'Уже начатое списание может пройти.',
+  accountAutoRenewError: 'Не удалось обновить автопродление. Ничего не изменилось.',
   accountLogout: 'Выйти',
   accountLegalLinks: 'Условия и возврат',
   accountOpenFromSuccess: 'Открыть кабинет',
