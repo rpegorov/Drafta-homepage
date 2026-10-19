@@ -15,6 +15,8 @@ export const endpoints = {
   me: '/v1/account/me',
   license: '/v1/license/status',
   subscribe: '/v1/billing/subscribe',
+  orders: '/v1/billing/orders',
+  logout: '/v1/auth/logout',
 } as const;
 
 export const releases = 'https://github.com/rpegorov/drafta-releases/releases/latest';
