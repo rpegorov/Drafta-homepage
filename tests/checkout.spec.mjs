@@ -17,11 +17,16 @@ const SIGNED_IN = { drafta_access: 'access-1', drafta_email: 'reader@example.com
 let page;
 afterEach(() => { page?.close(); page = undefined; });
 
-async function openCheckout({ search = '', storage = {}, plans = () => json(200, PLANS) } = {}) {
+const PAYMENT_URL = 'https://auth.robokassa.ru/Merchant/Index.aspx?InvId=7';
+
+async function openCheckout({
+  search = '', storage = {}, plans = () => json(200, PLANS),
+  subscribe = () => json(200, { paymentUrl: PAYMENT_URL, invId: 7 }),
+} = {}) {
   resetScripts();
   const fetch = stubFetch({
     '/v1/plans': plans,
-    '/v1/billing/subscribe': () => json(200, { plan: 'pro_yearly', status: 'active' }),
+    '/v1/billing/subscribe': subscribe,
   });
   page = await openPage({ url: `https://drafta.org/checkout/${search}`, html: fixture('checkout.html'), storage, fetch });
   await runScript('src/scripts/forms.ts', OWNER);
@@ -94,5 +99,48 @@ describe('ЗАДАЧА-1.3 checkout', () => {
     const fetch = await openCheckout({ search: '?plan=pro_yearly', storage: SIGNED_IN });
     await vi.waitFor(() => expect(page.document.querySelectorAll('[data-plans] .plan').length).toBe(2));
     expect(fetch.calls.filter((c) => c.path.endsWith('/v1/billing/subscribe'))).toEqual([]);
+  });
+
+  describe('subscribe', () => {
+    const subscribeCalls = (fetch) => fetch.calls.filter((c) => c.path.endsWith('/v1/billing/subscribe'));
+    const cta = (code) => page.document.querySelector(`[data-plans] .plan__cta[data-plan="${code}"]`);
+
+    async function pressPlan(options, code = 'pro_yearly') {
+      const fetch = await openCheckout({ storage: SIGNED_IN, ...options });
+      await vi.waitFor(() => expect(cta(code)).not.toBeNull());
+      cta(code).click();
+      return fetch;
+    }
+
+    it('[+] posts the plan and the page language with the bearer token, then goes to the https paymentUrl', async () => {
+      const fetch = await pressPlan();
+      await vi.waitFor(() => expect(page.navigations.length).toBeGreaterThan(0));
+      expect(page.navigations.at(-1).url).toBe(PAYMENT_URL);
+      const [call] = subscribeCalls(fetch);
+      expect(JSON.parse(call.init.body)).toEqual({ plan: 'pro_yearly', lang: 'en' });
+      expect(call.init.headers.Authorization).toBe('Bearer access-1');
+      expect(cta('pro_yearly').disabled, 'busy until the navigation replaces the page').toBe(true);
+    });
+
+    it('[-] a non-https paymentUrl is rejected: no navigation, an error is shown, the button is usable again', async () => {
+      await pressPlan({ subscribe: () => json(200, { paymentUrl: 'http://auth.robokassa.ru/pay', invId: 7 }) });
+      await vi.waitFor(() => expect(page.document.getElementById('order-error').textContent).not.toBe(''));
+      expect(page.navigations).toEqual([]);
+      expect(cta('pro_yearly').disabled).toBe(false);
+    });
+
+    it('[-] a response without paymentUrl is rejected the same way and never reports a purchase', async () => {
+      await pressPlan({ subscribe: () => json(200, { plan: 'pro_yearly', status: 'active' }) });
+      await vi.waitFor(() => expect(page.document.getElementById('order-error').textContent).not.toBe(''));
+      expect(page.navigations).toEqual([]);
+      expect(page.document.getElementById('order-ok').textContent).toBe('');
+    });
+
+    it('[-] 401 shows the server error, the sign-in link, and does not navigate', async () => {
+      await pressPlan({ subscribe: () => json(401, { error: 'token expired' }) });
+      await vi.waitFor(() => expect(page.document.getElementById('order-error').textContent).toBe('token expired'));
+      expect(page.document.getElementById('order-login').hidden).toBe(false);
+      expect(page.navigations).toEqual([]);
+    });
   });
 });

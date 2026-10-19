@@ -1,9 +1,7 @@
 ---
-/* /checkout/ (ЗАДАЧА-1.3) — ported from commit c497677's checkout/index.html.
-   The plans cards and the order form are wired by scripts/pages/checkout.ts;
-   this file only owns markup and copy. Payment is not connected yet
-   (PLAN v2 §8): nothing here charges anything or changes the subscribe
-   contract. */
+/* /checkout/ — the plan cards and the order form are wired by
+   scripts/pages/checkout.ts; this file only owns markup and copy. Choosing a
+   plan sends the buyer to the payment page the API returns. */
 import Base from '../../layouts/Base.astro';
 import { t } from '../../i18n';
 import { releases } from '../../lib/config';
@@ -41,7 +39,7 @@ const lang = 'en';
     </div>
   </section>
 
-  <!-- Order — paper band; where the server's answer lands -->
+  <!-- Order — paper band; session state and errors -->
   <section class="band" id="order">
     <div class="wrap wrap--narrow">
       <h2 class="h2">{t(lang, 'checkoutOrderH2')}</h2>
@@ -49,8 +47,6 @@ const lang = 'en';
         <p class="form__hint" id="order-hint">{t(lang, 'checkoutOrderChecking')}</p>
         <div class="form__error is-hidden" id="order-error" role="alert"></div>
         <div class="form__ok is-hidden" id="order-ok" role="status"></div>
-        <dl class="mono" id="order-fields" hidden></dl>
-        <p class="form__hint" id="order-note" hidden>{t(lang, 'checkoutOrderNote')}</p>
         <div class="form__actions">
           <a class="btn btn--ghost" id="order-login" href="/login/?next=/checkout/" hidden>{t(lang, 'footerSignIn')}</a>
         </div>

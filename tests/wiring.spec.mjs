@@ -15,6 +15,7 @@ const API_SCRIPTS = [
   'src/scripts/pages/register.ts',
   'src/scripts/pages/verify.ts',
   'src/scripts/pages/checkout.ts',
+  'src/scripts/pages/checkout-success.ts',
 ];
 const ALL_SCRIPTS = ['src/scripts/lang.ts', 'src/scripts/nav.ts', ...API_SCRIPTS];
 

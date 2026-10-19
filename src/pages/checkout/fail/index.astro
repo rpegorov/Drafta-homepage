@@ -1,0 +1,25 @@
+---
+/* /checkout/fail/ — Robokassa's FailURL: the payment was not completed. */
+import Base from '../../../layouts/Base.astro';
+import { t } from '../../../i18n';
+
+const lang = 'en';
+---
+<Base
+  lang={lang}
+  title={t(lang, 'checkoutFailTitle')}
+  description={t(lang, 'checkoutFailMeta')}
+  canonicalPath="/checkout/fail/"
+  noindex
+>
+  <section class="band band--soft">
+    <div class="wrap wrap--narrow">
+      <p class="eyebrow">{t(lang, 'checkoutSuccessEyebrow')}</p>
+      <h1 class="h1">{t(lang, 'checkoutFailH1')}</h1>
+      <p class="lede">{t(lang, 'checkoutFailLede')}</p>
+      <div class="form__actions">
+        <a class="btn btn--primary" href="/checkout/">{t(lang, 'checkoutFailBack')}</a>
+      </div>
+    </div>
+  </section>
+</Base>

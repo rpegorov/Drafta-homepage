@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- DOM hooks of /checkout/ at commit c497677: [data-plans], #quota-line, #order-form,
-     #order-hint, #order-error, #order-ok, #order-fields, #order-note, #order-login.
+     #order-hint, #order-error, #order-ok, #order-login.
      tests/checkout.spec.mjs checks dist/checkout/ still has them. -->
 <html lang="en" data-theme="paper">
 <head><meta charset="utf-8"><title>Checkout — Drafta</title></head>
@@ -23,8 +23,6 @@
           <p class="form__hint" id="order-hint">Checking your session…</p>
           <div class="form__error is-hidden" id="order-error" role="alert"></div>
           <div class="form__ok is-hidden" id="order-ok" role="status"></div>
-          <dl class="mono" id="order-fields" hidden></dl>
-          <p class="form__hint" id="order-note" hidden>Nothing has been charged.</p>
           <div class="form__actions">
             <a class="btn btn--ghost" id="order-login" href="/login/?next=/checkout/" hidden>Sign in</a>
           </div>
