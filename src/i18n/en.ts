@@ -94,6 +94,7 @@ export const en = {
   checkoutRetry: 'Nothing was changed. You can try again.',
   checkoutExpired: 'This session is no longer valid. Sign in again to continue.',
   checkoutNetwork: 'Network error — the accounts API could not be reached.',
+  checkoutUnavailable: 'Payments are temporarily unavailable. Nothing was charged. Please try again later.',
   checkoutSignedInAs: 'Signed in as {value}.',
   checkoutSignedIn: 'Signed in.',
   checkoutNeedsAccount: 'Buying needs an account. Sign in to continue — new accounts start with a 30-day trial.',

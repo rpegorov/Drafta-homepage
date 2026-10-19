@@ -4,6 +4,7 @@
 import { normalizeLang } from '../../i18n';
 import { clearError, post, setBusy, showError, validateEmail } from '../forms';
 import { endpoints } from '../../lib/config';
+import { ACCESS_KEY, EMAIL_KEY, REFRESH_KEY } from '../session';
 import type { Lang } from '../../lib/types';
 
 const DEFAULT_NEXT = '/checkout/';
@@ -67,14 +68,14 @@ function saveSession(data: Record<string, unknown> | null | undefined, email: st
   const tokens = data && typeof data === 'object' ? (data as { tokens?: { accessToken?: string; refreshToken?: string } }).tokens : null;
   if (!tokens || !tokens.accessToken) return 'nosession';
   try {
-    localStorage.setItem('drafta_access', tokens.accessToken);
-    if (tokens.refreshToken) localStorage.setItem('drafta_refresh', tokens.refreshToken);
-    localStorage.setItem('drafta_email', email);
+    localStorage.setItem(ACCESS_KEY, tokens.accessToken);
+    if (tokens.refreshToken) localStorage.setItem(REFRESH_KEY, tokens.refreshToken);
+    localStorage.setItem(EMAIL_KEY, email);
   } catch {
     try {
-      localStorage.removeItem('drafta_access');
-      localStorage.removeItem('drafta_refresh');
-      localStorage.removeItem('drafta_email');
+      localStorage.removeItem(ACCESS_KEY);
+      localStorage.removeItem(REFRESH_KEY);
+      localStorage.removeItem(EMAIL_KEY);
     } catch { /* nothing to do */ }
     return 'nostorage';
   }

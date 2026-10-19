@@ -22,6 +22,8 @@ export interface PostResult {
   ok: boolean;
   status: number;
   data: Record<string, unknown> & { error?: string };
+  /** True when the body was not JSON; `data` then carries a fallback message. */
+  unparsed?: boolean;
 }
 
 /** One entry of GET /v1/billing/orders → {orders: AccountOrder[]}; amounts are roubles in kopecks. */
