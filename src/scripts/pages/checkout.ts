@@ -1,8 +1,7 @@
-/* Drafta — checkout page script (ЗАДАЧА-1.3). Ported from /checkout/ and
-   /ru/checkout/ at commit c497677: same DOM hooks, same behaviour, same
-   division of ownership — `renderPlans` owns everything inside [data-plans],
-   this script owns #order-form and everything in it. The page never holds a
-   price of its own: it prints whatever the server returns. */
+/* Drafta — checkout page script. `renderPlans` owns everything inside
+   [data-plans], this script owns #order-form and everything in it. The page
+   never holds a price of its own and never reports a purchase: choosing a plan
+   only asks the API for a payment URL and sends the buyer there. */
 
 import { renderPlans, loadPlans, formatStorage, formatNotes } from '../plans';
 import { post, showError, showOk } from '../forms';
@@ -31,8 +30,6 @@ function fill(template: string, value: string): string {
 const plansEl = document.querySelector<HTMLElement>('[data-plans]');
 const formEl = document.getElementById('order-form');
 const hintEl = document.getElementById('order-hint');
-const fieldsEl = document.getElementById('order-fields');
-const noteEl = document.getElementById('order-note');
 const loginEl = document.getElementById('order-login');
 if (loginEl) loginEl.setAttribute('href', LOGIN_URL);
 
@@ -41,7 +38,6 @@ function hide(el: HTMLElement | null): void { if (el) { el.hidden = true; el.cla
 function say(el: HTMLElement | null, text: string): void { if (el) el.textContent = text; }
 
 function setError(text: string): void { showError(formEl, text); }
-function setOk(text: string): void { showOk(formEl, text); }
 function clearMessages(): void { showError(formEl, ''); showOk(formEl, ''); }
 
 function read(key: string): string {
@@ -58,32 +54,6 @@ function busy(button: HTMLElement | null, on: boolean): void {
   button.setAttribute('aria-busy', on ? 'true' : 'false');
 }
 
-/* The server's response, printed field by field, verbatim. */
-function renderFields(data: Record<string, unknown> | null | undefined): void {
-  if (!fieldsEl) return;
-  const src = data || {};
-  const rows: [string, unknown][] = [
-    ['plan', src.plan],
-    ['status', src.status],
-    ['currentPeriodEnd', src.currentPeriodEnd],
-  ];
-  fieldsEl.textContent = '';
-  for (const [key, value] of rows) {
-    const dt = document.createElement('dt');
-    dt.textContent = key;
-    const dd = document.createElement('dd');
-    dd.textContent = value === undefined || value === null || value === '' ? '—' : String(value);
-    fieldsEl.appendChild(dt);
-    fieldsEl.appendChild(dd);
-  }
-}
-
-function resetResult(): void {
-  clearMessages();
-  hide(fieldsEl);
-  hide(noteEl);
-}
-
 function initSession(): void {
   if (token()) {
     const email = read('drafta_email');
@@ -97,8 +67,13 @@ function initSession(): void {
 
 let sending = false;
 
+function isHttpsUrl(value: unknown): value is string {
+  if (typeof value !== 'string') return false;
+  try { return new URL(value).protocol === 'https:'; } catch { return false; }
+}
+
 /* Choosing a plan needs a session; without one the buyer goes to /login/. */
-function subscribe(code: string, name: string, button: HTMLElement | null): void {
+function subscribe(code: string, button: HTMLElement | null): void {
   if (sending) return;
   const access = token();
   if (!access) { window.location.href = LOGIN_URL; return; }
@@ -107,22 +82,24 @@ function subscribe(code: string, name: string, button: HTMLElement | null): void
   if (!plan) return;
 
   sending = true;
-  resetResult();
+  clearMessages();
   say(hintEl, t(LANG, 'checkoutSending'));
   busy(button, true);
 
-  post(endpoints.subscribe, { plan }, access).then((res) => {
+  post(endpoints.subscribe, { plan, lang: LANG }, access).then((res) => {
+    const status = res ? res.status : 0;
+    const paymentUrl = res && res.ok ? res.data.paymentUrl : undefined;
+    if (res && res.ok && isHttpsUrl(paymentUrl)) {
+      /* Stay busy: the page is about to be replaced by the payment form. */
+      say(hintEl, t(LANG, 'checkoutRedirecting'));
+      window.location.href = paymentUrl;
+      return;
+    }
     sending = false;
     busy(button, false);
-    const status = res ? res.status : 0;
     if (res && res.ok) {
-      /* Never claim a completed purchase: show what the server said, nothing more. */
-      setOk(t(LANG, 'checkoutAccepted'));
-      renderFields(res.data);
-      show(fieldsEl);
-      show(noteEl);
-      say(hintEl, t(LANG, 'checkoutSelected') + ' ' + (name || plan));
-      hide(loginEl);
+      setError(t(LANG, 'checkoutBadPaymentUrl'));
+      say(hintEl, t(LANG, 'checkoutRetry'));
     } else {
       /* The server's own error text, verbatim. */
       const message = res && res.data && res.data.error
@@ -146,10 +123,9 @@ function subscribe(code: string, name: string, button: HTMLElement | null): void
 
 function onSelect(plan: Plan): void {
   const code = plan && plan.code ? plan.code : String(plan);
-  const name = plan && plan.name ? plan.name : String(code || '');
   /* The card that was pressed, so its own button shows the busy state. */
   const button = plansEl ? plansEl.querySelector<HTMLElement>('.plan__cta[data-plan="' + window.CSS.escape(code) + '"]') : null;
-  subscribe(code, name, button);
+  subscribe(code, button);
 }
 
 /* 1 — the two billing cards and the shared list, rendered by the shared layer

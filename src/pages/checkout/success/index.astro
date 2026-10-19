@@ -1,0 +1,35 @@
+---
+/* /checkout/success/ — Robokassa's SuccessURL. Arriving here proves
+   nothing about payment; scripts/pages/checkout-success.ts reads the licence
+   from the account and the markup states only what the bank received. */
+import Base from '../../../layouts/Base.astro';
+import { t } from '../../../i18n';
+
+const lang = 'en';
+---
+<Base
+  lang={lang}
+  title={t(lang, 'checkoutSuccessTitle')}
+  description={t(lang, 'checkoutSuccessMeta')}
+  canonicalPath="/checkout/success/"
+  noindex
+>
+  <section class="band band--soft">
+    <div class="wrap wrap--narrow">
+      <p class="eyebrow">{t(lang, 'checkoutSuccessEyebrow')}</p>
+      <h1 class="h1">{t(lang, 'checkoutSuccessH1')}</h1>
+      <p class="lede">{t(lang, 'checkoutSuccessLede')}</p>
+
+      <div class="form" id="licence-state" role="status">
+        <p class="form__hint" id="licence-message">{t(lang, 'checkoutSuccessChecking')}</p>
+        <div class="form__actions">
+          <a class="btn btn--primary" id="licence-login" href="/login/?next=/checkout/success/" hidden>{t(lang, 'footerSignIn')}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    import '../../../scripts/pages/checkout-success.ts';
+  </script>
+</Base>

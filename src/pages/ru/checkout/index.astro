@@ -1,7 +1,5 @@
 ---
-/* /ru/checkout/ (ЗАДАЧА-1.3) — Russian twin of ../checkout/index.astro,
-   ported from commit c497677's ru/checkout/index.html. See that file for the
-   shared notes on ownership and the payment contract. */
+/* /ru/checkout/ — Russian twin of ../checkout/index.astro. */
 import Base from '../../../layouts/Base.astro';
 import { t } from '../../../i18n';
 import { releases } from '../../../lib/config';
@@ -39,7 +37,7 @@ const lang = 'ru';
     </div>
   </section>
 
-  <!-- Заказ — полоса-бумага; здесь появляется ответ сервера -->
+  <!-- Заказ — полоса-бумага; состояние сессии и ошибки -->
   <section class="band" id="order">
     <div class="wrap wrap--narrow">
       <h2 class="h2">{t(lang, 'checkoutOrderH2')}</h2>
@@ -47,8 +45,6 @@ const lang = 'ru';
         <p class="form__hint" id="order-hint">{t(lang, 'checkoutOrderChecking')}</p>
         <div class="form__error is-hidden" id="order-error" role="alert"></div>
         <div class="form__ok is-hidden" id="order-ok" role="status"></div>
-        <dl class="mono" id="order-fields" hidden></dl>
-        <p class="form__hint" id="order-note" hidden>{t(lang, 'checkoutOrderNote')}</p>
         <div class="form__actions">
           <a class="btn btn--ghost" id="order-login" href="/ru/login/?next=/ru/checkout/" hidden>{t(lang, 'footerSignIn')}</a>
         </div>
