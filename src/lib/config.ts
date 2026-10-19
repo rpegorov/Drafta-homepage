@@ -15,6 +15,8 @@ export const endpoints = {
   me: '/v1/account/me',
   license: '/v1/license/status',
   subscribe: '/v1/billing/subscribe',
+  orders: '/v1/billing/orders',
+  logout: '/v1/auth/logout',
 } as const;
 
 export const releases = 'https://github.com/rpegorov/drafta-releases/releases/latest';
@@ -41,7 +43,6 @@ export const rubPrices: Readonly<Record<string, { total: number; perMonth: numbe
 
 /** Capabilities the site shows but does not deliver yet; wave 1 closes with only OWNER fields here. */
 export const unwiredCapabilities: string[] = [
-  'OWNER: checkout redirects to Robokassa via the API\'s POST /v1/billing/subscribe {paymentUrl}; the API side (signing, ResultURL, licence grant, RUB amounts) is not built yet',
   'OWNER: support email support@drafta.org on the legal pages receives nothing until mail is set up on the domain',
   'OWNER: jurisdiction, the offer text and the refund rule are drafts pending a lawyer and the seller',
 ];

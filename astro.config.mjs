@@ -25,7 +25,7 @@ function remarkFlagMermaid() {
 // Pages that stay out of the sitemap: auth/checkout flows, the bilingual
 // 404, and the generated OG images, in either language twin. Keep in sync
 // with the noindex pages themselves.
-const SITEMAP_EXCLUDED = /^\/(ru\/)?(login|register|verify|checkout|404)(\/|$)/;
+const SITEMAP_EXCLUDED = /^\/(ru\/)?(login|register|verify|checkout|account|404)(\/|$)/;
 const SITEMAP_EXCLUDED_ASSETS = /^\/og\//;
 
 const LEGAL_DIR = new URL('./src/content/legal/', import.meta.url);

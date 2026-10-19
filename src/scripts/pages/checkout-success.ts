@@ -3,6 +3,7 @@
    licence state comes only from the license status endpoint. */
 import { api, endpoints } from '../../lib/config';
 import { normalizeLang, t } from '../../i18n';
+import { accessToken } from '../session';
 
 const LANG = normalizeLang(document.documentElement.lang);
 const ACTIVE_STATUS = 'active';
@@ -12,10 +13,6 @@ const messageEl = document.getElementById('licence-message');
 const loginEl = document.getElementById('licence-login');
 
 function say(text: string): void { if (messageEl) messageEl.textContent = text; }
-
-function token(): string {
-  try { return localStorage.getItem('drafta_access') || ''; } catch { return ''; }
-}
 
 function formatDate(value: unknown): string {
   if (typeof value !== 'string' || !value) return '';
@@ -41,7 +38,7 @@ async function fetchLicense(access: string): Promise<Record<string, unknown> | n
 }
 
 async function showLicence(): Promise<void> {
-  const access = token();
+  const access = accessToken();
   if (!access) {
     say(t(LANG, 'checkoutSuccessNeedsSignIn'));
     if (loginEl) loginEl.hidden = false;

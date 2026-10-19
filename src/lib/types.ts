@@ -23,3 +23,30 @@ export interface PostResult {
   status: number;
   data: Record<string, unknown> & { error?: string };
 }
+
+/** One entry of GET /v1/billing/orders → {orders: AccountOrder[]}; amounts are roubles in kopecks. */
+export interface AccountOrder {
+  invId: number;
+  createdAt: string;
+  plan: string;
+  amountKopecks: number;
+  status: string;
+}
+
+/** What the account page shows for the licence; `until` is an already formatted date. */
+export type LicenceView =
+  | { kind: 'trial'; daysLeft: number }
+  | { kind: 'active'; until: string }
+  | { kind: 'lifetime' }
+  | { kind: 'expired' }
+  | { kind: 'unknown' };
+
+/** One formatted line of the order history. */
+export interface OrderRow {
+  invId: number;
+  date: string;
+  plan: string;
+  amount: string;
+  status: 'paid' | 'pending' | 'unpaid' | 'other';
+  statusLabel: string;
+}
