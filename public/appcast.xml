@@ -5,6 +5,15 @@
     <description>Обновления Drafta</description>
     <language>ru</language>
     <item>
+      <title>1.5.1</title>
+      <pubDate>Sun, 25 Oct 2026 17:31:28 +0300</pubDate>
+      <sparkle:version>1.5.1</sparkle:version>
+      <sparkle:shortVersionString>1.5.1</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>15.0.0</sparkle:minimumSystemVersion>
+      <description>&lt;ul&gt;&lt;li&gt;The library keeps itself fresh. Drafta holds a request on the server&amp;#x27;s change feed, so a note edited on another Mac, through the MCP server or on Windows shows up in seconds; switching back to Drafta syncs too. The Sync button is still there, but you no longer need it to stay current.&lt;/li&gt;&lt;li&gt;Mermaid diagrams are drawn by Pele, a single renderer for every diagram type, instead of two libraries. Colours, including chart series, follow the active theme and update when the theme changes. The app bundle is about 4.4 MB smaller, and a diagram appears several times faster on first use.&lt;/li&gt;&lt;li&gt;Diagram text that Mermaid cannot parse is reported in the diagram&amp;#x27;s error block for every diagram type.&lt;/li&gt;&lt;li&gt;Read-only mode (expired licence): Export Selection and Export as Bundle are hidden, and Empty Trash, expired-trash cleanup, revision snapshots and the &amp;quot;Tags from text&amp;quot; setting no longer write. Text kept as a revision when a changed file is reloaded is still saved.&lt;/li&gt;&lt;li&gt;Quick Open (⌘P): Backspace reaches the search field, so a lone mode prefix can be removed with it.&lt;/li&gt;&lt;li&gt;Vim mode on the Russian layout: Ctrl-w h / Ctrl-w l and other Ctrl combinations are read by the physical key, whatever character the layout reports for it.&lt;/li&gt;&lt;li&gt;A new note no longer shows a hollow block cursor in the body while the title has focus.&lt;/li&gt;&lt;li&gt;A hashtag with a letter outside the Latin and Russian alphabets, such as a Ukrainian one, is no longer highlighted, because it never became a tag.&lt;/li&gt;&lt;li&gt;Exported DOCX files keep the rounded corners of diagram nodes.&lt;/li&gt;&lt;li&gt;Bookmarks are written in a stable key order, so an unchanged note is no longer rewritten and synced again.&lt;/li&gt;&lt;li&gt;&lt;code&gt;dompurify&lt;/code&gt; is updated to 3.4.17, which fixes two sanitizer advisories.&lt;/li&gt;&lt;/ul&gt;</description>
+      <enclosure url="https://github.com/rpegorov/Drafta-releases/releases/download/v1.5.1/Drafta-1.5.1.dmg" type="application/octet-stream" length="23550785" sparkle:edSignature="534S9g66R85Vw8SRGEIr7pz3qh07DRQDZvMFUHkLKry5XTaC+pgmo2NTm/9yuIqNiR49dV1iQt1IqRnzFJwfDQ==" />
+    </item>
+    <item>
       <title>1.4.0</title>
       <pubDate>Wed, 14 Oct 2026 14:55:57 +0300</pubDate>
       <sparkle:version>1.4.0</sparkle:version>
