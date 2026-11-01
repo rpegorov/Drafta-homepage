@@ -71,6 +71,7 @@ export const en = {
   checkoutPricingEyebrow: 'Pricing',
   checkoutPricingH2: 'Everything in one plan.',
   checkoutPricingLede: 'Prices come live from the accounts API when this page opens — no figure here is hardcoded.',
+  checkoutSubscriptionNote: 'A purchase renews automatically until you cancel it in your Robokassa account. Payments bind to your Drafta account by email — pay with the same address you registered with.',
   checkoutQuotaNote: 'Cloud storage is encrypted end to end, so the service holds ciphertext it cannot read. If you would rather not use the plan’s quota at all, connect your own CouchDB — locally or on a server you control.',
   checkoutOrderH2: 'Your order',
   checkoutOrderChecking: 'Checking your session…',
