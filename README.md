@@ -34,3 +34,17 @@ tests/              Vitest tests
 ## License
 
 Apache License 2.0 — see [LICENSE](LICENSE).
+
+## Test scope
+
+- Task checks: `TEST_BASE=<base> python3 scripts/test-policy.py <component>`.
+- Preview selection: add `--plan`; see `.test-policy.json` for component names.
+- Release verification: `TEST_MODE=release python3 scripts/test-policy.py all`.
+- Immediate manual testing: `TEST_MODE=manual` plus the usual build/package
+  command. Tests are not run; the artifact is not a verified release.
+
+CI defaults to targeted tests; select `test_mode=release` or `manual` when
+dispatching a workflow that offers these inputs. A source/dependency change can
+affect several components. Full browser/app-hosted suites require release mode;
+run explicit scenario tests separately for task acceptance. Existing deployment
+permissions and data guards still apply.

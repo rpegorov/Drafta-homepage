@@ -8,11 +8,13 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && vitest run",
+    "build": "astro build",
     "astro:build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "test": "vitest run"
+    "test": "vitest run",
+    "build:release": "npm run build && TEST_MODE=release python3 scripts/test-policy.py unit",
+    "test:targeted": "python3 scripts/test-policy.py unit"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "7.3.1",

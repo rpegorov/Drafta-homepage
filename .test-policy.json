@@ -1,0 +1,42 @@
+{
+  "unit": {
+    "paths": [
+      "src/*",
+      "worker/*",
+      "tests/*",
+      "package*.json",
+      "vitest*.ts",
+      "scripts/*",
+      "contract/*"
+    ],
+    "command": [
+      "npm",
+      "exec",
+      "--no",
+      "--",
+      "vitest",
+      "run"
+    ],
+    "cwd": ".",
+    "kind": "vitest"
+  },
+  "policy": {
+    "paths": [
+      ".test-policy.json",
+      "scripts/test-policy.py",
+      "scripts/test_test_policy.py"
+    ],
+    "command": [
+      "python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "scripts",
+      "-p",
+      "test_test_policy.py"
+    ],
+    "cwd": ".",
+    "kind": "component"
+  }
+}
