@@ -9,3 +9,12 @@
 - Тема: `<html data-theme="paper">` / `"sumi"`.
 - Stop-хук гоняет `brand-lint.sh`; вручную: `~/.claude/skills/craftzman-brand/scripts/brand-lint.sh .`
 <!-- craftzman-brand:end -->
+
+## Test execution modes
+
+Run task-related tests with `TEST_BASE=<base> python3 scripts/test-policy.py <component>`;
+use `--plan` to inspect commands. Components and impact paths are in `.test-policy.json`.
+Use `TEST_MODE=release` for complete release verification. For immediate manual
+testing, use `TEST_MODE=manual` and the existing build/package command; report
+that tests were not run. Release optimization is not release verification.
+Build, lint, data guards and migration checks remain required.
